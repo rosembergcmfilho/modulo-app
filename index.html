@@ -1273,6 +1273,10 @@
       </div>
     </div>
     <div class="form-group">
+      <label class="form-label">Empresa de recarga</label>
+      <input class="form-input" id="ext-empresa" placeholder="Ex: Prevenção Extintores, FirePro..." />
+    </div>
+    <div class="form-group">
       <label class="form-label">Observações</label>
       <textarea class="form-input" id="ext-obs" rows="2" placeholder="Condições do extintor, lacre, validade do pó, etc." style="resize:vertical;"></textarea>
     </div>
@@ -1791,6 +1795,7 @@
     document.getElementById('ext-capacidade').value = '4 kg';
     document.getElementById('ext-ultima-recarga').value = '';
     document.getElementById('ext-proxima-recarga').value = '';
+    document.getElementById('ext-empresa').value = '';
     document.getElementById('ext-obs').value = '';
     document.getElementById('ext-fotos-preview').innerHTML = '';
     document.getElementById('ext-foto-input').value = '';
@@ -1816,6 +1821,7 @@
     document.getElementById('ext-capacidade').value = e.capacidade;
     document.getElementById('ext-ultima-recarga').value = e.ultimaRecarga;
     document.getElementById('ext-proxima-recarga').value = e.proximaRecarga;
+    document.getElementById('ext-empresa').value = e.empresa || '';
     document.getElementById('ext-obs').value = e.obs || '';
     fotosTemp = [...(e.fotos || [])];
     renderPreviewFotos();
@@ -1869,6 +1875,7 @@
       capacidade: document.getElementById('ext-capacidade').value,
       ultimaRecarga: document.getElementById('ext-ultima-recarga').value,
       proximaRecarga,
+      empresa: document.getElementById('ext-empresa').value.trim(),
       obs: document.getElementById('ext-obs').value.trim(),
       fotos: [...fotosTemp],
       dataCadastro: new Date().toISOString()
@@ -1908,20 +1915,37 @@
     const W = 210, marg = 15;
     let y = 20;
 
-    // Cabeçalho
-    doc.setFillColor(26, 38, 64); // azul marinho Módulo
-    doc.rect(0, 0, W, 35, 'F');
+    // Captura logo se disponível
+    let logoData = null;
+    try {
+      const imgEl = document.getElementById('modulo-logo');
+      if (imgEl && imgEl.src && imgEl.src.startsWith('data:image')) {
+        logoData = imgEl.src;
+      }
+    } catch(e) {}
+
+    // ── Cabeçalho ─────────────────────────────────────────────
+    doc.setFillColor(26, 38, 64);
+    doc.rect(0, 0, W, 38, 'F');
+
+    // Logo (se disponível) à direita
+    if (logoData) {
+      try { doc.addImage(logoData, 'PNG', W - 52, 4, 38, 16); } catch {
+        try { doc.addImage(logoData, 'JPEG', W - 52, 4, 38, 16); } catch {}
+      }
+    }
+
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
+    doc.setFontSize(17);
     doc.setFont('helvetica', 'bold');
-    doc.text('MÓDULO ADMINISTRADORA', marg, 14);
-    doc.setFontSize(11);
+    doc.text('MÓDULO ADMINISTRADORA', marg, 13);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Relatório de Vistoria de Extintores', marg, 22);
-    doc.setFontSize(9);
-    doc.text(`Condomínio: ${condoAtual}`, marg, 30);
+    doc.text('Relatório de Vistoria de Extintores', marg, 21);
+    doc.setFontSize(8);
+    doc.text(`Condomínio: ${condoAtual}`, marg, 29);
     const dataRelatorio = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
-    doc.text(`Data: ${dataRelatorio}`, W - marg - 40, 30);
+    doc.text(`Data: ${dataRelatorio}`, marg, 35);
 
     y = 50;
     doc.setTextColor(30, 30, 30);
@@ -1992,13 +2016,14 @@
         y = 20;
       }
       const st = calcularStatus(e.proximaRecarga);
-      const rowH = 8;
+      const rowH = e.obs ? 13 : 8;
       if (i % 2 === 0) {
         doc.setFillColor(245, 245, 250);
         doc.rect(marg, y, W - marg*2, rowH, 'F');
       }
       doc.setTextColor(30, 30, 30);
       doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
       doc.text(e.numero.substring(0,12), marg + 1, y + 5.5);
       doc.text(e.local.substring(0,22), marg + 20, y + 5.5);
       doc.text(e.tipo.substring(0,18), marg + 60, y + 5.5);
@@ -2013,16 +2038,13 @@
       doc.text(st === 'ok' ? 'OK' : st === 'alerta' ? 'ALERTA' : 'VENCIDO', marg + 155, y + 5.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(30, 30, 30);
-      y += rowH;
-
-      // Observação
       if (e.obs) {
         doc.setFontSize(6.5);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Obs: ${e.obs.substring(0,80)}`, marg + 1, y + 3);
-        y += 5;
+        doc.text(`Obs: ${e.obs.substring(0,80)}`, marg + 1, y + 10);
         doc.setTextColor(30, 30, 30);
       }
+      y += rowH;
     });
 
     // Fotos
@@ -2038,11 +2060,21 @@
 
       for (const e of comFotos) {
         if (y > 240) { doc.addPage(); y = 20; }
+
+        // Título do extintor — sempre helvetica bold, sem espaçamento excessivo
         doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(26, 38, 64);
-        doc.text(`${e.numero} — ${e.local} (${e.tipo})`, marg, y);
-        y += 5;
+        const labelTitulo = `${e.numero} — ${e.local} (${e.tipo} • ${e.capacidade})`;
+        doc.text(labelTitulo, marg, y);
+        if (e.empresa) {
+          doc.setFontSize(7.5);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(96, 130, 200);
+          doc.text(`Empresa: ${e.empresa}`, marg, y + 5);
+          y += 5;
+        }
+        y += 6;
 
         let x = marg;
         for (const foto of e.fotos) {
@@ -2059,7 +2091,7 @@
       }
     }
 
-    // Rodapé
+    // Rodapé em todas as páginas
     const pageCount = doc.internal.getNumberOfPages();
     for (let p = 1; p <= pageCount; p++) {
       doc.setPage(p);
