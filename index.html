@@ -635,6 +635,147 @@
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* RELATÓRIO MENSAL */
+  .foto-bloco {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .foto-bloco-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 6px 10px;
+    text-align: center;
+  }
+  .foto-drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 8px;
+    cursor: pointer;
+    border-bottom: 1px dashed var(--border);
+    transition: background .15s;
+    gap: 4px;
+  }
+  .foto-drop:hover { background: var(--border); }
+  .foto-mini-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 6px;
+    min-height: 10px;
+  }
+  .foto-mini-grid img {
+    width: 52px; height: 52px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform .15s;
+  }
+  .foto-mini-grid img:hover { transform: scale(1.08); }
+
+  /* CARD SERVIÇO */
+  .servico-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .servico-card:hover { border-color: var(--accent); }
+  .servico-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 14px 16px 10px;
+    gap: 12px;
+  }
+  .servico-fotos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
+  .servico-fotos-momento {
+    padding: 10px;
+    border-right: 1px solid var(--border);
+  }
+  .servico-fotos-momento:last-child { border-right: none; }
+  .momento-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .momento-fotos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .momento-fotos img {
+    width: 64px; height: 64px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform .15s;
+  }
+  .momento-fotos img:hover { transform: scale(1.07); }
+
+  /* ATIVIDADE ITEM */
+  .atividade-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .atividade-item:last-child { border-bottom: none; }
+  .atividade-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 24px;
+    padding-top: 2px;
+  }
+  .atividade-data {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: 2px;
+    min-width: 60px;
+  }
+  .atividade-texto {
+    font-size: 13px;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.5;
+  }
+  .atividade-empresa {
+    font-size: 11px;
+    color: var(--blue);
+    margin-top: 2px;
+  }
+  .atividade-os {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .atividade-acoes {
+    display: flex;
+    gap: 4px;
+    padding-top: 1px;
+  }
 </style>
 </head>
 <body>
@@ -672,15 +813,16 @@
   </div>
 
   <div class="nav-section" style="margin-top: 8px;">
+    <div class="nav-label">Vistorias</div>
+    <div class="nav-item" id="nav-extintores" onclick="setNav(this); showSection('extintores')">
+      <span class="icon">🧯</span> Extintores
+    </div>
+  </div>
+
+  <div class="nav-section" style="margin-top: 8px;">
     <div class="nav-label">Relatórios</div>
-    <div class="nav-item" onclick="setNav(this)">
-      <span class="icon">📄</span> Relatórios
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <span class="icon">🏢</span> Condomínios
-    </div>
-    <div class="nav-item" onclick="setNav(this)">
-      <span class="icon">👤</span> Equipe
+    <div class="nav-item" id="nav-relatorio" onclick="setNav(this); showSection('relatorio')">
+      <span class="icon">📋</span> Rel. Mensal
     </div>
   </div>
 
@@ -697,6 +839,9 @@
 
 <!-- MAIN -->
 <main class="main">
+
+<!-- SECTION: PLANOS (default) -->
+<div id="section-planos">
   <div class="topbar">
     <div>
       <div class="topbar-title">Planos de Manutenção</div>
@@ -750,7 +895,7 @@
             <div class="plano-icon" style="background: rgba(74,222,128,0.1)">🧹</div>
             <div class="plano-info">
               <div class="plano-name">Limpeza de Caixa d'Água</div>
-              <div class="plano-condo">Ed. Atlântico • Boa Viagem</div>
+              <div class="plano-condo">Ed. Guilherme Moreira</div>
             </div>
             <span class="plano-freq freq-semanal">Semanal</span>
             <div class="plano-status">
@@ -763,7 +908,7 @@
             <div class="plano-icon" style="background: rgba(96,165,250,0.1)">🔧</div>
             <div class="plano-info">
               <div class="plano-name">Revisão de Elevadores</div>
-              <div class="plano-condo">Res. Vila Nova • Olinda</div>
+              <div class="plano-condo">Res. Aroeiras</div>
             </div>
             <span class="plano-freq freq-mensal">Mensal</span>
             <div class="plano-status">
@@ -776,7 +921,7 @@
             <div class="plano-icon" style="background: rgba(248,113,113,0.1)">⚡</div>
             <div class="plano-info">
               <div class="plano-name">Manutenção Elétrica Geral</div>
-              <div class="plano-condo">Cond. Sol Nascente • Recife</div>
+              <div class="plano-condo">Ed. Santa Clara</div>
             </div>
             <span class="plano-freq freq-trimestral">Trimestral</span>
             <div class="plano-status">
@@ -789,7 +934,7 @@
             <div class="plano-icon" style="background: rgba(74,222,128,0.1)">🏊</div>
             <div class="plano-info">
               <div class="plano-name">Tratamento de Piscina</div>
-              <div class="plano-condo">Ed. Beira Mar • Boa Viagem</div>
+              <div class="plano-condo">Ed. Long Beach IV</div>
             </div>
             <span class="plano-freq freq-semanal">Semanal</span>
             <div class="plano-status">
@@ -815,7 +960,7 @@
             <div class="plano-icon" style="background: rgba(96,165,250,0.1)">🚿</div>
             <div class="plano-info">
               <div class="plano-name">Desentupimento Preventivo</div>
-              <div class="plano-condo">Ed. Primavera • Recife</div>
+              <div class="plano-condo">Ed. Figueira da Foz</div>
             </div>
             <span class="plano-freq freq-trimestral">Trimestral</span>
             <div class="plano-status">
@@ -851,11 +996,42 @@
             <div class="form-group">
               <label class="form-label">Condomínio</label>
               <select class="form-select">
-                <option>Ed. Atlântico — Boa Viagem</option>
-                <option>Res. Vila Nova — Olinda</option>
-                <option>Cond. Sol Nascente — Recife</option>
-                <option>Ed. Beira Mar — Boa Viagem</option>
-                <option>Ed. Primavera — Recife</option>
+                <option value="">— Selecione —</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
+                <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
+                <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
+                <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
+                <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
+                <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
+                <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
+                <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
+                <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
               </select>
             </div>
 
@@ -908,7 +1084,7 @@
             <div id="checkList">
               <div class="check-item" onclick="toggleCheck(this)">
                 <div class="checkbox checked">✓</div>
-                <span class="check-label checked">Limpeza área comum — Ed. Atlântico</span>
+                <span class="check-label checked">Limpeza área comum — Ed. Guilherme Moreira</span>
               </div>
               <div class="check-item" onclick="toggleCheck(this)">
                 <div class="checkbox checked">✓</div>
@@ -916,11 +1092,11 @@
               </div>
               <div class="check-item" onclick="toggleCheck(this)">
                 <div class="checkbox checked">✓</div>
-                <span class="check-label checked">Ronda segurança — Sol Nascente</span>
+                <span class="check-label checked">Ronda segurança — Ed. Santa Clara</span>
               </div>
               <div class="check-item" onclick="toggleCheck(this)">
                 <div class="checkbox"></div>
-                <span class="check-label">Inspeção portões — Ed. Beira Mar</span>
+                <span class="check-label">Inspeção portões — Ed. Long Beach IV</span>
               </div>
               <div class="check-item" onclick="toggleCheck(this)">
                 <div class="checkbox checked">✓</div>
@@ -928,7 +1104,7 @@
               </div>
               <div class="check-item" onclick="toggleCheck(this)">
                 <div class="checkbox checked">✓</div>
-                <span class="check-label checked">Teste alarme incêndio — Ed. Primavera</span>
+                <span class="check-label checked">Teste alarme incêndio — Ed. Figueira da Foz</span>
               </div>
               <div class="check-item" onclick="toggleCheck(this)">
                 <div class="checkbox"></div>
@@ -944,7 +1120,403 @@
   </div>
 </main>
 
-<!-- MODAL -->
+<!-- SECTION: EXTINTORES -->
+<div id="section-extintores" style="display:none; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="ext-condo-title">Vistoria de Extintores</div>
+      <div class="topbar-sub" id="ext-condo-sub">Selecione um condomínio para iniciar</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" id="btn-pdf" onclick="gerarPDF()" style="display:none;">📄 Gerar Relatório PDF</button>
+      <button class="btn btn-primary" onclick="openExtModal()">+ Cadastrar Extintor</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Seletor de condomínio -->
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Condomínio:</label>
+        <select id="ext-condo-select" class="form-input" style="flex:1; min-width:200px; max-width:400px;" onchange="selecionarCondo()">
+          <option value="">— Selecione —</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
+          <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
+          <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
+          <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
+          <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
+          <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+        </select>
+        <div id="ext-alertas-badge" style="display:none; background:rgba(251,191,36,0.15); border:1px solid var(--warn); border-radius:8px; padding:6px 14px; font-size:12px; color:var(--warn);">
+          ⚠ <span id="ext-alertas-count">0</span> extintor(es) vencem em 30 dias
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela de extintores -->
+    <div class="card" id="ext-tabela-card" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+        <div style="font-weight:600; font-size:15px;">Extintores cadastrados</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="pill" onclick="filtrarExt('todos')" id="filtro-todos" style="background:var(--accent-glow); color:var(--accent); border:1px solid var(--accent);">Todos</button>
+          <button class="pill" onclick="filtrarExt('ok')" id="filtro-ok">✓ OK</button>
+          <button class="pill" onclick="filtrarExt('alerta')" id="filtro-alerta">⚠ Alerta</button>
+          <button class="pill" onclick="filtrarExt('vencido')" id="filtro-vencido">✗ Vencido</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border); color:var(--muted);">
+              <th style="padding:10px 8px; text-align:left; font-weight:500;">Nº / ID</th>
+              <th style="padding:10px 8px; text-align:left; font-weight:500;">Localização</th>
+              <th style="padding:10px 8px; text-align:left; font-weight:500;">Tipo</th>
+              <th style="padding:10px 8px; text-align:left; font-weight:500;">Cap.</th>
+              <th style="padding:10px 8px; text-align:left; font-weight:500;">Última Recarga</th>
+              <th style="padding:10px 8px; text-align:left; font-weight:500;">Próxima Recarga</th>
+              <th style="padding:10px 8px; text-align:center; font-weight:500;">Status</th>
+              <th style="padding:10px 8px; text-align:center; font-weight:500;">Fotos</th>
+              <th style="padding:10px 8px; text-align:center; font-weight:500;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="ext-tbody"></tbody>
+        </table>
+        <div id="ext-empty" style="text-align:center; padding:40px; color:var(--muted);">
+          Nenhum extintor cadastrado ainda. Clique em "+ Cadastrar Extintor" para começar.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: Cadastro de Extintor -->
+<div class="modal-overlay" id="extModalOverlay" onclick="closeExtModalOutside(event)">
+  <div class="modal" style="max-width:560px; width:100%;">
+    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div>
+        <div class="modal-title" id="ext-modal-title">Cadastrar Extintor</div>
+        <div class="modal-sub" id="ext-modal-sub">Preencha os dados da vistoria</div>
+      </div>
+      <button class="modal-close" onclick="closeExtModal()">✕</button>
+    </div>
+    <input type="hidden" id="ext-edit-index" value="">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Número / ID *</label>
+        <input class="form-input" id="ext-numero" placeholder="Ex: EXT-01" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Localização *</label>
+        <input class="form-input" id="ext-local" placeholder="Ex: Hall de entrada" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo *</label>
+        <select class="form-input" id="ext-tipo">
+          <option value="">— Selecione —</option>
+          <option>ABC (Pó Químico)</option>
+          <option>BC (Pó Químico)</option>
+          <option>CO₂ (Gás Carbônico)</option>
+          <option>Água Pressurizada</option>
+          <option>Espuma Mecânica</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Capacidade</label>
+        <select class="form-input" id="ext-capacidade">
+          <option>4 kg</option><option>6 kg</option><option>8 kg</option>
+          <option>10 kg</option><option>4 L</option><option>10 L</option>
+          <option>2 kg (CO₂)</option><option>4 kg (CO₂)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data da última recarga *</label>
+        <input class="form-input" type="date" id="ext-ultima-recarga" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data da próxima recarga *</label>
+        <input class="form-input" type="date" id="ext-proxima-recarga" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observações</label>
+      <textarea class="form-input" id="ext-obs" rows="2" placeholder="Condições do extintor, lacre, validade do pó, etc." style="resize:vertical;"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fotos do extintor</label>
+      <div onclick="document.getElementById('ext-foto-input').click()"
+        style="border:2px dashed var(--border); border-radius:10px; padding:20px; text-align:center; cursor:pointer; transition:border-color .2s;"
+        onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:26px; margin-bottom:4px;">📷</div>
+        <div style="font-size:13px; color:var(--muted2);">Clique para tirar foto ou selecionar da galeria</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">Múltiplas fotos permitidas • JPG, PNG</div>
+      </div>
+      <input type="file" id="ext-foto-input" accept="image/*" multiple style="display:none;" onchange="previewFotos(event)" />
+      <div id="ext-fotos-preview" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeExtModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarExtintor()">💾 Salvar Extintor</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Visualizar Fotos -->
+<div class="modal-overlay" id="fotosModalOverlay" onclick="closeFotosModal()" style="z-index:1001;">
+  <div class="modal" style="max-width:700px; width:100%;" onclick="event.stopPropagation()">
+    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div class="modal-title" id="fotos-modal-title">Fotos do Extintor</div>
+      <button class="modal-close" onclick="closeFotosModal()">✕</button>
+    </div>
+    <div id="fotos-modal-grid" style="display:flex; flex-wrap:wrap; gap:10px; max-height:60vh; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- SECTION: RELATÓRIO MENSAL -->
+<div id="section-relatorio" style="display:none; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="rel-titulo">Relatório Mensal</div>
+      <div class="topbar-sub" id="rel-subtitulo">Selecione o condomínio e mês</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" id="btn-rel-pdf" onclick="gerarRelPDF()" style="display:none;">📄 Gerar PDF</button>
+      <button class="btn btn-primary" onclick="abrirModalServico()">+ Adicionar Serviço</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Filtros -->
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:200px; max-width:400px;">
+          <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Condomínio:</label>
+          <select id="rel-condo-select" class="form-input" style="flex:1;" onchange="relAtualizarTitulo()">
+            <option value="">— Selecione —</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
+            <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
+            <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
+            <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
+            <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
+            <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
+            <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
+            <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
+            <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+          </select>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Competência:</label>
+          <input type="month" id="rel-mes-select" class="form-input" style="width:160px;" onchange="relAtualizarTitulo()" />
+        </div>
+        <button class="btn btn-ghost" onclick="relCarregar()" style="white-space:nowrap;">▶ Carregar</button>
+      </div>
+    </div>
+
+    <!-- Conteúdo (oculto até carregar) -->
+    <div id="rel-conteudo" style="display:none;">
+
+      <!-- SEÇÃO 1: CONTROLE DE ATIVIDADES -->
+      <div class="card" style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="font-weight:700; font-size:15px; color:var(--text);">📋 Controle de Atividades do Mês</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Registro cronológico de serviços e visitas técnicas</div>
+          </div>
+          <button class="btn btn-primary" style="font-size:12px; padding:6px 14px;" onclick="abrirModalAtividade()">+ Atividade</button>
+        </div>
+        <div id="rel-atividades-lista">
+          <div id="rel-atividades-empty" style="text-align:center; padding:32px; color:var(--muted); font-size:13px;">
+            Nenhuma atividade registrada. Clique em "+ Atividade" para começar.
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 2: SERVIÇOS COM FOTOS -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="font-weight:700; font-size:15px; color:var(--text);">🔧 Serviços Realizados</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Com registro fotográfico antes / durante / depois</div>
+          </div>
+          <button class="btn btn-primary" style="font-size:12px; padding:6px 14px;" onclick="abrirModalServico()">+ Serviço</button>
+        </div>
+        <div id="rel-servicos-lista">
+          <div id="rel-servicos-empty" style="text-align:center; padding:32px; color:var(--muted); font-size:13px;">
+            Nenhum serviço cadastrado ainda.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /rel-conteudo -->
+  </div>
+</div><!-- /section-relatorio -->
+
+<!-- MODAL: Nova Atividade -->
+<div class="modal-overlay" id="atividadeModalOverlay" onclick="if(event.target===this) fecharModalAtividade()">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div>
+        <div class="modal-title" id="ativ-modal-titulo">Nova Atividade</div>
+        <div class="modal-sub">Registro de serviço ou visita técnica</div>
+      </div>
+      <button class="modal-close" onclick="fecharModalAtividade()">✕</button>
+    </div>
+    <input type="hidden" id="ativ-edit-idx" value="">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data *</label>
+        <input class="form-input" type="date" id="ativ-data" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Empresa / Responsável</label>
+        <input class="form-input" id="ativ-empresa" placeholder="Ex: COOP Elevadores, Dgtel..." />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição *</label>
+      <textarea class="form-input" id="ativ-descricao" rows="3" placeholder="Ex: Coop elevadores - Técnico Wilson, visita técnica para manutenção preventiva do elevador social A." style="resize:vertical;"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nº da OS (opcional)</label>
+      <input class="form-input" id="ativ-os" placeholder="Ex: OS nº 67275183" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModalAtividade()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAtividade()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Novo Serviço com Fotos -->
+<div class="modal-overlay" id="servicoModalOverlay" onclick="if(event.target===this) fecharModalServico()">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div>
+        <div class="modal-title" id="serv-modal-titulo">Novo Serviço</div>
+        <div class="modal-sub">Registro com fotos antes / durante / depois</div>
+      </div>
+      <button class="modal-close" onclick="fecharModalServico()">✕</button>
+    </div>
+    <input type="hidden" id="serv-edit-idx" value="">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Descrição do serviço *</label>
+        <input class="form-input" id="serv-descricao" placeholder="Ex: Remoção e substituição de luminárias 2º andar" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data de início</label>
+        <input class="form-input" type="date" id="serv-data" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Empresa / Responsável</label>
+      <input class="form-input" id="serv-empresa" placeholder="Ex: Iluminação Express, Funcionário João..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observações</label>
+      <textarea class="form-input" id="serv-obs" rows="2" placeholder="Detalhes adicionais, materiais usados, etc." style="resize:vertical;"></textarea>
+    </div>
+
+    <!-- Upload fotos por momento -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:4px;">
+      <div id="foto-bloco-antes" class="foto-bloco">
+        <div class="foto-bloco-label" style="background:rgba(96,165,250,.15); color:var(--blue);">📷 ANTES</div>
+        <div class="foto-drop" onclick="document.getElementById('inp-antes').click()">
+          <div style="font-size:22px;">➕</div>
+          <div style="font-size:11px; color:var(--muted);">Adicionar fotos</div>
+        </div>
+        <input type="file" id="inp-antes" accept="image/*" multiple style="display:none;" onchange="addFotosMomento('antes',event)">
+        <div id="prev-antes" class="foto-mini-grid"></div>
+      </div>
+      <div id="foto-bloco-durante" class="foto-bloco">
+        <div class="foto-bloco-label" style="background:rgba(251,191,36,.15); color:var(--warn);">📷 DURANTE</div>
+        <div class="foto-drop" onclick="document.getElementById('inp-durante').click()">
+          <div style="font-size:22px;">➕</div>
+          <div style="font-size:11px; color:var(--muted);">Adicionar fotos</div>
+        </div>
+        <input type="file" id="inp-durante" accept="image/*" multiple style="display:none;" onchange="addFotosMomento('durante',event)">
+        <div id="prev-durante" class="foto-mini-grid"></div>
+      </div>
+      <div id="foto-bloco-depois" class="foto-bloco">
+        <div class="foto-bloco-label" style="background:rgba(74,222,128,.15); color:var(--accent);">📷 DEPOIS</div>
+        <div class="foto-drop" onclick="document.getElementById('inp-depois').click()">
+          <div style="font-size:22px;">➕</div>
+          <div style="font-size:11px; color:var(--muted);">Adicionar fotos</div>
+        </div>
+        <input type="file" id="inp-depois" accept="image/*" multiple style="display:none;" onchange="addFotosMomento('depois',event)">
+        <div id="prev-depois" class="foto-mini-grid"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn btn-ghost" onclick="fecharModalServico()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarServico()">💾 Salvar Serviço</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PLANOS -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
   <div class="modal">
     <div class="modal-title">Novo Plano de Manutenção</div>
@@ -954,10 +1526,44 @@
       <label class="form-label">Condomínio</label>
       <select class="form-select">
         <option value="">Selecione o condomínio...</option>
-        <option>Ed. Atlântico — Boa Viagem</option>
-        <option>Res. Vila Nova — Olinda</option>
-        <option>Cond. Sol Nascente — Recife</option>
-        <option>Ed. Beira Mar — Boa Viagem</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
+          <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
+          <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
+          <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
+          <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
+          <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+      </select>
+
+
       </select>
     </div>
 
@@ -1013,7 +1619,420 @@
   Plano criado com sucesso!
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
+  // ── NAVEGAÇÃO DE SEÇÕES ──────────────────────────────────────
+  let currentSection = 'planos';
+
+  function showSection(section) {
+    currentSection = section;
+    document.getElementById('section-planos').style.display = section === 'planos' ? '' : 'none';
+    const extEl = document.getElementById('section-extintores');
+    extEl.style.display = section === 'extintores' ? 'flex' : 'none';
+    const relEl = document.getElementById('section-relatorio');
+    relEl.style.display = section === 'relatorio' ? 'flex' : 'none';
+  }
+
+  // ── DADOS DE EXTINTORES (em memória) ────────────────────────
+  let extintores = {}; // { "Nome do Condo": [ {dados...}, ... ] }
+  let condoAtual = '';
+  let fotosTemp = []; // base64 das fotos no modal aberto
+  let filtroAtivo = 'todos';
+
+  function selecionarCondo() {
+    condoAtual = document.getElementById('ext-condo-select').value;
+    if (!condoAtual) return;
+    if (!extintores[condoAtual]) extintores[condoAtual] = [];
+    document.getElementById('ext-condo-title').textContent = condoAtual;
+    document.getElementById('ext-condo-sub').textContent = 'Vistoria de Extintores';
+    document.getElementById('ext-tabela-card').style.display = '';
+    document.getElementById('btn-pdf').style.display = '';
+    renderTabela();
+  }
+
+  function calcularStatus(proximaRecarga) {
+    if (!proximaRecarga) return 'sem-data';
+    const hoje = new Date();
+    const proxima = new Date(proximaRecarga);
+    const diffDias = Math.ceil((proxima - hoje) / (1000 * 60 * 60 * 24));
+    if (diffDias < 0) return 'vencido';
+    if (diffDias <= 30) return 'alerta';
+    return 'ok';
+  }
+
+  function statusBadge(status) {
+    if (status === 'ok') return '<span style="background:rgba(74,222,128,.15); color:#4ade80; border:1px solid #4ade80; border-radius:6px; padding:3px 10px; font-size:11px; white-space:nowrap;">✓ OK</span>';
+    if (status === 'alerta') return '<span style="background:rgba(251,191,36,.15); color:#fbbf24; border:1px solid #fbbf24; border-radius:6px; padding:3px 10px; font-size:11px; white-space:nowrap;">⚠ Alerta</span>';
+    if (status === 'vencido') return '<span style="background:rgba(248,113,113,.15); color:#f87171; border:1px solid #f87171; border-radius:6px; padding:3px 10px; font-size:11px; white-space:nowrap;">✗ Vencido</span>';
+    return '<span style="color:var(--muted); font-size:11px;">—</span>';
+  }
+
+  function formatarData(d) {
+    if (!d) return '—';
+    const [y, m, dia] = d.split('-');
+    return `${dia}/${m}/${y}`;
+  }
+
+  function renderTabela() {
+    const lista = extintores[condoAtual] || [];
+    const tbody = document.getElementById('ext-tbody');
+    const empty = document.getElementById('ext-empty');
+
+    // filtro
+    const filtrado = lista.filter(e => {
+      if (filtroAtivo === 'todos') return true;
+      return calcularStatus(e.proximaRecarga) === filtroAtivo;
+    });
+
+    // alertas badge
+    const alertas = lista.filter(e => calcularStatus(e.proximaRecarga) === 'alerta' || calcularStatus(e.proximaRecarga) === 'vencido').length;
+    const badge = document.getElementById('ext-alertas-badge');
+    if (alertas > 0) {
+      badge.style.display = '';
+      document.getElementById('ext-alertas-count').textContent = alertas;
+    } else {
+      badge.style.display = 'none';
+    }
+
+    if (filtrado.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    tbody.innerHTML = filtrado.map((e, i) => {
+      const idxReal = lista.indexOf(e);
+      const st = calcularStatus(e.proximaRecarga);
+      const nFotos = (e.fotos || []).length;
+      return `<tr style="border-bottom:1px solid var(--border); transition:background .15s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+        <td style="padding:12px 8px; font-weight:500;">${e.numero}</td>
+        <td style="padding:12px 8px; color:var(--muted2);">${e.local}</td>
+        <td style="padding:12px 8px;">${e.tipo}</td>
+        <td style="padding:12px 8px; color:var(--muted2);">${e.capacidade}</td>
+        <td style="padding:12px 8px;">${formatarData(e.ultimaRecarga)}</td>
+        <td style="padding:12px 8px; font-weight:${st !== 'ok' ? '600' : '400'}; color:${st === 'vencido' ? 'var(--danger)' : st === 'alerta' ? 'var(--warn)' : 'inherit'};">${formatarData(e.proximaRecarga)}</td>
+        <td style="padding:12px 8px; text-align:center;">${statusBadge(st)}</td>
+        <td style="padding:12px 8px; text-align:center;">
+          ${nFotos > 0
+            ? `<button onclick="verFotos(${idxReal})" style="background:rgba(96,165,250,.15); color:var(--blue); border:1px solid var(--blue); border-radius:6px; padding:4px 10px; font-size:11px; cursor:pointer;">📷 ${nFotos}</button>`
+            : '<span style="color:var(--muted); font-size:11px;">—</span>'}
+        </td>
+        <td style="padding:12px 8px; text-align:center;">
+          <button onclick="editarExtintor(${idxReal})" style="background:none; border:none; color:var(--muted2); cursor:pointer; font-size:16px; margin-right:4px;" title="Editar">✏️</button>
+          <button onclick="excluirExtintor(${idxReal})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;" title="Excluir">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function filtrarExt(tipo) {
+    filtroAtivo = tipo;
+    ['todos','ok','alerta','vencido'].forEach(f => {
+      const btn = document.getElementById('filtro-' + f);
+      if (f === tipo) {
+        btn.style.background = 'var(--accent-glow)';
+        btn.style.color = 'var(--accent)';
+        btn.style.border = '1px solid var(--accent)';
+      } else {
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.style.border = '';
+      }
+    });
+    renderTabela();
+  }
+
+  // ── MODAL EXTINTOR ───────────────────────────────────────────
+  function openExtModal() {
+    if (!condoAtual) { alert('Selecione um condomínio primeiro.'); return; }
+    document.getElementById('ext-modal-title').textContent = 'Cadastrar Extintor';
+    document.getElementById('ext-edit-index').value = '';
+    document.getElementById('ext-numero').value = '';
+    document.getElementById('ext-local').value = '';
+    document.getElementById('ext-tipo').value = '';
+    document.getElementById('ext-capacidade').value = '4 kg';
+    document.getElementById('ext-ultima-recarga').value = '';
+    document.getElementById('ext-proxima-recarga').value = '';
+    document.getElementById('ext-obs').value = '';
+    document.getElementById('ext-fotos-preview').innerHTML = '';
+    document.getElementById('ext-foto-input').value = '';
+    fotosTemp = [];
+    document.getElementById('extModalOverlay').classList.add('open');
+  }
+
+  function closeExtModal() {
+    document.getElementById('extModalOverlay').classList.remove('open');
+  }
+
+  function closeExtModalOutside(e) {
+    if (e.target === document.getElementById('extModalOverlay')) closeExtModal();
+  }
+
+  function editarExtintor(idx) {
+    const e = extintores[condoAtual][idx];
+    document.getElementById('ext-modal-title').textContent = 'Editar Extintor';
+    document.getElementById('ext-edit-index').value = idx;
+    document.getElementById('ext-numero').value = e.numero;
+    document.getElementById('ext-local').value = e.local;
+    document.getElementById('ext-tipo').value = e.tipo;
+    document.getElementById('ext-capacidade').value = e.capacidade;
+    document.getElementById('ext-ultima-recarga').value = e.ultimaRecarga;
+    document.getElementById('ext-proxima-recarga').value = e.proximaRecarga;
+    document.getElementById('ext-obs').value = e.obs || '';
+    fotosTemp = [...(e.fotos || [])];
+    renderPreviewFotos();
+    document.getElementById('extModalOverlay').classList.add('open');
+  }
+
+  function excluirExtintor(idx) {
+    if (!confirm('Excluir este extintor?')) return;
+    extintores[condoAtual].splice(idx, 1);
+    renderTabela();
+  }
+
+  function previewFotos(event) {
+    const files = Array.from(event.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fotosTemp.push(e.target.result);
+        renderPreviewFotos();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderPreviewFotos() {
+    const preview = document.getElementById('ext-fotos-preview');
+    preview.innerHTML = fotosTemp.map((src, i) =>
+      `<div style="position:relative;">
+        <img src="${src}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--border);" />
+        <button onclick="removerFotoTemp(${i})" style="position:absolute; top:-6px; right:-6px; background:var(--danger); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+      </div>`
+    ).join('');
+  }
+
+  function removerFotoTemp(i) {
+    fotosTemp.splice(i, 1);
+    renderPreviewFotos();
+  }
+
+  function salvarExtintor() {
+    const numero = document.getElementById('ext-numero').value.trim();
+    const local = document.getElementById('ext-local').value.trim();
+    const tipo = document.getElementById('ext-tipo').value;
+    const proximaRecarga = document.getElementById('ext-proxima-recarga').value;
+    if (!numero || !local || !tipo || !proximaRecarga) {
+      alert('Preencha os campos obrigatórios: Número, Localização, Tipo e Próxima Recarga.');
+      return;
+    }
+    const extintor = {
+      numero, local, tipo,
+      capacidade: document.getElementById('ext-capacidade').value,
+      ultimaRecarga: document.getElementById('ext-ultima-recarga').value,
+      proximaRecarga,
+      obs: document.getElementById('ext-obs').value.trim(),
+      fotos: [...fotosTemp],
+      dataCadastro: new Date().toISOString()
+    };
+    const editIdx = document.getElementById('ext-edit-index').value;
+    if (editIdx !== '') {
+      extintores[condoAtual][parseInt(editIdx)] = extintor;
+    } else {
+      extintores[condoAtual].push(extintor);
+    }
+    closeExtModal();
+    renderTabela();
+    showToast('Extintor salvo com sucesso!');
+  }
+
+  // ── MODAL FOTOS ──────────────────────────────────────────────
+  function verFotos(idx) {
+    const e = extintores[condoAtual][idx];
+    document.getElementById('fotos-modal-title').textContent = `Fotos — ${e.numero} (${e.local})`;
+    document.getElementById('fotos-modal-grid').innerHTML = (e.fotos || []).map(src =>
+      `<img src="${src}" style="width:200px; height:200px; object-fit:cover; border-radius:10px; border:1px solid var(--border);" />`
+    ).join('');
+    document.getElementById('fotosModalOverlay').classList.add('open');
+  }
+
+  function closeFotosModal() {
+    document.getElementById('fotosModalOverlay').classList.remove('open');
+  }
+
+  // ── GERAR PDF ────────────────────────────────────────────────
+  async function gerarPDF() {
+    const lista = extintores[condoAtual] || [];
+    if (lista.length === 0) { alert('Nenhum extintor cadastrado para gerar o relatório.'); return; }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210, marg = 15;
+    let y = 20;
+
+    // Cabeçalho
+    doc.setFillColor(26, 38, 64); // azul marinho Módulo
+    doc.rect(0, 0, W, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('MÓDULO ADMINISTRADORA', marg, 14);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Relatório de Vistoria de Extintores', marg, 22);
+    doc.setFontSize(9);
+    doc.text(`Condomínio: ${condoAtual}`, marg, 30);
+    const dataRelatorio = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
+    doc.text(`Data: ${dataRelatorio}`, W - marg - 40, 30);
+
+    y = 50;
+    doc.setTextColor(30, 30, 30);
+
+    // Resumo
+    const total = lista.length;
+    const ok = lista.filter(e => calcularStatus(e.proximaRecarga) === 'ok').length;
+    const alerta = lista.filter(e => calcularStatus(e.proximaRecarga) === 'alerta').length;
+    const vencido = lista.filter(e => calcularStatus(e.proximaRecarga) === 'vencido').length;
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('RESUMO', marg, y);
+    y += 7;
+
+    // Caixas resumo
+    const boxW = 40, boxH = 18, gap = 5;
+    const boxes = [
+      { label: 'Total', val: total, r: 200, g: 200, b: 200 },
+      { label: 'OK', val: ok, r: 74, g: 222, b: 128 },
+      { label: 'Alerta (30 dias)', val: alerta, r: 251, g: 191, b: 36 },
+      { label: 'Vencidos', val: vencido, r: 248, g: 113, b: 113 },
+    ];
+    boxes.forEach((b, i) => {
+      const bx = marg + i * (boxW + gap);
+      doc.setFillColor(b.r, b.g, b.b);
+      doc.roundedRect(bx, y, boxW, boxH, 3, 3, 'F');
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text(String(b.val), bx + boxW/2, y + 10, { align: 'center' });
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.text(b.label, bx + boxW/2, y + 16, { align: 'center' });
+    });
+    y += boxH + 12;
+
+    // Tabela
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(30, 30, 30);
+    doc.text('EXTINTORES', marg, y);
+    y += 6;
+
+    // Header tabela
+    doc.setFillColor(26, 38, 64);
+    doc.rect(marg, y, W - marg*2, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    const cols = [
+      { t: 'Nº/ID', x: marg + 1 },
+      { t: 'Localização', x: marg + 20 },
+      { t: 'Tipo', x: marg + 60 },
+      { t: 'Cap.', x: marg + 95 },
+      { t: 'Últ. Recarga', x: marg + 112 },
+      { t: 'Próx. Recarga', x: marg + 133 },
+      { t: 'Status', x: marg + 155 },
+    ];
+    cols.forEach(c => doc.text(c.t, c.x, y + 5.5));
+    y += 8;
+
+    // Linhas
+    doc.setFont('helvetica', 'normal');
+    lista.forEach((e, i) => {
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
+      }
+      const st = calcularStatus(e.proximaRecarga);
+      const rowH = 8;
+      if (i % 2 === 0) {
+        doc.setFillColor(245, 245, 250);
+        doc.rect(marg, y, W - marg*2, rowH, 'F');
+      }
+      doc.setTextColor(30, 30, 30);
+      doc.setFontSize(7);
+      doc.text(e.numero.substring(0,12), marg + 1, y + 5.5);
+      doc.text(e.local.substring(0,22), marg + 20, y + 5.5);
+      doc.text(e.tipo.substring(0,18), marg + 60, y + 5.5);
+      doc.text(e.capacidade, marg + 95, y + 5.5);
+      doc.text(formatarData(e.ultimaRecarga), marg + 112, y + 5.5);
+      doc.text(formatarData(e.proximaRecarga), marg + 133, y + 5.5);
+      // Status colorido
+      if (st === 'ok') doc.setTextColor(39, 174, 96);
+      else if (st === 'alerta') doc.setTextColor(200, 140, 0);
+      else doc.setTextColor(220, 50, 50);
+      doc.setFont('helvetica', 'bold');
+      doc.text(st === 'ok' ? 'OK' : st === 'alerta' ? 'ALERTA' : 'VENCIDO', marg + 155, y + 5.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(30, 30, 30);
+      y += rowH;
+
+      // Observação
+      if (e.obs) {
+        doc.setFontSize(6.5);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Obs: ${e.obs.substring(0,80)}`, marg + 1, y + 3);
+        y += 5;
+        doc.setTextColor(30, 30, 30);
+      }
+    });
+
+    // Fotos
+    const comFotos = lista.filter(e => e.fotos && e.fotos.length > 0);
+    if (comFotos.length > 0) {
+      doc.addPage();
+      y = 20;
+      doc.setFontSize(13);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(30, 30, 30);
+      doc.text('REGISTRO FOTOGRÁFICO', marg, y);
+      y += 10;
+
+      for (const e of comFotos) {
+        if (y > 240) { doc.addPage(); y = 20; }
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(26, 38, 64);
+        doc.text(`${e.numero} — ${e.local} (${e.tipo})`, marg, y);
+        y += 5;
+
+        let x = marg;
+        for (const foto of e.fotos) {
+          if (x + 55 > W - marg) { x = marg; y += 58; }
+          if (y + 55 > 270) { doc.addPage(); y = 20; x = marg; }
+          try {
+            doc.addImage(foto, 'JPEG', x, y, 52, 52);
+          } catch {
+            try { doc.addImage(foto, 'PNG', x, y, 52, 52); } catch {}
+          }
+          x += 56;
+        }
+        y += 58;
+      }
+    }
+
+    // Rodapé
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= pageCount; p++) {
+      doc.setPage(p);
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Módulo Administradora — ${condoAtual} — Gerado em ${dataRelatorio} — Pág. ${p}/${pageCount}`, W/2, 292, { align: 'center' });
+    }
+
+    doc.save(`Vistoria_Extintores_${condoAtual.replace(/\s/g,'_')}_${dataRelatorio.replace(/\//g,'-')}.pdf`);
+  }
   function setNav(el) {
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
@@ -1037,8 +2056,11 @@
     if (e.target === document.getElementById('modalOverlay')) closeModal();
   }
 
-  function showToast() {
+  function showToast(msg) {
     const t = document.getElementById('toast');
+    t.querySelector ? t.innerHTML = `<span class="toast-icon">✓</span> ${msg || 'Ação realizada com sucesso!'}` : null;
+    t.textContent = msg || 'Ação realizada com sucesso!';
+    t.innerHTML = `<span class="toast-icon">✓</span> ${msg || 'Ação realizada com sucesso!'}`;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
@@ -1067,6 +2089,440 @@
     const pct = Math.round((done.length / all.length) * 100);
     document.getElementById('progressBar').style.width = pct + '%';
     document.getElementById('checkCount').textContent = `${done.length}/${all.length} concluídos`;
+  }
+
+  // ── RELATÓRIO MENSAL ────────────────────────────────────────
+  let relDados = {}; // { "CONDO||2026-03": { atividades: [], servicos: [] } }
+  let servFotosTemp = { antes: [], durante: [], depois: [] };
+
+  function relChave() {
+    const condo = document.getElementById('rel-condo-select').value;
+    const mes = document.getElementById('rel-mes-select').value;
+    return condo && mes ? `${condo}||${mes}` : null;
+  }
+
+  function relAtualizarTitulo() {
+    const condo = document.getElementById('rel-condo-select').value;
+    const mes = document.getElementById('rel-mes-select').value;
+    if (condo && mes) {
+      const [y, m] = mes.split('-');
+      const nomeMes = new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      document.getElementById('rel-titulo').textContent = condo.replace('CONDOMÍNIO DO EDIFÍCIO ', '').replace('CONDOMÍNIO DO ', '').replace('CONDOMÍNIO ', '');
+      document.getElementById('rel-subtitulo').textContent = `Relatório Mensal — ${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)}`;
+    }
+  }
+
+  function relCarregar() {
+    const chave = relChave();
+    if (!chave) { alert('Selecione o condomínio e a competência.'); return; }
+    if (!relDados[chave]) relDados[chave] = { atividades: [], servicos: [] };
+    document.getElementById('rel-conteudo').style.display = '';
+    document.getElementById('btn-rel-pdf').style.display = '';
+    relAtualizarTitulo();
+    renderAtividades();
+    renderServicos();
+  }
+
+  // ── ATIVIDADES ───────────────────────────────────────────────
+  function renderAtividades() {
+    const chave = relChave();
+    if (!chave) return;
+    const lista = relDados[chave].atividades;
+    const container = document.getElementById('rel-atividades-lista');
+    const empty = document.getElementById('rel-atividades-empty');
+    if (lista.length === 0) {
+      container.innerHTML = '';
+      container.appendChild(empty);
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+    const sorted = [...lista].sort((a, b) => a.data.localeCompare(b.data));
+    container.innerHTML = sorted.map((a, i) => {
+      const idx = lista.indexOf(a);
+      const [y, m, d] = a.data.split('-');
+      return `<div class="atividade-item">
+        <div class="atividade-num">${String(i + 1).padStart(2, '0')}°</div>
+        <div class="atividade-data">${d}/${m}</div>
+        <div style="flex:1;">
+          <div class="atividade-texto">${a.descricao}</div>
+          ${a.empresa ? `<div class="atividade-empresa">🏢 ${a.empresa}</div>` : ''}
+          ${a.os ? `<div class="atividade-os">📄 ${a.os}</div>` : ''}
+        </div>
+        <div class="atividade-acoes">
+          <button onclick="editarAtividade(${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px;" title="Editar">✏️</button>
+          <button onclick="excluirAtividade(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;" title="Excluir">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function abrirModalAtividade() {
+    if (!relChave()) { alert('Carregue um relatório primeiro.'); return; }
+    document.getElementById('ativ-modal-titulo').textContent = 'Nova Atividade';
+    document.getElementById('ativ-edit-idx').value = '';
+    document.getElementById('ativ-data').value = new Date().toISOString().split('T')[0];
+    document.getElementById('ativ-empresa').value = '';
+    document.getElementById('ativ-descricao').value = '';
+    document.getElementById('ativ-os').value = '';
+    document.getElementById('atividadeModalOverlay').classList.add('open');
+  }
+
+  function fecharModalAtividade() {
+    document.getElementById('atividadeModalOverlay').classList.remove('open');
+  }
+
+  function editarAtividade(idx) {
+    const a = relDados[relChave()].atividades[idx];
+    document.getElementById('ativ-modal-titulo').textContent = 'Editar Atividade';
+    document.getElementById('ativ-edit-idx').value = idx;
+    document.getElementById('ativ-data').value = a.data;
+    document.getElementById('ativ-empresa').value = a.empresa || '';
+    document.getElementById('ativ-descricao').value = a.descricao;
+    document.getElementById('ativ-os').value = a.os || '';
+    document.getElementById('atividadeModalOverlay').classList.add('open');
+  }
+
+  function excluirAtividade(idx) {
+    if (!confirm('Excluir esta atividade?')) return;
+    relDados[relChave()].atividades.splice(idx, 1);
+    renderAtividades();
+  }
+
+  function salvarAtividade() {
+    const descricao = document.getElementById('ativ-descricao').value.trim();
+    const data = document.getElementById('ativ-data').value;
+    if (!descricao || !data) { alert('Preencha data e descrição.'); return; }
+    const ativ = {
+      data, descricao,
+      empresa: document.getElementById('ativ-empresa').value.trim(),
+      os: document.getElementById('ativ-os').value.trim()
+    };
+    const chave = relChave();
+    const editIdx = document.getElementById('ativ-edit-idx').value;
+    if (editIdx !== '') {
+      relDados[chave].atividades[parseInt(editIdx)] = ativ;
+    } else {
+      relDados[chave].atividades.push(ativ);
+    }
+    fecharModalAtividade();
+    renderAtividades();
+    showToast('Atividade salva!');
+  }
+
+  // ── SERVIÇOS COM FOTOS ───────────────────────────────────────
+  function renderServicos() {
+    const chave = relChave();
+    if (!chave) return;
+    const lista = relDados[chave].servicos;
+    const container = document.getElementById('rel-servicos-lista');
+    const empty = document.getElementById('rel-servicos-empty');
+    if (lista.length === 0) {
+      container.innerHTML = '';
+      container.appendChild(empty);
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+    container.innerHTML = lista.map((s, idx) => {
+      const [y, m, d] = s.data ? s.data.split('-') : ['', '', ''];
+      const dataFmt = s.data ? `${d}/${m}/${y}` : '';
+      const totalFotos = (s.antes||[]).length + (s.durante||[]).length + (s.depois||[]).length;
+      return `<div class="servico-card">
+        <div class="servico-card-header">
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:14px; color:var(--text);">${s.descricao}</div>
+            ${s.empresa ? `<div style="font-size:12px; color:var(--blue); margin-top:3px;">🏢 ${s.empresa}</div>` : ''}
+            ${s.obs ? `<div style="font-size:12px; color:var(--muted2); margin-top:3px);">${s.obs}</div>` : ''}
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+            ${dataFmt ? `<span style="font-size:11px; color:var(--muted);">${dataFmt}</span>` : ''}
+            <span style="font-size:11px; background:rgba(74,222,128,.1); color:var(--accent); border:1px solid var(--accent); border-radius:5px; padding:2px 8px;">${totalFotos} foto${totalFotos !== 1 ? 's' : ''}</span>
+            <button onclick="editarServico(${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px;">✏️</button>
+            <button onclick="excluirServico(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">🗑️</button>
+          </div>
+        </div>
+        <div class="servico-fotos-grid">
+          ${['antes','durante','depois'].map(momento => {
+            const fotos = s[momento] || [];
+            const cor = momento === 'antes' ? 'var(--blue)' : momento === 'durante' ? 'var(--warn)' : 'var(--accent)';
+            const bg = momento === 'antes' ? 'rgba(96,165,250,.15)' : momento === 'durante' ? 'rgba(251,191,36,.15)' : 'rgba(74,222,128,.15)';
+            return `<div class="servico-fotos-momento">
+              <div class="momento-label" style="background:${bg}; color:${cor};">📷 ${momento.toUpperCase()}</div>
+              <div class="momento-fotos">
+                ${fotos.length > 0
+                  ? fotos.map((f, fi) => `<img src="${f}" onclick="verFotoRelatorio('${chave}',${idx},'${momento}',${fi})" />`).join('')
+                  : `<span style="font-size:11px; color:var(--muted);">Sem fotos</span>`}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function abrirModalServico() {
+    if (!relChave()) { alert('Carregue um relatório primeiro.'); return; }
+    document.getElementById('serv-modal-titulo').textContent = 'Novo Serviço';
+    document.getElementById('serv-edit-idx').value = '';
+    document.getElementById('serv-descricao').value = '';
+    document.getElementById('serv-empresa').value = '';
+    document.getElementById('serv-obs').value = '';
+    document.getElementById('serv-data').value = new Date().toISOString().split('T')[0];
+    servFotosTemp = { antes: [], durante: [], depois: [] };
+    ['antes','durante','depois'].forEach(m => {
+      document.getElementById('prev-' + m).innerHTML = '';
+      document.getElementById('inp-' + m).value = '';
+    });
+    document.getElementById('servicoModalOverlay').classList.add('open');
+  }
+
+  function fecharModalServico() {
+    document.getElementById('servicoModalOverlay').classList.remove('open');
+  }
+
+  function editarServico(idx) {
+    const s = relDados[relChave()].servicos[idx];
+    document.getElementById('serv-modal-titulo').textContent = 'Editar Serviço';
+    document.getElementById('serv-edit-idx').value = idx;
+    document.getElementById('serv-descricao').value = s.descricao;
+    document.getElementById('serv-empresa').value = s.empresa || '';
+    document.getElementById('serv-obs').value = s.obs || '';
+    document.getElementById('serv-data').value = s.data || '';
+    servFotosTemp = {
+      antes: [...(s.antes || [])],
+      durante: [...(s.durante || [])],
+      depois: [...(s.depois || [])]
+    };
+    ['antes','durante','depois'].forEach(m => renderPreviewMomento(m));
+    document.getElementById('servicoModalOverlay').classList.add('open');
+  }
+
+  function excluirServico(idx) {
+    if (!confirm('Excluir este serviço?')) return;
+    relDados[relChave()].servicos.splice(idx, 1);
+    renderServicos();
+  }
+
+  function addFotosMomento(momento, event) {
+    const files = Array.from(event.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        servFotosTemp[momento].push(e.target.result);
+        renderPreviewMomento(momento);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderPreviewMomento(momento) {
+    const preview = document.getElementById('prev-' + momento);
+    preview.innerHTML = servFotosTemp[momento].map((src, i) =>
+      `<div style="position:relative; display:inline-block;">
+        <img src="${src}" style="width:52px;height:52px;object-fit:cover;border-radius:5px;border:1px solid var(--border);" />
+        <button onclick="removerFotoMomento('${momento}',${i})" style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;line-height:16px;text-align:center;">✕</button>
+      </div>`
+    ).join('');
+  }
+
+  function removerFotoMomento(momento, i) {
+    servFotosTemp[momento].splice(i, 1);
+    renderPreviewMomento(momento);
+  }
+
+  function salvarServico() {
+    const descricao = document.getElementById('serv-descricao').value.trim();
+    if (!descricao) { alert('Informe a descrição do serviço.'); return; }
+    const servico = {
+      descricao,
+      empresa: document.getElementById('serv-empresa').value.trim(),
+      obs: document.getElementById('serv-obs').value.trim(),
+      data: document.getElementById('serv-data').value,
+      antes: [...servFotosTemp.antes],
+      durante: [...servFotosTemp.durante],
+      depois: [...servFotosTemp.depois]
+    };
+    const chave = relChave();
+    const editIdx = document.getElementById('serv-edit-idx').value;
+    if (editIdx !== '') {
+      relDados[chave].servicos[parseInt(editIdx)] = servico;
+    } else {
+      relDados[chave].servicos.push(servico);
+    }
+    fecharModalServico();
+    renderServicos();
+    showToast('Serviço salvo!');
+  }
+
+  function verFotoRelatorio(chave, sIdx, momento, fIdx) {
+    const s = relDados[chave].servicos[sIdx];
+    const fotos = s[momento] || [];
+    document.getElementById('fotos-modal-title').textContent = `${s.descricao} — ${momento.toUpperCase()}`;
+    document.getElementById('fotos-modal-grid').innerHTML = fotos.map(src =>
+      `<img src="${src}" style="width:200px;height:200px;object-fit:cover;border-radius:10px;border:1px solid var(--border);" />`
+    ).join('');
+    document.getElementById('fotosModalOverlay').classList.add('open');
+  }
+
+  // ── GERAR PDF RELATÓRIO MENSAL ───────────────────────────────
+  async function gerarRelPDF() {
+    const chave = relChave();
+    if (!chave) return;
+    const dados = relDados[chave];
+    const condo = document.getElementById('rel-condo-select').value;
+    const mes = document.getElementById('rel-mes-select').value;
+    const [y, m] = mes.split('-');
+    const nomeMes = new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    const competencia = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+    const dataGeracao = new Date().toLocaleDateString('pt-BR');
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210, marg = 15;
+    let y2 = 0;
+
+    function cabecalho() {
+      doc.setFillColor(26, 38, 64);
+      doc.rect(0, 0, W, 38, 'F');
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(16); doc.setFont('helvetica','bold');
+      doc.text('MÓDULO ADMINISTRADORA', marg, 14);
+      doc.setFontSize(11); doc.setFont('helvetica','normal');
+      doc.text('Relatório Mensal de Serviços', marg, 22);
+      doc.setFontSize(8);
+      const condoNome = condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+      doc.text(`${condoNome}  |  Competência: ${competencia}`, marg, 30);
+      doc.text(`Gerado em: ${dataGeracao}`, W - marg - 42, 30);
+    }
+
+    function rodape(pageNum, total) {
+      doc.setFontSize(7); doc.setTextColor(150,150,150);
+      doc.text(`Módulo Administradora  —  ${condoNome(condo)}  —  ${competencia}  —  Pág. ${pageNum}/${total}`, W/2, 292, { align:'center' });
+    }
+
+    function condoNome(c) {
+      return c.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+    }
+
+    // ─ Página 1: Capa + Atividades ─
+    cabecalho(); y2 = 50;
+
+    // Título seção atividades
+    doc.setFillColor(240, 244, 255);
+    doc.rect(marg, y2, W - marg*2, 9, 'F');
+    doc.setTextColor(26,38,64); doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text('CONTROLE DE ATIVIDADES DO MÊS', marg + 4, y2 + 6.2);
+    y2 += 14;
+
+    const ativSorted = [...(dados.atividades || [])].sort((a,b) => a.data.localeCompare(b.data));
+    if (ativSorted.length === 0) {
+      doc.setTextColor(150,150,150); doc.setFontSize(9); doc.setFont('helvetica','italic');
+      doc.text('Nenhuma atividade registrada.', marg, y2);
+      y2 += 10;
+    } else {
+      ativSorted.forEach((a, i) => {
+        if (y2 > 268) { doc.addPage(); cabecalho(); y2 = 50; }
+        const [ay, am, ad] = a.data.split('-');
+        doc.setTextColor(74,222,128); doc.setFontSize(8); doc.setFont('helvetica','bold');
+        doc.text(`${String(i+1).padStart(2,'0')}°`, marg, y2);
+        doc.setTextColor(120,120,120); doc.setFont('helvetica','normal');
+        doc.text(`${ad}/${am}`, marg + 10, y2);
+        doc.setTextColor(30,30,30); doc.setFontSize(9);
+        const lines = doc.splitTextToSize(a.descricao, W - marg*2 - 45);
+        doc.text(lines, marg + 30, y2);
+        y2 += lines.length * 5;
+        if (a.empresa) {
+          doc.setTextColor(96,165,250); doc.setFontSize(7.5);
+          doc.text(`🏢 ${a.empresa}`, marg + 30, y2);
+          y2 += 5;
+        }
+        if (a.os) {
+          doc.setTextColor(150,150,150); doc.setFontSize(7.5);
+          doc.text(a.os, marg + 30, y2);
+          y2 += 5;
+        }
+        y2 += 2;
+        doc.setDrawColor(42, 45, 56);
+        doc.line(marg, y2, W - marg, y2);
+        y2 += 4;
+      });
+    }
+
+    // ─ Seção serviços (nova página se necessário) ─
+    if ((dados.servicos || []).length > 0) {
+      doc.addPage(); cabecalho(); y2 = 50;
+      doc.setFillColor(240, 244, 255);
+      doc.rect(marg, y2, W - marg*2, 9, 'F');
+      doc.setTextColor(26,38,64); doc.setFontSize(10); doc.setFont('helvetica','bold');
+      doc.text('SERVIÇOS REALIZADOS — REGISTRO FOTOGRÁFICO', marg + 4, y2 + 6.2);
+      y2 += 14;
+
+      for (const s of dados.servicos) {
+        if (y2 > 220) { doc.addPage(); cabecalho(); y2 = 50; }
+
+        // Header do serviço
+        doc.setFillColor(26,38,64);
+        doc.rect(marg, y2, W - marg*2, 8, 'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
+        doc.text(s.descricao.substring(0,65), marg + 3, y2 + 5.5);
+        if (s.data) {
+          const [sy,sm,sd] = s.data.split('-');
+          doc.setFontSize(7); doc.setFont('helvetica','normal');
+          doc.text(`${sd}/${sm}/${sy}`, W - marg - 18, y2 + 5.5);
+        }
+        y2 += 10;
+        if (s.empresa) {
+          doc.setTextColor(96,165,250); doc.setFontSize(8); doc.setFont('helvetica','normal');
+          doc.text(`Empresa: ${s.empresa}`, marg, y2); y2 += 5;
+        }
+        if (s.obs) {
+          doc.setTextColor(100,100,100); doc.setFontSize(7.5);
+          doc.text(s.obs.substring(0,90), marg, y2); y2 += 5;
+        }
+        y2 += 2;
+
+        // Fotos por momento
+        const momentos = [
+          { key:'antes', label:'ANTES', r:96, g:165, b:250 },
+          { key:'durante', label:'DURANTE', r:251, g:191, b:36 },
+          { key:'depois', label:'DEPOIS', r:74, g:222, b:128 },
+        ];
+        const fotoW = 42, fotoH = 42, colW = (W - marg*2) / 3;
+        for (const mom of momentos) {
+          const fotos = s[mom.key] || [];
+          if (fotos.length === 0) continue;
+          if (y2 + 55 > 275) { doc.addPage(); cabecalho(); y2 = 50; }
+          // label
+          doc.setFillColor(mom.r, mom.g, mom.b, 0.15);
+          doc.setTextColor(mom.r, mom.g, mom.b);
+          doc.setFontSize(8); doc.setFont('helvetica','bold');
+          doc.text(`📷 ${mom.label}`, marg, y2); y2 += 6;
+          // fotos em linha
+          let fx = marg;
+          for (const foto of fotos) {
+            if (fx + fotoW > W - marg) { fx = marg; y2 += fotoH + 4; }
+            if (y2 + fotoH > 272) { doc.addPage(); cabecalho(); y2 = 50; fx = marg; }
+            try { doc.addImage(foto, 'JPEG', fx, y2, fotoW, fotoH); }
+            catch { try { doc.addImage(foto, 'PNG', fx, y2, fotoW, fotoH); } catch {} }
+            fx += fotoW + 3;
+          }
+          y2 += fotoH + 8;
+        }
+        y2 += 4;
+        doc.setDrawColor(42,45,56); doc.line(marg, y2, W-marg, y2); y2 += 6;
+      }
+    }
+
+    // Rodapés
+    const total = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= total; p++) {
+      doc.setPage(p);
+      rodape(p, total);
+    }
+
+    const nomeArquivo = `Relatorio_Mensal_${condoNome(condo).replace(/\s+/g,'_')}_${mes}.pdf`;
+    doc.save(nomeArquivo);
   }
 
   // Load logo from GitHub Pages site
