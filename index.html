@@ -814,13 +814,23 @@
 
   <div class="nav-section" style="margin-top: 8px;">
     <div class="nav-label">Relatórios</div>
-    <div class="nav-item" id="nav-relatorio" onclick="setNav(this); showSection('relatorio')">
-      <span class="icon">📋</span> Rel. Mensal
+    <div class="nav-item" id="nav-vistoria" onclick="setNav(this); showSection('vistoria')">
+      <span class="icon">🔍</span> Vistoria
+    </div>
+    <div class="nav-item" id="nav-acompanhamento" onclick="setNav(this); showSection('acompanhamento')">
+      <span class="icon">🔧</span> Acompan. Serviços
+    </div>
+  </div>
+
+  <div class="nav-section" style="margin-top:8px;">
+    <div class="nav-label">Imóveis</div>
+    <div class="nav-item" id="nav-alugueis" onclick="setNav(this); showSection('alugueis')">
+      <span class="icon">🏢</span> Aluguéis
+      <span class="nav-badge" id="badge-alugueis" style="display:none; background:var(--danger);">!</span>
     </div>
   </div>
 
   <div class="sidebar-bottom">
-    <div class="user-card">
       <div class="avatar">RS</div>
       <div class="user-info">
         <div class="user-name">Rosemberg S.</div>
@@ -1510,212 +1520,452 @@
   </div>
 </div>
 
-<!-- SECTION: RELATÓRIO MENSAL -->
-<div id="section-relatorio" style="display:none; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
+<!-- SECTION: VISTORIA -->
+<div id="section-vistoria" style="display:none; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
   <div class="topbar">
     <div>
-      <div class="topbar-title" id="rel-titulo">Relatório Mensal</div>
-      <div class="topbar-sub" id="rel-subtitulo">Selecione o condomínio e mês</div>
+      <div class="topbar-title" id="vis-titulo">Vistoria</div>
+      <div class="topbar-sub" id="vis-subtitulo">Selecione o condomínio e mês</div>
     </div>
     <div class="topbar-right">
-      <button class="btn btn-ghost" id="btn-rel-pdf" onclick="gerarRelPDF()" style="display:none;">📄 Gerar PDF</button>
-      <button class="btn btn-primary" onclick="abrirModalServico()">+ Adicionar Serviço</button>
+      <button class="btn btn-ghost" id="btn-vis-pdf" onclick="gerarVisoriaPDF()" style="display:none;">📄 Gerar PDF</button>
+      <button class="btn btn-primary" onclick="abrirModalOcorrencia()">+ Ocorrência</button>
     </div>
   </div>
-
   <div class="content">
-
-    <!-- Filtros -->
     <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
-        <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:200px; max-width:400px;">
-          <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Condomínio:</label>
-          <select id="rel-condo-select" class="form-input" style="flex:1;" onchange="relAtualizarTitulo()">
-            <option value="">— Selecione —</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
-            <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
-            <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
-            <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
-            <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
-            <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
-            <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
-            <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
-            <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
-          </select>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Competência:</label>
-          <input type="month" id="rel-mes-select" class="form-input" style="width:160px;" onchange="relAtualizarTitulo()" />
-        </div>
-        <button class="btn btn-ghost" onclick="relCarregar()" style="white-space:nowrap;">▶ Carregar</button>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Condomínio:</label>
+        <select id="vis-condo" class="form-input" style="flex:1; min-width:200px; max-width:400px;" onchange="visAtualizar()">
+          <option value="">— Selecione —</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
+          <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
+          <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
+          <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
+          <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
+          <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+        </select>
+        <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Mês:</label>
+        <input type="month" id="vis-mes" class="form-input" style="width:160px;" onchange="visAtualizar()" />
+        <button class="btn btn-ghost" onclick="visCarregar()">▶ Carregar</button>
       </div>
     </div>
-
-    <!-- Conteúdo (oculto até carregar) -->
-    <div id="rel-conteudo" style="display:none;">
-
-      <!-- SEÇÃO 1: CONTROLE DE ATIVIDADES -->
-      <div class="card" style="margin-bottom:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-          <div>
-            <div style="font-weight:700; font-size:15px; color:var(--text);">📋 Controle de Atividades do Mês</div>
-            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Registro cronológico de serviços e visitas técnicas</div>
-          </div>
-          <button class="btn btn-primary" style="font-size:12px; padding:6px 14px;" onclick="abrirModalAtividade()">+ Atividade</button>
-        </div>
-        <div id="rel-atividades-lista">
-          <div id="rel-atividades-empty" style="text-align:center; padding:32px; color:var(--muted); font-size:13px;">
-            Nenhuma atividade registrada. Clique em "+ Atividade" para começar.
-          </div>
-        </div>
+    <div id="vis-conteudo" style="display:none;">
+      <!-- Filtro status -->
+      <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+        <button class="pill" id="vis-f-todos" onclick="visFiltrar('todos')" style="background:var(--accent-glow);color:var(--accent);border:1px solid var(--accent);">Todos</button>
+        <button class="pill" id="vis-f-identificado" onclick="visFiltrar('identificado')">🔴 Identificado</button>
+        <button class="pill" id="vis-f-andamento" onclick="visFiltrar('andamento')">🟡 Em andamento</button>
+        <button class="pill" id="vis-f-resolvido" onclick="visFiltrar('resolvido')">🟢 Resolvido</button>
       </div>
-
-      <!-- SEÇÃO 2: SERVIÇOS COM FOTOS -->
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-          <div>
-            <div style="font-weight:700; font-size:15px; color:var(--text);">🔧 Serviços Realizados</div>
-            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Com registro fotográfico antes / durante / depois</div>
-          </div>
-          <button class="btn btn-primary" style="font-size:12px; padding:6px 14px;" onclick="abrirModalServico()">+ Serviço</button>
-        </div>
-        <div id="rel-servicos-lista">
-          <div id="rel-servicos-empty" style="text-align:center; padding:32px; color:var(--muted); font-size:13px;">
-            Nenhum serviço cadastrado ainda.
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /rel-conteudo -->
-  </div>
-</div><!-- /section-relatorio -->
-
-<!-- MODAL: Nova Atividade -->
-<div class="modal-overlay" id="atividadeModalOverlay" onclick="if(event.target===this) fecharModalAtividade()">
-  <div class="modal" style="max-width:500px;">
-    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-      <div>
-        <div class="modal-title" id="ativ-modal-titulo">Nova Atividade</div>
-        <div class="modal-sub">Registro de serviço ou visita técnica</div>
-      </div>
-      <button class="modal-close" onclick="fecharModalAtividade()">✕</button>
-    </div>
-    <input type="hidden" id="ativ-edit-idx" value="">
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Data *</label>
-        <input class="form-input" type="date" id="ativ-data" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Empresa / Responsável</label>
-        <input class="form-input" id="ativ-empresa" placeholder="Ex: COOP Elevadores, Dgtel..." />
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Descrição *</label>
-      <textarea class="form-input" id="ativ-descricao" rows="3" placeholder="Ex: Coop elevadores - Técnico Wilson, visita técnica para manutenção preventiva do elevador social A." style="resize:vertical;"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Nº da OS (opcional)</label>
-      <input class="form-input" id="ativ-os" placeholder="Ex: OS nº 67275183" />
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="fecharModalAtividade()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarAtividade()">💾 Salvar</button>
+      <div id="vis-lista"></div>
     </div>
   </div>
 </div>
 
-<!-- MODAL: Novo Serviço com Fotos -->
+<!-- SECTION: ACOMPANHAMENTO DE SERVIÇOS -->
+<div id="section-acompanhamento" style="display:none; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="aco-titulo">Acompanhamento de Serviços</div>
+      <div class="topbar-sub" id="aco-subtitulo">Selecione o condomínio e mês</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" id="btn-aco-pdf" onclick="gerarAcompanhamentoPDF()" style="display:none;">📄 Gerar PDF</button>
+      <button class="btn btn-primary" onclick="abrirModalServico()">+ Serviço</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Condomínio:</label>
+        <select id="aco-condo" class="form-input" style="flex:1; min-width:200px; max-width:400px;" onchange="acoAtualizar()">
+          <option value="">— Selecione —</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
+          <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
+          <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
+          <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
+          <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
+          <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+        </select>
+        <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Mês:</label>
+        <input type="month" id="aco-mes" class="form-input" style="width:160px;" onchange="acoAtualizar()" />
+        <button class="btn btn-ghost" onclick="acoCarregar()">▶ Carregar</button>
+      </div>
+    </div>
+    <div id="aco-conteudo" style="display:none;">
+      <div id="aco-lista"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Ocorrência de Vistoria -->
+<div class="modal-overlay" id="ocorrenciaModalOverlay" onclick="if(event.target===this) fecharModalOcorrencia()">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div>
+        <div class="modal-title" id="ocr-modal-titulo">Nova Ocorrência</div>
+        <div class="modal-sub">Registro de vistoria</div>
+      </div>
+      <button class="modal-close" onclick="fecharModalOcorrencia()">✕</button>
+    </div>
+    <input type="hidden" id="ocr-edit-idx" value="">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data *</label>
+        <input class="form-input" type="date" id="ocr-data" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo *</label>
+        <select class="form-input" id="ocr-tipo">
+          <option value="">— Selecione —</option>
+          <option>Extintor</option>
+          <option>Tubulação de incêndio</option>
+          <option>Portão / Porta</option>
+          <option>Câmera / Interfone</option>
+          <option>Elevador</option>
+          <option>Bomba d'água</option>
+          <option>Reservatório</option>
+          <option>Área comum</option>
+          <option>Elétrica</option>
+          <option>Infiltração / Vazamento</option>
+          <option>SPDA</option>
+          <option>Outro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Localização</label>
+        <input class="form-input" id="ocr-local" placeholder="Ex: Hall do 3º andar, garagem B..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status *</label>
+        <select class="form-input" id="ocr-status">
+          <option value="identificado">🔴 Identificado</option>
+          <option value="andamento">🟡 Em andamento</option>
+          <option value="resolvido">🟢 Resolvido</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição / Observação *</label>
+      <textarea class="form-input" id="ocr-descricao" rows="3" placeholder="Descreva a situação encontrada..." style="resize:vertical;"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fotos</label>
+      <div class="foto-drop" onclick="document.getElementById('ocr-inp-foto').click()" style="border-radius:8px; border:1px dashed var(--border);">
+        <div style="font-size:20px;">📷</div>
+        <div style="font-size:11px; color:var(--muted);">Clique para adicionar fotos</div>
+      </div>
+      <input type="file" id="ocr-inp-foto" accept="image/*" multiple style="display:none;" onchange="ocrAddFotos(event)">
+      <div id="ocr-preview" class="foto-mini-grid" style="margin-top:8px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModalOcorrencia()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarOcorrencia()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Serviço Acompanhamento -->
 <div class="modal-overlay" id="servicoModalOverlay" onclick="if(event.target===this) fecharModalServico()">
-  <div class="modal" style="max-width:600px;">
+  <div class="modal" style="max-width:580px;">
     <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
       <div>
         <div class="modal-title" id="serv-modal-titulo">Novo Serviço</div>
-        <div class="modal-sub">Registro com fotos antes / durante / depois</div>
+        <div class="modal-sub">Registro com fotos antes / depois</div>
       </div>
       <button class="modal-close" onclick="fecharModalServico()">✕</button>
     </div>
     <input type="hidden" id="serv-edit-idx" value="">
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Descrição do serviço *</label>
-        <input class="form-input" id="serv-descricao" placeholder="Ex: Remoção e substituição de luminárias 2º andar" />
+        <label class="form-label">Descrição *</label>
+        <input class="form-input" id="serv-descricao" placeholder="Ex: Substituição de luminárias 2º andar" />
       </div>
       <div class="form-group">
-        <label class="form-label">Data de início</label>
+        <label class="form-label">Data</label>
         <input class="form-input" type="date" id="serv-data" />
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Empresa / Responsável</label>
-      <input class="form-input" id="serv-empresa" placeholder="Ex: Iluminação Express, Funcionário João..." />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Empresa / Responsável</label>
+        <input class="form-input" id="serv-empresa" placeholder="Ex: Iluminação Express..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input" id="serv-status">
+          <option value="andamento">🟡 Em andamento</option>
+          <option value="concluido">🟢 Concluído</option>
+        </select>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Observações</label>
-      <textarea class="form-input" id="serv-obs" rows="2" placeholder="Detalhes adicionais, materiais usados, etc." style="resize:vertical;"></textarea>
+      <textarea class="form-input" id="serv-obs" rows="2" placeholder="Materiais, detalhes, valor, etc." style="resize:vertical;"></textarea>
     </div>
-
-    <!-- Upload fotos por momento -->
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:4px;">
-      <div id="foto-bloco-antes" class="foto-bloco">
-        <div class="foto-bloco-label" style="background:rgba(96,165,250,.15); color:var(--blue);">📷 ANTES</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:4px;">
+      <div class="foto-bloco">
+        <div class="foto-bloco-label" style="background:rgba(96,165,250,.15);color:var(--blue);">📷 ANTES</div>
         <div class="foto-drop" onclick="document.getElementById('inp-antes').click()">
-          <div style="font-size:22px;">➕</div>
-          <div style="font-size:11px; color:var(--muted);">Adicionar fotos</div>
+          <div style="font-size:20px;">➕</div><div style="font-size:11px;color:var(--muted);">Adicionar fotos</div>
         </div>
         <input type="file" id="inp-antes" accept="image/*" multiple style="display:none;" onchange="addFotosMomento('antes',event)">
         <div id="prev-antes" class="foto-mini-grid"></div>
       </div>
-      <div id="foto-bloco-durante" class="foto-bloco">
-        <div class="foto-bloco-label" style="background:rgba(251,191,36,.15); color:var(--warn);">📷 DURANTE</div>
-        <div class="foto-drop" onclick="document.getElementById('inp-durante').click()">
-          <div style="font-size:22px;">➕</div>
-          <div style="font-size:11px; color:var(--muted);">Adicionar fotos</div>
-        </div>
-        <input type="file" id="inp-durante" accept="image/*" multiple style="display:none;" onchange="addFotosMomento('durante',event)">
-        <div id="prev-durante" class="foto-mini-grid"></div>
-      </div>
-      <div id="foto-bloco-depois" class="foto-bloco">
-        <div class="foto-bloco-label" style="background:rgba(74,222,128,.15); color:var(--accent);">📷 DEPOIS</div>
+      <div class="foto-bloco">
+        <div class="foto-bloco-label" style="background:rgba(74,222,128,.15);color:var(--accent);">📷 DEPOIS</div>
         <div class="foto-drop" onclick="document.getElementById('inp-depois').click()">
-          <div style="font-size:22px;">➕</div>
-          <div style="font-size:11px; color:var(--muted);">Adicionar fotos</div>
+          <div style="font-size:20px;">➕</div><div style="font-size:11px;color:var(--muted);">Adicionar fotos</div>
         </div>
         <input type="file" id="inp-depois" accept="image/*" multiple style="display:none;" onchange="addFotosMomento('depois',event)">
         <div id="prev-depois" class="foto-mini-grid"></div>
       </div>
     </div>
-
     <div class="modal-footer" style="margin-top:16px;">
       <button class="btn btn-ghost" onclick="fecharModalServico()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarServico()">💾 Salvar Serviço</button>
+      <button class="btn btn-primary" onclick="salvarServico()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: ALUGUÉIS -->
+<div id="section-alugueis" style="display:none; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">🏢 Gestão de Aluguéis</div>
+      <div class="topbar-sub">Controle de contratos e reajustes</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="abrirModalAluguel()">+ Novo Contrato</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- Cards de alerta -->
+    <div id="alug-alertas-area" style="display:none; margin-bottom:20px;"></div>
+
+    <!-- Lista de contratos -->
+    <div id="alug-lista">
+      <div style="text-align:center; padding:48px; color:var(--muted); font-size:14px;">
+        <div style="font-size:40px; margin-bottom:12px; opacity:.3;">🏢</div>
+        Nenhum contrato cadastrado. Clique em "+ Novo Contrato" para começar.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Contrato de Aluguel -->
+<div class="modal-overlay" id="aluguelModalOverlay" onclick="if(event.target===this) fecharModalAluguel()">
+  <div class="modal" style="max-width:620px; max-height:90vh; overflow-y:auto;">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div>
+        <div class="modal-title" id="alug-modal-titulo">Novo Contrato</div>
+        <div class="modal-sub">Preencha os dados do contrato de aluguel</div>
+      </div>
+      <button class="modal-close" onclick="fecharModalAluguel()">✕</button>
+    </div>
+    <input type="hidden" id="alug-edit-idx" value="">
+
+    <!-- Imóvel e Unidade -->
+    <div style="font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin-bottom:10px;">IMÓVEL</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Imóvel *</label>
+        <input class="form-input" id="alug-imovel" placeholder="Ex: Néos Recife, Ed. Comercial..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unidade *</label>
+        <input class="form-input" id="alug-unidade" placeholder="Ex: Sala 1, Apto 302..." />
+      </div>
+    </div>
+
+    <!-- Inquilino -->
+    <div style="font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin:14px 0 10px;">INQUILINO</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input class="form-input" id="alug-inquilino" placeholder="Ex: Marcos Bittencourt" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contato (tel/e-mail)</label>
+        <input class="form-input" id="alug-contato" placeholder="Ex: (81) 99999-0000" />
+      </div>
+    </div>
+
+    <!-- Aluguel -->
+    <div style="font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin:14px 0 10px;">ALUGUEL</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Valor atual (R$) *</label>
+        <input class="form-input" id="alug-valor" type="number" step="0.01" placeholder="0,00" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Dia de vencimento</label>
+        <input class="form-input" id="alug-dia-venc" type="number" min="1" max="31" placeholder="Ex: 10" />
+      </div>
+    </div>
+
+    <!-- Reajuste -->
+    <div style="font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin:14px 0 10px;">REAJUSTE</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Índice *</label>
+        <select class="form-input" id="alug-indice">
+          <option value="">— Selecione —</option>
+          <option>IGP-M</option>
+          <option>IPCA</option>
+          <option>Salário Mínimo</option>
+          <option>INPC</option>
+          <option>IPC-A</option>
+          <option>Fixo (% ao ano)</option>
+          <option>A negociar</option>
+        </select>
+      </div>
+      <div class="form-group" id="alug-perc-group" style="display:none;">
+        <label class="form-label">Percentual fixo (%)</label>
+        <input class="form-input" id="alug-perc" type="number" step="0.1" placeholder="Ex: 5.0" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data do próximo reajuste *</label>
+        <input class="form-input" type="date" id="alug-data-reajuste" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vencimento do contrato</label>
+        <input class="form-input" type="date" id="alug-data-venc-contrato" />
+      </div>
+    </div>
+
+    <!-- Contrato PDF -->
+    <div style="font-size:11px; font-weight:700; color:var(--accent); letter-spacing:1px; margin:14px 0 10px;">CONTRATO</div>
+    <div class="form-group">
+      <label class="form-label">Anexar contrato (PDF)</label>
+      <div class="foto-drop" onclick="document.getElementById('alug-inp-contrato').click()" style="border-radius:8px; border:1px dashed var(--border); padding:16px;">
+        <div style="font-size:20px;">📎</div>
+        <div style="font-size:12px; color:var(--muted);">Clique para selecionar o PDF do contrato</div>
+      </div>
+      <input type="file" id="alug-inp-contrato" accept="application/pdf" style="display:none;" onchange="alugAnexarContrato(event)">
+      <div id="alug-contrato-preview" style="margin-top:8px; display:none;">
+        <div style="display:flex; align-items:center; gap:8px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 14px;">
+          <span style="font-size:20px;">📄</span>
+          <span id="alug-contrato-nome" style="font-size:13px; color:var(--text); flex:1;"></span>
+          <button onclick="alugRemoverContrato()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Observações</label>
+      <textarea class="form-input" id="alug-obs" rows="2" placeholder="Garantia, fiador, cláusulas especiais..." style="resize:vertical;"></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModalAluguel()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAluguel()">💾 Salvar Contrato</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Registrar Reajuste -->
+<div class="modal-overlay" id="reajusteModalOverlay" onclick="if(event.target===this) fecharModalReajuste()">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div>
+        <div class="modal-title">Registrar Reajuste</div>
+        <div class="modal-sub" id="reaj-subtitulo"></div>
+      </div>
+      <button class="modal-close" onclick="fecharModalReajuste()">✕</button>
+    </div>
+    <input type="hidden" id="reaj-idx" value="">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Valor anterior (R$)</label>
+        <input class="form-input" id="reaj-valor-ant" readonly style="opacity:.6;" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Novo valor (R$) *</label>
+        <input class="form-input" id="reaj-valor-novo" type="number" step="0.01" placeholder="0,00" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data do reajuste *</label>
+        <input class="form-input" type="date" id="reaj-data" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Próximo reajuste</label>
+        <input class="form-input" type="date" id="reaj-proxima" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observação</label>
+      <input class="form-input" id="reaj-obs" placeholder="Ex: Reajuste IGP-M acumulado 4,2%" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModalReajuste()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarReajuste()">✅ Confirmar Reajuste</button>
     </div>
   </div>
 </div>
@@ -1832,8 +2082,10 @@
     try {
       localStorage.setItem('modulo_extintores',   JSON.stringify(extintores));
       localStorage.setItem('modulo_empresas',     JSON.stringify(empresasCondo));
-      localStorage.setItem('modulo_relDados',     JSON.stringify(relDados));
+      localStorage.setItem('modulo_visDados',     JSON.stringify(visDados));
+      localStorage.setItem('modulo_acoDados',     JSON.stringify(acoDados));
       localStorage.setItem('modulo_periodicos',   JSON.stringify(periodicos));
+      localStorage.setItem('modulo_alugueis',     JSON.stringify(alugueis));
     } catch(e) { console.warn('localStorage cheio:', e); }
   }
 
@@ -1841,8 +2093,10 @@
     try {
       extintores    = JSON.parse(localStorage.getItem('modulo_extintores')  || '{}');
       empresasCondo = JSON.parse(localStorage.getItem('modulo_empresas')    || '{}');
-      relDados      = JSON.parse(localStorage.getItem('modulo_relDados')    || '{}');
+      visDados      = JSON.parse(localStorage.getItem('modulo_visDados')    || '{}');
+      acoDados      = JSON.parse(localStorage.getItem('modulo_acoDados')    || '{}');
       periodicos    = JSON.parse(localStorage.getItem('modulo_periodicos')  || '{}');
+      alugueis      = JSON.parse(localStorage.getItem('modulo_alugueis')    || '[]');
     } catch(e) { console.warn('Erro ao carregar localStorage:', e); }
   }
 
@@ -1854,7 +2108,9 @@
       'dashboard':  document.getElementById('section-dashboard'),
       'periodicos': document.getElementById('section-periodicos'),
       'extintores': document.getElementById('section-extintores'),
-      'relatorio':  document.getElementById('section-relatorio'),
+      'vistoria':       document.getElementById('section-vistoria'),
+      'acompanhamento':  document.getElementById('section-acompanhamento'),
+      'alugueis':       document.getElementById('section-alugueis'),
     };
     // Ocultar seção antiga planos (mantida no DOM mas nunca exibida)
     const planos = document.getElementById('section-planos');
@@ -1866,6 +2122,7 @@
       el.style.display = isActive ? 'flex' : 'none';
     });
     if (section === 'dashboard') renderDashboard();
+    if (section === 'alugueis') renderAlugueis();
     if (section === 'periodicos') { /* seletor já controla */ }
   }
 
@@ -2376,459 +2633,463 @@
     document.getElementById('checkCount').textContent = `${done.length}/${all.length} concluídos`;
   }
 
-  // ── RELATÓRIO MENSAL ────────────────────────────────────────
-  let periodicos = {}; // { "NOME CONDO": [ {tipo, empresa, vencimento, obs} ] }
-  let relDados = {}; // { "CONDO||2026-03": { atividades: [], servicos: [] } }
-  let servFotosTemp = { antes: [], durante: [], depois: [] };
+  // ── VISTORIA ─────────────────────────────────────────────────
+  let visDados = {};  // { "CONDO||2026-03": [ {ocorrencias} ] }
+  let visChaveAtual = null;
+  let visFiltroAtivo = 'todos';
+  let ocrFotosTemp = [];
 
-  function relChave() {
-    const condo = document.getElementById('rel-condo-select').value;
-    const mes = document.getElementById('rel-mes-select').value;
-    return condo && mes ? `${condo}||${mes}` : null;
+  function visChave() {
+    const c = document.getElementById('vis-condo').value;
+    const m = document.getElementById('vis-mes').value;
+    return c && m ? c + '||' + m : null;
   }
-
-  function relAtualizarTitulo() {
-    const condo = document.getElementById('rel-condo-select').value;
-    const mes = document.getElementById('rel-mes-select').value;
-    if (condo && mes) {
-      const [y, m] = mes.split('-');
-      const nomeMes = new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-      document.getElementById('rel-titulo').textContent = condo.replace('CONDOMÍNIO DO EDIFÍCIO ', '').replace('CONDOMÍNIO DO ', '').replace('CONDOMÍNIO ', '');
-      document.getElementById('rel-subtitulo').textContent = `Relatório Mensal — ${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)}`;
-    }
+  function visAtualizar() { visChaveAtual = visChave(); }
+  function visCarregar() {
+    const chave = visChave();
+    if (!chave) { alert('Selecione condomínio e mês.'); return; }
+    visChaveAtual = chave;
+    if (!visDados[chave]) visDados[chave] = [];
+    const [condo, mes] = chave.split('||');
+    const [y,m] = mes.split('-');
+    const nomeMes = new Date(y, m-1, 1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+    const curto = condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+    document.getElementById('vis-titulo').textContent = curto;
+    document.getElementById('vis-subtitulo').textContent = 'Vistoria — ' + nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+    document.getElementById('vis-conteudo').style.display = '';
+    document.getElementById('btn-vis-pdf').style.display = '';
+    visFiltrar('todos');
   }
-
-  function relCarregar() {
-    const chave = relChave();
-    if (!chave) { alert('Selecione o condomínio e a competência.'); return; }
-    if (!relDados[chave]) relDados[chave] = { atividades: [], servicos: [] };
-    document.getElementById('rel-conteudo').style.display = '';
-    document.getElementById('btn-rel-pdf').style.display = '';
-    relAtualizarTitulo();
-    renderAtividades();
-    renderServicos();
+  function visFiltrar(f) {
+    visFiltroAtivo = f;
+    ['todos','identificado','andamento','resolvido'].forEach(x => {
+      const b = document.getElementById('vis-f-' + x);
+      if (!b) return;
+      b.style.background = x===f ? 'var(--accent-glow)' : '';
+      b.style.color = x===f ? 'var(--accent)' : '';
+      b.style.border = x===f ? '1px solid var(--accent)' : '';
+    });
+    renderVistoria();
   }
-
-  // ── ATIVIDADES ───────────────────────────────────────────────
-  function renderAtividades() {
-    const chave = relChave();
-    if (!chave) return;
-    const lista = relDados[chave].atividades;
-    const container = document.getElementById('rel-atividades-lista');
-    const empty = document.getElementById('rel-atividades-empty');
-    if (lista.length === 0) {
-      container.innerHTML = '';
-      container.appendChild(empty);
-      empty.style.display = '';
+  function renderVistoria() {
+    if (!visChaveAtual) return;
+    const lista = visDados[visChaveAtual] || [];
+    const filtrada = visFiltroAtivo === 'todos' ? lista : lista.filter(o => o.status === visFiltroAtivo);
+    const container = document.getElementById('vis-lista');
+    if (filtrada.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Nenhuma ocorrência registrada.</div>';
       return;
     }
-    empty.style.display = 'none';
-    const sorted = [...lista].sort((a, b) => a.data.localeCompare(b.data));
-    container.innerHTML = sorted.map((a, i) => {
-      const idx = lista.indexOf(a);
-      const [y, m, d] = a.data.split('-');
-      return `<div class="atividade-item">
-        <div class="atividade-num">${String(i + 1).padStart(2, '0')}°</div>
-        <div class="atividade-data">${d}/${m}</div>
-        <div style="flex:1;">
-          <div class="atividade-texto">${a.descricao}</div>
-          ${a.empresa ? `<div class="atividade-empresa">🏢 ${a.empresa}</div>` : ''}
-          ${a.os ? `<div class="atividade-os">📄 ${a.os}</div>` : ''}
-        </div>
-        <div class="atividade-acoes">
-          <button onclick="editarAtividade(${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px;" title="Editar">✏️</button>
-          <button onclick="excluirAtividade(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;" title="Excluir">🗑️</button>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function abrirModalAtividade() {
-    if (!relChave()) { alert('Carregue um relatório primeiro.'); return; }
-    document.getElementById('ativ-modal-titulo').textContent = 'Nova Atividade';
-    document.getElementById('ativ-edit-idx').value = '';
-    document.getElementById('ativ-data').value = new Date().toISOString().split('T')[0];
-    document.getElementById('ativ-empresa').value = '';
-    document.getElementById('ativ-descricao').value = '';
-    document.getElementById('ativ-os').value = '';
-    document.getElementById('atividadeModalOverlay').classList.add('open');
-  }
-
-  function fecharModalAtividade() {
-    document.getElementById('atividadeModalOverlay').classList.remove('open');
-  }
-
-  function editarAtividade(idx) {
-    const a = relDados[relChave()].atividades[idx];
-    document.getElementById('ativ-modal-titulo').textContent = 'Editar Atividade';
-    document.getElementById('ativ-edit-idx').value = idx;
-    document.getElementById('ativ-data').value = a.data;
-    document.getElementById('ativ-empresa').value = a.empresa || '';
-    document.getElementById('ativ-descricao').value = a.descricao;
-    document.getElementById('ativ-os').value = a.os || '';
-    document.getElementById('atividadeModalOverlay').classList.add('open');
-  }
-
-  function excluirAtividade(idx) {
-    if (!confirm('Excluir esta atividade?')) return;
-    relDados[relChave()].atividades.splice(idx, 1);
-    renderAtividades();
-    salvarDados();
-  }
-
-  function salvarAtividade() {
-    const descricao = document.getElementById('ativ-descricao').value.trim();
-    const data = document.getElementById('ativ-data').value;
-    if (!descricao || !data) { alert('Preencha data e descrição.'); return; }
-    const ativ = {
-      data, descricao,
-      empresa: document.getElementById('ativ-empresa').value.trim(),
-      os: document.getElementById('ativ-os').value.trim()
-    };
-    const chave = relChave();
-    const editIdx = document.getElementById('ativ-edit-idx').value;
-    if (editIdx !== '') {
-      relDados[chave].atividades[parseInt(editIdx)] = ativ;
-    } else {
-      relDados[chave].atividades.push(ativ);
-    }
-    fecharModalAtividade();
-    renderAtividades();
-    salvarDados();
-    showToast('Atividade salva!');
-  }
-
-  // ── SERVIÇOS COM FOTOS ───────────────────────────────────────
-  function renderServicos() {
-    const chave = relChave();
-    if (!chave) return;
-    const lista = relDados[chave].servicos;
-    const container = document.getElementById('rel-servicos-lista');
-    const empty = document.getElementById('rel-servicos-empty');
-    if (lista.length === 0) {
-      container.innerHTML = '';
-      container.appendChild(empty);
-      empty.style.display = '';
-      return;
-    }
-    empty.style.display = 'none';
-    container.innerHTML = lista.map((s, idx) => {
-      const [y, m, d] = s.data ? s.data.split('-') : ['', '', ''];
-      const dataFmt = s.data ? `${d}/${m}/${y}` : '';
-      const totalFotos = (s.antes||[]).length + (s.durante||[]).length + (s.depois||[]).length;
-      return `<div class="servico-card">
+    const ST_COR   = { identificado:'var(--danger)', andamento:'var(--warn)', resolvido:'var(--accent)' };
+    const ST_LABEL = { identificado:'🔴 Identificado', andamento:'🟡 Em andamento', resolvido:'🟢 Resolvido' };
+    container.innerHTML = lista.map((o, idx) => {
+      if (visFiltroAtivo !== 'todos' && o.status !== visFiltroAtivo) return '';
+      const [y,m,d] = o.data ? o.data.split('-') : ['','',''];
+      const dataFmt = o.data ? d+'/'+m+'/'+y : '';
+      const fotos = o.fotos || [];
+      return \`<div class="servico-card" style="margin-bottom:12px;">
         <div class="servico-card-header">
           <div style="flex:1;">
-            <div style="font-weight:600; font-size:14px; color:var(--text);">${s.descricao}</div>
-            ${s.empresa ? `<div style="font-size:12px; color:var(--blue); margin-top:3px;">🏢 ${s.empresa}</div>` : ''}
-            ${s.obs ? `<div style="font-size:12px; color:var(--muted2); margin-top:3px);">${s.obs}</div>` : ''}
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-weight:700;font-size:13px;color:var(--text);">\${o.tipo}</span>
+              <span style="font-size:11px;background:rgba(255,255,255,.07);border-radius:4px;padding:1px 7px;color:var(--muted2);">\${o.local||''}</span>
+              <span style="font-size:11px;font-weight:700;color:\${ST_COR[o.status]||'var(--muted)'};">\${ST_LABEL[o.status]||''}</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted2);margin-top:5px;line-height:1.5;">\${o.descricao}</div>
           </div>
-          <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
-            ${dataFmt ? `<span style="font-size:11px; color:var(--muted);">${dataFmt}</span>` : ''}
-            <span style="font-size:11px; background:rgba(74,222,128,.1); color:var(--accent); border:1px solid var(--accent); border-radius:5px; padding:2px 8px;">${totalFotos} foto${totalFotos !== 1 ? 's' : ''}</span>
-            <button onclick="editarServico(${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px;">✏️</button>
-            <button onclick="excluirServico(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">🗑️</button>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <span style="font-size:11px;color:var(--muted);">\${dataFmt}</span>
+            <div style="display:flex;gap:4px;">
+              <button onclick="editarOcorrencia(\${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px;">✏️</button>
+              <button onclick="excluirOcorrencia(\${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">🗑️</button>
+            </div>
           </div>
         </div>
-        <div class="servico-fotos-grid">
-          ${['antes','durante','depois'].map(momento => {
-            const fotos = s[momento] || [];
-            const cor = momento === 'antes' ? 'var(--blue)' : momento === 'durante' ? 'var(--warn)' : 'var(--accent)';
-            const bg = momento === 'antes' ? 'rgba(96,165,250,.15)' : momento === 'durante' ? 'rgba(251,191,36,.15)' : 'rgba(74,222,128,.15)';
-            return `<div class="servico-fotos-momento">
-              <div class="momento-label" style="background:${bg}; color:${cor};">📷 ${momento.toUpperCase()}</div>
-              <div class="momento-fotos">
-                ${fotos.length > 0
-                  ? fotos.map((f, fi) => `<img src="${f}" onclick="verFotoRelatorio('${chave}',${idx},'${momento}',${fi})" />`).join('')
-                  : `<span style="font-size:11px; color:var(--muted);">Sem fotos</span>`}
-              </div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
+        \${fotos.length > 0 ? \`<div style="padding:10px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;">
+          \${fotos.map((f,fi) => \`<img src="\${f}" style="width:70px;height:70px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;" onclick="verFotoSimples('\${visChaveAtual}','vis',\${idx},\${fi})">\`).join('')}
+        </div>\` : ''}
+      </div>\`;
     }).join('');
   }
+  function abrirModalOcorrencia() {
+    if (!visChaveAtual && !visCarregar()) return;
+    if (!visChaveAtual) { alert('Carregue um mês primeiro.'); return; }
+    document.getElementById('ocr-modal-titulo').textContent = 'Nova Ocorrência';
+    document.getElementById('ocr-edit-idx').value = '';
+    document.getElementById('ocr-data').value = new Date().toISOString().split('T')[0];
+    document.getElementById('ocr-tipo').value = '';
+    document.getElementById('ocr-local').value = '';
+    document.getElementById('ocr-status').value = 'identificado';
+    document.getElementById('ocr-descricao').value = '';
+    ocrFotosTemp = [];
+    document.getElementById('ocr-preview').innerHTML = '';
+    document.getElementById('ocr-inp-foto').value = '';
+    document.getElementById('ocorrenciaModalOverlay').classList.add('open');
+  }
+  function fecharModalOcorrencia() {
+    document.getElementById('ocorrenciaModalOverlay').classList.remove('open');
+  }
+  function ocrAddFotos(event) {
+    Array.from(event.target.files).forEach(file => {
+      const r = new FileReader();
+      r.onload = e => { ocrFotosTemp.push(e.target.result); renderOcrPreview(); };
+      r.readAsDataURL(file);
+    });
+  }
+  function renderOcrPreview() {
+    document.getElementById('ocr-preview').innerHTML = ocrFotosTemp.map((src,i) =>
+      \`<div style="position:relative;display:inline-block;">
+        <img src="\${src}" style="width:52px;height:52px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">
+        <button onclick="ocrFotosTemp.splice(\${i},1);renderOcrPreview()" style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;line-height:16px;text-align:center;">✕</button>
+      </div>\`
+    ).join('');
+  }
+  function editarOcorrencia(idx) {
+    const o = (visDados[visChaveAtual] || [])[idx];
+    document.getElementById('ocr-modal-titulo').textContent = 'Editar Ocorrência';
+    document.getElementById('ocr-edit-idx').value = idx;
+    document.getElementById('ocr-data').value = o.data || '';
+    document.getElementById('ocr-tipo').value = o.tipo || '';
+    document.getElementById('ocr-local').value = o.local || '';
+    document.getElementById('ocr-status').value = o.status || 'identificado';
+    document.getElementById('ocr-descricao').value = o.descricao || '';
+    ocrFotosTemp = [...(o.fotos || [])];
+    renderOcrPreview();
+    document.getElementById('ocorrenciaModalOverlay').classList.add('open');
+  }
+  function excluirOcorrencia(idx) {
+    if (!confirm('Excluir esta ocorrência?')) return;
+    visDados[visChaveAtual].splice(idx, 1);
+    renderVistoria(); salvarDados();
+  }
+  function salvarOcorrencia() {
+    const tipo = document.getElementById('ocr-tipo').value;
+    const descricao = document.getElementById('ocr-descricao').value.trim();
+    const data = document.getElementById('ocr-data').value;
+    if (!tipo || !descricao || !data) { alert('Preencha data, tipo e descrição.'); return; }
+    const ocr = { data, tipo, local: document.getElementById('ocr-local').value.trim(),
+      status: document.getElementById('ocr-status').value,
+      descricao, fotos: [...ocrFotosTemp] };
+    if (!visDados[visChaveAtual]) visDados[visChaveAtual] = [];
+    const editIdx = document.getElementById('ocr-edit-idx').value;
+    if (editIdx !== '') { visDados[visChaveAtual][parseInt(editIdx)] = ocr; }
+    else { visDados[visChaveAtual].push(ocr); }
+    fecharModalOcorrencia(); renderVistoria(); salvarDados(); showToast('Ocorrência salva!');
+  }
 
+  // ── ACOMPANHAMENTO DE SERVIÇOS ─────────────────────────────────
+  let acoDados = {};  // { "CONDO||2026-03": [ {servicos} ] }
+  let acoChaveAtual = null;
+  let servFotosTemp = { antes: [], depois: [] };
+
+  function acoChave() {
+    const c = document.getElementById('aco-condo').value;
+    const m = document.getElementById('aco-mes').value;
+    return c && m ? c + '||' + m : null;
+  }
+  function acoAtualizar() { acoChaveAtual = acoChave(); }
+  function acoCarregar() {
+    const chave = acoChave();
+    if (!chave) { alert('Selecione condomínio e mês.'); return; }
+    acoChaveAtual = chave;
+    if (!acoDados[chave]) acoDados[chave] = [];
+    const [condo, mes] = chave.split('||');
+    const [y,m] = mes.split('-');
+    const nomeMes = new Date(y, m-1, 1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+    const curto = condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+    document.getElementById('aco-titulo').textContent = curto;
+    document.getElementById('aco-subtitulo').textContent = 'Serviços — ' + nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+    document.getElementById('aco-conteudo').style.display = '';
+    document.getElementById('btn-aco-pdf').style.display = '';
+    renderAcompanhamento();
+  }
+  function renderAcompanhamento() {
+    if (!acoChaveAtual) return;
+    const lista = acoDados[acoChaveAtual] || [];
+    const container = document.getElementById('aco-lista');
+    if (lista.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Nenhum serviço cadastrado.</div>';
+      return;
+    }
+    container.innerHTML = lista.map((s, idx) => {
+      const [y,m,d] = s.data ? s.data.split('-') : ['','',''];
+      const dataFmt = s.data ? d+'/'+m+'/'+y : '';
+      const stLabel = s.status === 'concluido' ? '🟢 Concluído' : '🟡 Em andamento';
+      const stCor = s.status === 'concluido' ? 'var(--accent)' : 'var(--warn)';
+      const totalFotos = (s.antes||[]).length + (s.depois||[]).length;
+      return \`<div class="servico-card" style="margin-bottom:12px;">
+        <div class="servico-card-header">
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:13px;color:var(--text);">\${s.descricao}</div>
+            \${s.empresa ? \`<div style="font-size:11px;color:var(--blue);margin-top:3px;">🏢 \${s.empresa}</div>\` : ''}
+            \${s.obs ? \`<div style="font-size:12px;color:var(--muted2);margin-top:3px;">\${s.obs}</div>\` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              \${dataFmt ? \`<span style="font-size:11px;color:var(--muted);">\${dataFmt}</span>\` : ''}
+              <span style="font-size:11px;font-weight:700;color:\${stCor};">\${stLabel}</span>
+              <span style="font-size:11px;background:rgba(74,222,128,.1);color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:1px 7px;">\${totalFotos} foto\${totalFotos!==1?'s':''}</span>
+            </div>
+            <div style="display:flex;gap:4px;">
+              <button onclick="editarServico(\${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px;">✏️</button>
+              <button onclick="excluirServico(\${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">🗑️</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border);">
+          \${['antes','depois'].map(momento => {
+            const fotos = s[momento] || [];
+            const cor = momento==='antes'?'var(--blue)':'var(--accent)';
+            const bg = momento==='antes'?'rgba(96,165,250,.15)':'rgba(74,222,128,.15)';
+            return \`<div style="padding:10px;\${momento==='antes'?'border-right:1px solid var(--border)':''}">
+              <div style="font-size:10px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:4px;display:inline-block;background:\${bg};color:\${cor};margin-bottom:6px;">📷 \${momento.toUpperCase()}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                \${fotos.length > 0
+                  ? fotos.map((f,fi) => \`<img src="\${f}" style="width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;" onclick="verFotoSimples('\${acoChaveAtual}','aco',\${idx},'\${momento}',\${fi})">\`).join('')
+                  : \`<span style="font-size:11px;color:var(--muted);">Sem fotos</span>\`}
+              </div>
+            </div>\`;
+          }).join('')}
+        </div>
+      </div>\`;
+    }).join('');
+  }
   function abrirModalServico() {
-    if (!relChave()) { alert('Carregue um relatório primeiro.'); return; }
+    if (!acoChaveAtual) { alert('Carregue um mês primeiro.'); return; }
     document.getElementById('serv-modal-titulo').textContent = 'Novo Serviço';
     document.getElementById('serv-edit-idx').value = '';
     document.getElementById('serv-descricao').value = '';
     document.getElementById('serv-empresa').value = '';
     document.getElementById('serv-obs').value = '';
     document.getElementById('serv-data').value = new Date().toISOString().split('T')[0];
-    servFotosTemp = { antes: [], durante: [], depois: [] };
-    ['antes','durante','depois'].forEach(m => {
-      document.getElementById('prev-' + m).innerHTML = '';
-      document.getElementById('inp-' + m).value = '';
-    });
+    document.getElementById('serv-status').value = 'andamento';
+    servFotosTemp = { antes: [], depois: [] };
+    ['antes','depois'].forEach(m => { document.getElementById('prev-'+m).innerHTML=''; document.getElementById('inp-'+m).value=''; });
     document.getElementById('servicoModalOverlay').classList.add('open');
   }
-
   function fecharModalServico() {
     document.getElementById('servicoModalOverlay').classList.remove('open');
   }
-
   function editarServico(idx) {
-    const s = relDados[relChave()].servicos[idx];
+    const s = (acoDados[acoChaveAtual] || [])[idx];
     document.getElementById('serv-modal-titulo').textContent = 'Editar Serviço';
     document.getElementById('serv-edit-idx').value = idx;
     document.getElementById('serv-descricao').value = s.descricao;
     document.getElementById('serv-empresa').value = s.empresa || '';
     document.getElementById('serv-obs').value = s.obs || '';
     document.getElementById('serv-data').value = s.data || '';
-    servFotosTemp = {
-      antes: [...(s.antes || [])],
-      durante: [...(s.durante || [])],
-      depois: [...(s.depois || [])]
-    };
-    ['antes','durante','depois'].forEach(m => renderPreviewMomento(m));
+    document.getElementById('serv-status').value = s.status || 'andamento';
+    servFotosTemp = { antes: [...(s.antes||[])], depois: [...(s.depois||[])] };
+    ['antes','depois'].forEach(m => renderPreviewMomento(m));
     document.getElementById('servicoModalOverlay').classList.add('open');
   }
-
   function excluirServico(idx) {
     if (!confirm('Excluir este serviço?')) return;
-    relDados[relChave()].servicos.splice(idx, 1);
-    renderServicos();
-    salvarDados();
+    acoDados[acoChaveAtual].splice(idx, 1);
+    renderAcompanhamento(); salvarDados();
   }
-
   function addFotosMomento(momento, event) {
-    const files = Array.from(event.target.files);
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        servFotosTemp[momento].push(e.target.result);
-        renderPreviewMomento(momento);
-      };
-      reader.readAsDataURL(file);
+    Array.from(event.target.files).forEach(file => {
+      const r = new FileReader();
+      r.onload = e => { servFotosTemp[momento].push(e.target.result); renderPreviewMomento(momento); };
+      r.readAsDataURL(file);
     });
   }
-
   function renderPreviewMomento(momento) {
     const preview = document.getElementById('prev-' + momento);
     preview.innerHTML = servFotosTemp[momento].map((src, i) =>
-      `<div style="position:relative; display:inline-block;">
-        <img src="${src}" style="width:52px;height:52px;object-fit:cover;border-radius:5px;border:1px solid var(--border);" />
-        <button onclick="removerFotoMomento('${momento}',${i})" style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;line-height:16px;text-align:center;">✕</button>
-      </div>`
+      \`<div style="position:relative;display:inline-block;">
+        <img src="\${src}" style="width:52px;height:52px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">
+        <button onclick="servFotosTemp['\${momento}'].splice(\${i},1);renderPreviewMomento('\${momento}')" style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;line-height:16px;text-align:center;">✕</button>
+      </div>\`
     ).join('');
   }
-
-  function removerFotoMomento(momento, i) {
-    servFotosTemp[momento].splice(i, 1);
-    renderPreviewMomento(momento);
-  }
-
   function salvarServico() {
     const descricao = document.getElementById('serv-descricao').value.trim();
     if (!descricao) { alert('Informe a descrição do serviço.'); return; }
-    const servico = {
-      descricao,
+    const servico = { descricao,
       empresa: document.getElementById('serv-empresa').value.trim(),
       obs: document.getElementById('serv-obs').value.trim(),
       data: document.getElementById('serv-data').value,
-      antes: [...servFotosTemp.antes],
-      durante: [...servFotosTemp.durante],
-      depois: [...servFotosTemp.depois]
-    };
-    const chave = relChave();
+      status: document.getElementById('serv-status').value,
+      antes: [...servFotosTemp.antes], depois: [...servFotosTemp.depois] };
+    if (!acoDados[acoChaveAtual]) acoDados[acoChaveAtual] = [];
     const editIdx = document.getElementById('serv-edit-idx').value;
-    if (editIdx !== '') {
-      relDados[chave].servicos[parseInt(editIdx)] = servico;
-    } else {
-      relDados[chave].servicos.push(servico);
-    }
-    fecharModalServico();
-    renderServicos();
-    salvarDados();
-    showToast('Serviço salvo!');
+    if (editIdx !== '') { acoDados[acoChaveAtual][parseInt(editIdx)] = servico; }
+    else { acoDados[acoChaveAtual].push(servico); }
+    fecharModalServico(); renderAcompanhamento(); salvarDados(); showToast('Serviço salvo!');
   }
 
-  function verFotoRelatorio(chave, sIdx, momento, fIdx) {
-    const s = relDados[chave].servicos[sIdx];
-    const fotos = s[momento] || [];
-    document.getElementById('fotos-modal-title').textContent = `${s.descricao} — ${momento.toUpperCase()}`;
-    document.getElementById('fotos-modal-grid').innerHTML = fotos.map(src =>
-      `<img src="${src}" style="width:200px;height:200px;object-fit:cover;border-radius:10px;border:1px solid var(--border);" />`
+  // Visualizar foto ampliada
+  function verFotoSimples(chave, tipo, idx, ...args) {
+    let fotos = [];
+    if (tipo === 'vis') {
+      fotos = (visDados[chave]||[])[idx]?.fotos || [];
+    } else {
+      const momento = args[0]; const fi = args[1];
+      fotos = (acoDados[chave]||[])[idx]?.[momento] || [];
+    }
+    document.getElementById('fotos-modal-title').textContent = 'Fotos';
+    document.getElementById('fotos-modal-grid').innerHTML = fotos.map(f =>
+      \`<img src="\${f}" style="width:200px;height:200px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">\`
     ).join('');
     document.getElementById('fotosModalOverlay').classList.add('open');
   }
 
-  // ── GERAR PDF RELATÓRIO MENSAL ───────────────────────────────
-  async function gerarRelPDF() {
-    const chave = relChave();
+  // ── PDF VISTORIA ───────────────────────────────────────────────
+  async function gerarVisoriaPDF() {
+    const chave = visChaveAtual;
     if (!chave) return;
-    const dados = relDados[chave];
-    const condo = document.getElementById('rel-condo-select').value;
-    const mes = document.getElementById('rel-mes-select').value;
-    const [y, m] = mes.split('-');
-    const nomeMes = new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-    const competencia = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
-    const dataGeracao = new Date().toLocaleDateString('pt-BR');
-
+    const lista = visDados[chave] || [];
+    const [condo, mes] = chave.split('||');
+    const [y,m] = mes.split('-');
+    const nomeMes = new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    const competencia = nomeMes.charAt(0).toUpperCase()+nomeMes.slice(1);
+    const dataGer = new Date().toLocaleDateString('pt-BR');
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
     const W = 210, marg = 15;
-    let y2 = 0;
 
-    // Captura logo para o PDF
-    let relLogoData = null;
-    try {
-      const imgEl = document.getElementById('modulo-logo');
-      if (imgEl && imgEl.src && imgEl.src.startsWith('data:image')) relLogoData = imgEl.src;
-    } catch(e) {}
+    let logoData = null;
+    try { const el = document.getElementById('modulo-logo'); if(el&&el.src.startsWith('data:')) logoData = el.src; } catch(e){}
 
-    function cabecalho() {
-      doc.setFillColor(26, 38, 64);
-      doc.rect(0, 0, W, 38, 'F');
-      if (relLogoData) {
-        try { doc.addImage(relLogoData, 'PNG', W - 52, 4, 38, 16); } catch {
-          try { doc.addImage(relLogoData, 'JPEG', W - 52, 4, 38, 16); } catch {}
-        }
-      }
+    function cab() {
+      doc.setFillColor(26,38,64); doc.rect(0,0,W,38,'F');
+      if(logoData) { try{doc.addImage(logoData,'PNG',W-52,4,38,16);}catch{try{doc.addImage(logoData,'JPEG',W-52,4,38,16);}catch{}} }
       doc.setTextColor(255,255,255);
-      doc.setFontSize(16); doc.setFont('helvetica','bold');
-      doc.text('MÓDULO ADMINISTRADORA', marg, 14);
-      doc.setFontSize(11); doc.setFont('helvetica','normal');
-      doc.text('Relatório Mensal de Serviços', marg, 22);
+      doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text('MÓDULO ADMINISTRADORA',marg,13);
+      doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text('Relatório de Vistoria',marg,21);
       doc.setFontSize(8);
-      const condoNome = condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
-      doc.text(`${condoNome}  |  Competência: ${competencia}`, marg, 30);
-      doc.text(`Gerado em: ${dataGeracao}`, W - marg - 42, 30);
+      const cn = condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+      doc.text(cn+' | '+competencia,marg,29); doc.text('Gerado: '+dataGer,W-marg-40,29);
     }
-
-    function rodape(pageNum, total) {
-      doc.setFontSize(7); doc.setTextColor(150,150,150);
-      doc.text(`Módulo Administradora  —  ${condoNome(condo)}  —  ${competencia}  —  Pág. ${pageNum}/${total}`, W/2, 292, { align:'center' });
+    function rod(p,t) {
+      doc.setFontSize(7);doc.setTextColor(150,150,150);
+      const cn = condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+      doc.text('Módulo Administradora — '+cn+' — '+competencia+' — Pág. '+p+'/'+t,W/2,292,{align:'center'});
     }
-
-    function condoNome(c) {
-      return c.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
-    }
-
-    // ─ Página 1: Capa + Atividades ─
-    cabecalho(); y2 = 50;
-
-    // Título seção atividades
-    doc.setFillColor(240, 244, 255);
-    doc.rect(marg, y2, W - marg*2, 9, 'F');
-    doc.setTextColor(26,38,64); doc.setFontSize(10); doc.setFont('helvetica','bold');
-    doc.text('CONTROLE DE ATIVIDADES DO MÊS', marg + 4, y2 + 6.2);
-    y2 += 14;
-
-    const ativSorted = [...(dados.atividades || [])].sort((a,b) => a.data.localeCompare(b.data));
-    if (ativSorted.length === 0) {
-      doc.setTextColor(150,150,150); doc.setFontSize(9); doc.setFont('helvetica','italic');
-      doc.text('Nenhuma atividade registrada.', marg, y2);
-      y2 += 10;
-    } else {
-      ativSorted.forEach((a, i) => {
-        if (y2 > 268) { doc.addPage(); cabecalho(); y2 = 50; }
-        const [ay, am, ad] = a.data.split('-');
-        doc.setTextColor(74,222,128); doc.setFontSize(8); doc.setFont('helvetica','bold');
-        doc.text(`${String(i+1).padStart(2,'0')}°`, marg, y2);
-        doc.setTextColor(120,120,120); doc.setFont('helvetica','normal');
-        doc.text(`${ad}/${am}`, marg + 10, y2);
-        doc.setTextColor(30,30,30); doc.setFontSize(9);
-        const lines = doc.splitTextToSize(a.descricao, W - marg*2 - 45);
-        doc.text(lines, marg + 30, y2);
-        y2 += lines.length * 5;
-        if (a.empresa) {
-          doc.setTextColor(96,165,250); doc.setFontSize(7.5);
-          doc.text(`🏢 ${a.empresa}`, marg + 30, y2);
-          y2 += 5;
+    cab(); let y2 = 50;
+    // Resumo por status
+    const ids = lista.filter(o=>o.status==='identificado').length;
+    const ands = lista.filter(o=>o.status==='andamento').length;
+    const res = lista.filter(o=>o.status==='resolvido').length;
+    const boxes=[{l:'Total',v:lista.length,r:180,g:180,b:180},{l:'Identificado',v:ids,r:248,g:113,b:113},{l:'Em andamento',v:ands,r:251,g:191,b:36},{l:'Resolvido',v:res,r:74,g:222,b:128}];
+    boxes.forEach((b,i)=>{
+      const bx=marg+i*47;
+      doc.setFillColor(b.r,b.g,b.b);doc.roundedRect(bx,y2,43,16,3,3,'F');
+      doc.setTextColor(30,30,30);doc.setFontSize(14);doc.setFont('helvetica','bold');
+      doc.text(String(b.v),bx+21.5,y2+9,{align:'center'});
+      doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(b.l,bx+21.5,y2+14,{align:'center'});
+    });
+    y2 += 24;
+    for (const o of lista) {
+      if(y2>240){doc.addPage();cab();y2=50;}
+      const ST_LABEL={identificado:'IDENTIFICADO',andamento:'EM ANDAMENTO',resolvido:'RESOLVIDO'};
+      const ST_RGB={identificado:[220,50,50],andamento:[200,140,0],resolvido:[39,174,96]};
+      const [y2a,m2,d2]=o.data?o.data.split('-'):['','',''];
+      doc.setFillColor(26,38,64);doc.rect(marg,y2,W-marg*2,8,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');
+      doc.text(pdfTxt(o.tipo)+(o.local?' — '+pdfTxt(o.local):''),marg+2,y2+5.5);
+      if(o.data){doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text(d2+'/'+m2+'/'+y2a,W-marg-18,y2+5.5);}
+      y2+=9;
+      const rgb=ST_RGB[o.status]||[150,150,150];
+      doc.setTextColor(...rgb);doc.setFontSize(7);doc.setFont('helvetica','bold');
+      doc.text(ST_LABEL[o.status]||'',marg+2,y2+4);
+      y2+=7;
+      doc.setTextColor(40,40,40);doc.setFontSize(8);doc.setFont('helvetica','normal');
+      const lines=doc.splitTextToSize(pdfTxt(o.descricao),W-marg*2-4);
+      doc.text(lines,marg+2,y2);
+      y2+=lines.length*5+4;
+      // Fotos
+      if(o.fotos&&o.fotos.length>0){
+        if(y2+55>270){doc.addPage();cab();y2=50;}
+        let fx=marg;
+        for(const foto of o.fotos){
+          if(fx+55>W-marg){fx=marg;y2+=56;}
+          if(y2+55>270){doc.addPage();cab();y2=50;fx=marg;}
+          try{doc.addImage(foto,'JPEG',fx,y2,52,52);}catch{try{doc.addImage(foto,'PNG',fx,y2,52,52);}catch{}}
+          fx+=56;
         }
-        if (a.os) {
-          doc.setTextColor(150,150,150); doc.setFontSize(7.5);
-          doc.text(a.os, marg + 30, y2);
-          y2 += 5;
-        }
-        y2 += 2;
-        doc.setDrawColor(42, 45, 56);
-        doc.line(marg, y2, W - marg, y2);
-        y2 += 4;
-      });
-    }
-
-    // ─ Seção serviços (nova página se necessário) ─
-    if ((dados.servicos || []).length > 0) {
-      doc.addPage(); cabecalho(); y2 = 50;
-      doc.setFillColor(240, 244, 255);
-      doc.rect(marg, y2, W - marg*2, 9, 'F');
-      doc.setTextColor(26,38,64); doc.setFontSize(10); doc.setFont('helvetica','bold');
-      doc.text('SERVIÇOS REALIZADOS — REGISTRO FOTOGRÁFICO', marg + 4, y2 + 6.2);
-      y2 += 14;
-
-      for (const s of dados.servicos) {
-        if (y2 > 220) { doc.addPage(); cabecalho(); y2 = 50; }
-
-        // Header do serviço
-        doc.setFillColor(26,38,64);
-        doc.rect(marg, y2, W - marg*2, 8, 'F');
-        doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
-        doc.text(s.descricao.substring(0,65), marg + 3, y2 + 5.5);
-        if (s.data) {
-          const [sy,sm,sd] = s.data.split('-');
-          doc.setFontSize(7); doc.setFont('helvetica','normal');
-          doc.text(`${sd}/${sm}/${sy}`, W - marg - 18, y2 + 5.5);
-        }
-        y2 += 10;
-        if (s.empresa) {
-          doc.setTextColor(96,165,250); doc.setFontSize(8); doc.setFont('helvetica','normal');
-          doc.text(`Empresa: ${s.empresa}`, marg, y2); y2 += 5;
-        }
-        if (s.obs) {
-          doc.setTextColor(100,100,100); doc.setFontSize(7.5);
-          doc.text(s.obs.substring(0,90), marg, y2); y2 += 5;
-        }
-        y2 += 2;
-
-        // Fotos por momento
-        const momentos = [
-          { key:'antes', label:'ANTES', r:96, g:165, b:250 },
-          { key:'durante', label:'DURANTE', r:251, g:191, b:36 },
-          { key:'depois', label:'DEPOIS', r:74, g:222, b:128 },
-        ];
-        const fotoW = 42, fotoH = 42, colW = (W - marg*2) / 3;
-        for (const mom of momentos) {
-          const fotos = s[mom.key] || [];
-          if (fotos.length === 0) continue;
-          if (y2 + 55 > 275) { doc.addPage(); cabecalho(); y2 = 50; }
-          // label
-          doc.setFillColor(mom.r, mom.g, mom.b, 0.15);
-          doc.setTextColor(mom.r, mom.g, mom.b);
-          doc.setFontSize(8); doc.setFont('helvetica','bold');
-          doc.text(`📷 ${mom.label}`, marg, y2); y2 += 6;
-          // fotos em linha
-          let fx = marg;
-          for (const foto of fotos) {
-            if (fx + fotoW > W - marg) { fx = marg; y2 += fotoH + 4; }
-            if (y2 + fotoH > 272) { doc.addPage(); cabecalho(); y2 = 50; fx = marg; }
-            try { doc.addImage(foto, 'JPEG', fx, y2, fotoW, fotoH); }
-            catch { try { doc.addImage(foto, 'PNG', fx, y2, fotoW, fotoH); } catch {} }
-            fx += fotoW + 3;
-          }
-          y2 += fotoH + 8;
-        }
-        y2 += 4;
-        doc.setDrawColor(42,45,56); doc.line(marg, y2, W-marg, y2); y2 += 6;
+        y2+=56;
       }
+      doc.setDrawColor(42,45,56);doc.line(marg,y2,W-marg,y2);y2+=6;
     }
-
-    // Rodapés
-    const total = doc.internal.getNumberOfPages();
-    for (let p = 1; p <= total; p++) {
-      doc.setPage(p);
-      rodape(p, total);
-    }
-
-    const nomeArquivo = `Relatorio_Mensal_${condoNome(condo).replace(/\s+/g,'_')}_${mes}.pdf`;
-    doc.save(nomeArquivo);
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){doc.setPage(p);rod(p,total);}
+    const cn=condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+    doc.save('Vistoria_'+cn.replace(/\s+/g,'_')+'_'+mes+'.pdf');
   }
 
-  // Inicializar dados do localStorage
-  carregarDados();
+  // ── PDF ACOMPANHAMENTO ─────────────────────────────────────────
+  async function gerarAcompanhamentoPDF() {
+    const chave = acoChaveAtual;
+    if (!chave) return;
+    const lista = acoDados[chave] || [];
+    const [condo, mes] = chave.split('||');
+    const [y,m] = mes.split('-');
+    const nomeMes = new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    const competencia = nomeMes.charAt(0).toUpperCase()+nomeMes.slice(1);
+    const dataGer = new Date().toLocaleDateString('pt-BR');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const W = 210, marg = 15;
+
+    let logoData = null;
+    try { const el = document.getElementById('modulo-logo'); if(el&&el.src.startsWith('data:')) logoData = el.src; } catch(e){}
+
+    function cab() {
+      doc.setFillColor(26,38,64);doc.rect(0,0,W,38,'F');
+      if(logoData){try{doc.addImage(logoData,'PNG',W-52,4,38,16);}catch{try{doc.addImage(logoData,'JPEG',W-52,4,38,16);}catch{}}}
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text('MÓDULO ADMINISTRADORA',marg,13);
+      doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text('Acompanhamento de Serviços',marg,21);
+      doc.setFontSize(8);
+      const cn=condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+      doc.text(cn+' | '+competencia,marg,29);doc.text('Gerado: '+dataGer,W-marg-40,29);
+    }
+    function rod(p,t){
+      doc.setFontSize(7);doc.setTextColor(150,150,150);
+      const cn=condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+      doc.text('Módulo Administradora — '+cn+' — '+competencia+' — Pág. '+p+'/'+t,W/2,292,{align:'center'});
+    }
+    cab(); let y2=50;
+    for(const s of lista){
+      if(y2>220){doc.addPage();cab();y2=50;}
+      const stLabel=s.status==='concluido'?'CONCLUÍDO':'EM ANDAMENTO';
+      const stRGB=s.status==='concluido'?[39,174,96]:[200,140,0];
+      doc.setFillColor(26,38,64);doc.rect(marg,y2,W-marg*2,8,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont('helvetica','bold');
+      doc.text(pdfTxt(s.descricao).substring(0,60),marg+2,y2+5.5);
+      if(s.data){const[sy,sm,sd]=s.data.split('-');doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text(sd+'/'+sm+'/'+sy,W-marg-18,y2+5.5);}
+      y2+=9;
+      doc.setTextColor(...stRGB);doc.setFontSize(7);doc.setFont('helvetica','bold');doc.text(stLabel,marg+2,y2+4);
+      if(s.empresa){doc.setTextColor(96,130,200);doc.setFont('helvetica','normal');doc.text('Empresa: '+pdfTxt(s.empresa),marg+50,y2+4);}
+      y2+=8;
+      if(s.obs){doc.setTextColor(100,100,100);doc.setFontSize(7.5);doc.setFont('helvetica','normal');const ls=doc.splitTextToSize(pdfTxt(s.obs),W-marg*2-4);doc.text(ls,marg+2,y2);y2+=ls.length*5+2;}
+      // Fotos antes/depois
+      for(const momento of ['antes','depois']){
+        const fotos=s[momento]||[];
+        if(!fotos.length)continue;
+        if(y2+60>270){doc.addPage();cab();y2=50;}
+        const cor=momento==='antes'?[96,165,250]:[74,222,128];
+        doc.setTextColor(...cor);doc.setFontSize(8);doc.setFont('helvetica','bold');
+        doc.text('📷 '+momento.toUpperCase(),marg,y2);y2+=6;
+        let fx=marg;
+        for(const foto of fotos){
+          if(fx+55>W-marg){fx=marg;y2+=56;}
+          if(y2+55>270){doc.addPage();cab();y2=50;fx=marg;}
+          try{doc.addImage(foto,'JPEG',fx,y2,52,52);}catch{try{doc.addImage(foto,'PNG',fx,y2,52,52);}catch{}}
+          fx+=56;
+        }
+        y2+=56;
+      }
+      doc.setDrawColor(42,45,56);doc.line(marg,y2,W-marg,y2);y2+=6;
+    }
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){doc.setPage(p);rod(p,total);}
+    const cn=condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+    doc.save('Acompanhamento_'+cn.replace(/\s+/g,'_')+'_'+mes+'.pdf');
+  }
 
   // ── SERVIÇOS PERIÓDICOS ──────────────────────────────────────
   let condoPerAtual = '';
@@ -3043,6 +3304,264 @@
         <div style="font-size:12px;font-weight:700;color:${isVencido?'var(--danger)':'var(--warn)'};">${isVencido?'VENCIDO':'ALERTA'} — ${vencFmt}</div>
       </div>`;
     }).join('');
+  }
+
+  // ── ALUGUÉIS ─────────────────────────────────────────────────
+  let alugueis = []; // array de contratos
+  let alugContratoTemp = null; // { nome, base64 }
+
+  document.getElementById('alug-indice').addEventListener('change', function() {
+    document.getElementById('alug-perc-group').style.display = this.value === 'Fixo (% ao ano)' ? '' : 'none';
+  });
+
+  function renderAlugueis() {
+    const container = document.getElementById('alug-lista');
+    const alertasArea = document.getElementById('alug-alertas-area');
+    const badge = document.getElementById('badge-alugueis');
+
+    if (alugueis.length === 0) {
+      container.innerHTML = `<div style="text-align:center;padding:48px;color:var(--muted);font-size:14px;">
+        <div style="font-size:40px;margin-bottom:12px;opacity:.3;">🏢</div>
+        Nenhum contrato cadastrado. Clique em "+ Novo Contrato" para começar.</div>`;
+      alertasArea.style.display = 'none';
+      badge.style.display = 'none';
+      return;
+    }
+
+    // Calcular alertas (60 dias)
+    const hoje = new Date();
+    const limite = new Date(); limite.setDate(limite.getDate() + 60);
+    const alertas = alugueis.filter(a => {
+      if (!a.dataReajuste) return false;
+      const d = new Date(a.dataReajuste);
+      return d <= limite;
+    });
+
+    badge.style.display = alertas.length > 0 ? '' : 'none';
+    badge.textContent = alertas.length;
+
+    if (alertas.length > 0) {
+      alertasArea.style.display = '';
+      alertasArea.innerHTML = `<div style="background:rgba(251,191,36,.1);border:1px solid var(--warn);border-radius:12px;padding:14px 18px;">
+        <div style="font-weight:700;color:var(--warn);font-size:13px;margin-bottom:8px;">⚠️ ${alertas.length} reajuste(s) nos próximos 60 dias</div>
+        ${alertas.map(a => {
+          const [y,m,d] = a.dataReajuste.split('-');
+          const dias = Math.ceil((new Date(a.dataReajuste) - hoje) / 86400000);
+          return `<div style="font-size:12px;color:var(--text);margin-top:4px;">
+            🏢 <strong>${a.imovel} — ${a.unidade}</strong> (${a.inquilino}) — Reajuste em ${d}/${m}/${y}
+            <span style="color:${dias<=0?'var(--danger)':'var(--warn)'};font-weight:700;margin-left:8px;">${dias<=0?'VENCIDO':dias+' dias'}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+    } else {
+      alertasArea.style.display = 'none';
+    }
+
+    container.innerHTML = alugueis.map((a, idx) => {
+      const valorFmt = a.valor ? 'R$ ' + parseFloat(a.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '—';
+      const [ry,rm,rd] = a.dataReajuste ? a.dataReajuste.split('-') : ['','',''];
+      const [vy,vm,vd] = a.dataVencContrato ? a.dataVencContrato.split('-') : ['','',''];
+      const reajFmt = a.dataReajuste ? `${rd}/${rm}/${ry}` : '—';
+      const vencFmt = a.dataVencContrato ? `${vd}/${vm}/${vy}` : '—';
+      const dias = a.dataReajuste ? Math.ceil((new Date(a.dataReajuste) - hoje) / 86400000) : null;
+      const alertaReaj = dias !== null && dias <= 60;
+      const vencido = dias !== null && dias <= 0;
+
+      return `<div class="servico-card" style="margin-bottom:14px;">
+        <div class="servico-card-header">
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span style="font-weight:700;font-size:15px;color:var(--text);">🏢 ${a.imovel}</span>
+              <span style="background:rgba(96,165,250,.15);color:var(--blue);font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;">${a.unidade}</span>
+            </div>
+            <div style="font-size:13px;color:var(--muted2);margin-top:4px;">👤 ${a.inquilino}${a.contato?' · '+a.contato:''}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            ${a.contrato ? `<button onclick="verContrato(${idx})" style="background:rgba(96,165,250,.1);border:1px solid var(--blue);color:var(--blue);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;">📄 Contrato</button>` : ''}
+            <button onclick="abrirModalReajuste(${idx})" style="background:rgba(74,222,128,.1);border:1px solid var(--accent);color:var(--accent);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;">↑ Reajuste</button>
+            <button onclick="editarAluguel(${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:16px;">✏️</button>
+            <button onclick="excluirAluguel(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">🗑️</button>
+          </div>
+        </div>
+
+        <!-- Dados financeiros -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--border);">
+          ${[
+            {l:'Valor atual', v:valorFmt, cor:'var(--accent)'},
+            {l:'Índice', v:a.indice||(a.percFixo?a.percFixo+'% a.a.':'—'), cor:'var(--text)'},
+            {l:'Próx. reajuste', v:reajFmt, cor: vencido?'var(--danger)':alertaReaj?'var(--warn)':'var(--text)'},
+            {l:'Venc. contrato', v:vencFmt, cor:'var(--muted2)'},
+          ].map((item,i) => `<div style="padding:12px;${i<3?'border-right:1px solid var(--border)':''}">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">${item.l}</div>
+            <div style="font-size:13px;font-weight:700;color:${item.cor};">${item.v}</div>
+          </div>`).join('')}
+        </div>
+
+        <!-- Histórico de reajustes -->
+        ${a.historico && a.historico.length > 0 ? `
+        <div style="border-top:1px solid var(--border);padding:10px 14px;">
+          <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;">HISTÓRICO DE REAJUSTES</div>
+          ${a.historico.slice().reverse().map(h => {
+            const [hy,hm,hd] = h.data.split('-');
+            const pct = h.valorAnt ? (((h.valorNovo-h.valorAnt)/h.valorAnt)*100).toFixed(1) : null;
+            return `<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--border);">
+              <span style="color:var(--muted);min-width:70px;">${hd}/${hm}/${hy}</span>
+              <span style="color:var(--muted2);">R$ ${parseFloat(h.valorAnt).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+              <span style="color:var(--muted);">→</span>
+              <span style="color:var(--accent);font-weight:600;">R$ ${parseFloat(h.valorNovo).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+              ${pct ? `<span style="color:var(--accent);font-size:11px;">(+${pct}%)</span>` : ''}
+              ${h.obs ? `<span style="color:var(--muted);font-size:11px;margin-left:4px;">— ${h.obs}</span>` : ''}
+            </div>`;
+          }).join('')}
+        </div>` : ''}
+
+        ${a.obs ? `<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted2);">📝 ${a.obs}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function abrirModalAluguel() {
+    document.getElementById('alug-modal-titulo').textContent = 'Novo Contrato';
+    document.getElementById('alug-edit-idx').value = '';
+    ['alug-imovel','alug-unidade','alug-inquilino','alug-contato','alug-valor','alug-dia-venc','alug-perc','alug-obs'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value = '';
+    });
+    document.getElementById('alug-indice').value = '';
+    document.getElementById('alug-data-reajuste').value = '';
+    document.getElementById('alug-data-venc-contrato').value = '';
+    document.getElementById('alug-perc-group').style.display = 'none';
+    alugContratoTemp = null;
+    document.getElementById('alug-contrato-preview').style.display = 'none';
+    document.getElementById('alug-inp-contrato').value = '';
+    document.getElementById('aluguelModalOverlay').classList.add('open');
+  }
+
+  function fecharModalAluguel() {
+    document.getElementById('aluguelModalOverlay').classList.remove('open');
+  }
+
+  function editarAluguel(idx) {
+    const a = alugueis[idx];
+    document.getElementById('alug-modal-titulo').textContent = 'Editar Contrato';
+    document.getElementById('alug-edit-idx').value = idx;
+    document.getElementById('alug-imovel').value = a.imovel || '';
+    document.getElementById('alug-unidade').value = a.unidade || '';
+    document.getElementById('alug-inquilino').value = a.inquilino || '';
+    document.getElementById('alug-contato').value = a.contato || '';
+    document.getElementById('alug-valor').value = a.valor || '';
+    document.getElementById('alug-dia-venc').value = a.diaVenc || '';
+    document.getElementById('alug-indice').value = a.indice || '';
+    document.getElementById('alug-perc').value = a.percFixo || '';
+    document.getElementById('alug-perc-group').style.display = a.indice === 'Fixo (% ao ano)' ? '' : 'none';
+    document.getElementById('alug-data-reajuste').value = a.dataReajuste || '';
+    document.getElementById('alug-data-venc-contrato').value = a.dataVencContrato || '';
+    document.getElementById('alug-obs').value = a.obs || '';
+    alugContratoTemp = a.contrato || null;
+    if (alugContratoTemp) {
+      document.getElementById('alug-contrato-preview').style.display = '';
+      document.getElementById('alug-contrato-nome').textContent = alugContratoTemp.nome;
+    } else {
+      document.getElementById('alug-contrato-preview').style.display = 'none';
+    }
+    document.getElementById('aluguelModalOverlay').classList.add('open');
+  }
+
+  function excluirAluguel(idx) {
+    if (!confirm('Excluir este contrato?')) return;
+    alugueis.splice(idx, 1);
+    renderAlugueis(); salvarDados();
+  }
+
+  function alugAnexarContrato(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = e => {
+      alugContratoTemp = { nome: file.name, base64: e.target.result };
+      document.getElementById('alug-contrato-nome').textContent = file.name;
+      document.getElementById('alug-contrato-preview').style.display = '';
+    };
+    r.readAsDataURL(file);
+  }
+
+  function alugRemoverContrato() {
+    alugContratoTemp = null;
+    document.getElementById('alug-contrato-preview').style.display = 'none';
+    document.getElementById('alug-inp-contrato').value = '';
+  }
+
+  function verContrato(idx) {
+    const a = alugueis[idx];
+    if (!a.contrato) return;
+    const link = document.createElement('a');
+    link.href = a.contrato.base64;
+    link.download = a.contrato.nome;
+    link.click();
+  }
+
+  function salvarAluguel() {
+    const imovel = document.getElementById('alug-imovel').value.trim();
+    const unidade = document.getElementById('alug-unidade').value.trim();
+    const inquilino = document.getElementById('alug-inquilino').value.trim();
+    const dataReajuste = document.getElementById('alug-data-reajuste').value;
+    if (!imovel || !unidade || !inquilino || !dataReajuste) {
+      alert('Preencha imóvel, unidade, inquilino e data do próximo reajuste.'); return;
+    }
+    const contrato = {
+      imovel, unidade, inquilino,
+      contato: document.getElementById('alug-contato').value.trim(),
+      valor: document.getElementById('alug-valor').value,
+      diaVenc: document.getElementById('alug-dia-venc').value,
+      indice: document.getElementById('alug-indice').value,
+      percFixo: document.getElementById('alug-perc').value,
+      dataReajuste,
+      dataVencContrato: document.getElementById('alug-data-venc-contrato').value,
+      obs: document.getElementById('alug-obs').value.trim(),
+      contrato: alugContratoTemp,
+    };
+    const editIdx = document.getElementById('alug-edit-idx').value;
+    if (editIdx !== '') {
+      contrato.historico = alugueis[parseInt(editIdx)].historico || [];
+      alugueis[parseInt(editIdx)] = contrato;
+    } else {
+      contrato.historico = [];
+      alugueis.push(contrato);
+    }
+    fecharModalAluguel(); renderAlugueis(); salvarDados(); showToast('Contrato salvo!');
+  }
+
+  // ── REAJUSTE ──────────────────────────────────────────────────
+  function abrirModalReajuste(idx) {
+    const a = alugueis[idx];
+    document.getElementById('reaj-idx').value = idx;
+    document.getElementById('reaj-subtitulo').textContent = `${a.imovel} — ${a.unidade} (${a.inquilino})`;
+    document.getElementById('reaj-valor-ant').value = a.valor || '';
+    document.getElementById('reaj-valor-novo').value = '';
+    document.getElementById('reaj-data').value = new Date().toISOString().split('T')[0];
+    document.getElementById('reaj-proxima').value = a.dataReajuste || '';
+    document.getElementById('reaj-obs').value = '';
+    document.getElementById('reajusteModalOverlay').classList.add('open');
+  }
+
+  function fecharModalReajuste() {
+    document.getElementById('reajusteModalOverlay').classList.remove('open');
+  }
+
+  function salvarReajuste() {
+    const idx = parseInt(document.getElementById('reaj-idx').value);
+    const valorNovo = document.getElementById('reaj-valor-novo').value;
+    const data = document.getElementById('reaj-data').value;
+    const proxima = document.getElementById('reaj-proxima').value;
+    if (!valorNovo || !data) { alert('Informe o novo valor e a data.'); return; }
+    const a = alugueis[idx];
+    if (!a.historico) a.historico = [];
+    a.historico.push({
+      data, valorAnt: a.valor, valorNovo,
+      obs: document.getElementById('reaj-obs').value.trim()
+    });
+    a.valor = valorNovo;
+    if (proxima) a.dataReajuste = proxima;
+    fecharModalReajuste(); renderAlugueis(); salvarDados(); showToast('Reajuste registrado!');
   }
 
   // Load logo from GitHub Pages site
