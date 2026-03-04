@@ -1181,6 +1181,12 @@
           ⚠ <span id="ext-alertas-count">0</span> extintor(es) vencem em 30 dias
         </div>
       </div>
+      <!-- Empresa de recarga por condomínio -->
+      <div id="ext-empresa-row" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">🏢 Empresa de recarga:</label>
+        <input id="ext-empresa-condo" class="form-input" style="flex:1; min-width:200px; max-width:360px;" placeholder="Ex: Prevenção Extintores, FirePro..." oninput="salvarEmpresaCondo()" />
+        <span style="font-size:11px; color:var(--muted);">Salvo automaticamente</span>
+      </div>
     </div>
 
     <!-- Tabela de extintores -->
@@ -1271,10 +1277,6 @@
         <label class="form-label">Data da próxima recarga *</label>
         <input class="form-input" type="date" id="ext-proxima-recarga" />
       </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Empresa de recarga</label>
-      <input class="form-input" id="ext-empresa" placeholder="Ex: Prevenção Extintores, FirePro..." />
     </div>
     <div class="form-group">
       <label class="form-label">Observações</label>
@@ -1680,6 +1682,8 @@
   let fotosTemp = []; // base64 das fotos no modal aberto
   let filtroAtivo = 'todos';
 
+  let empresasCondo = {}; // { "NOME CONDO": "Empresa X" }
+
   function selecionarCondo() {
     condoAtual = document.getElementById('ext-condo-select').value;
     if (!condoAtual) return;
@@ -1688,7 +1692,16 @@
     document.getElementById('ext-condo-sub').textContent = 'Vistoria de Extintores';
     document.getElementById('ext-tabela-card').style.display = '';
     document.getElementById('btn-pdf').style.display = '';
+    // Mostrar campo empresa e carregar valor salvo
+    const empresaRow = document.getElementById('ext-empresa-row');
+    empresaRow.style.display = 'flex';
+    document.getElementById('ext-empresa-condo').value = empresasCondo[condoAtual] || '';
     renderTabela();
+  }
+
+  function salvarEmpresaCondo() {
+    if (!condoAtual) return;
+    empresasCondo[condoAtual] = document.getElementById('ext-empresa-condo').value.trim();
   }
 
   function calcularStatus(proximaRecarga) {
@@ -1795,7 +1808,6 @@
     document.getElementById('ext-capacidade').value = '4 kg';
     document.getElementById('ext-ultima-recarga').value = '';
     document.getElementById('ext-proxima-recarga').value = '';
-    document.getElementById('ext-empresa').value = '';
     document.getElementById('ext-obs').value = '';
     document.getElementById('ext-fotos-preview').innerHTML = '';
     document.getElementById('ext-foto-input').value = '';
@@ -1821,7 +1833,6 @@
     document.getElementById('ext-capacidade').value = e.capacidade;
     document.getElementById('ext-ultima-recarga').value = e.ultimaRecarga;
     document.getElementById('ext-proxima-recarga').value = e.proximaRecarga;
-    document.getElementById('ext-empresa').value = e.empresa || '';
     document.getElementById('ext-obs').value = e.obs || '';
     fotosTemp = [...(e.fotos || [])];
     renderPreviewFotos();
@@ -1875,7 +1886,6 @@
       capacidade: document.getElementById('ext-capacidade').value,
       ultimaRecarga: document.getElementById('ext-ultima-recarga').value,
       proximaRecarga,
-      empresa: document.getElementById('ext-empresa').value.trim(),
       obs: document.getElementById('ext-obs').value.trim(),
       fotos: [...fotosTemp],
       dataCadastro: new Date().toISOString()
@@ -1915,7 +1925,13 @@
     const W = 210, marg = 15;
     let y = 20;
 
-    // Captura logo se disponível
+    // Sanitiza caracteres Unicode que causam troca de fonte no jsPDF
+    function pdfTxt(str) {
+      return (str || '').replace(/₂/g, '2').replace(/₃/g, '3').replace(/[^\x00-\x7E\xC0-\xFF]/g, '?');
+    }
+
+    // Empresa de recarga do condomínio
+    const empresaCondoAtual = empresasCondo[condoAtual] || '';
     let logoData = null;
     try {
       const imgEl = document.getElementById('modulo-logo');
@@ -1946,8 +1962,13 @@
     doc.text(`Condomínio: ${condoAtual}`, marg, 29);
     const dataRelatorio = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
     doc.text(`Data: ${dataRelatorio}`, marg, 35);
+    if (empresaCondoAtual) {
+      doc.setFontSize(7.5);
+      doc.setTextColor(180, 210, 255);
+      doc.text(`Empresa de recarga: ${empresaCondoAtual}`, marg, 41);
+    }
 
-    y = 50;
+    y = empresaCondoAtual ? 54 : 50;
     doc.setTextColor(30, 30, 30);
 
     // Resumo
@@ -2026,7 +2047,7 @@
       doc.setFont('helvetica', 'normal');
       doc.text(e.numero.substring(0,12), marg + 1, y + 5.5);
       doc.text(e.local.substring(0,22), marg + 20, y + 5.5);
-      doc.text(e.tipo.substring(0,18), marg + 60, y + 5.5);
+      doc.text(pdfTxt(e.tipo).substring(0,18), marg + 60, y + 5.5);
       doc.text(e.capacidade, marg + 95, y + 5.5);
       doc.text(formatarData(e.ultimaRecarga), marg + 112, y + 5.5);
       doc.text(formatarData(e.proximaRecarga), marg + 133, y + 5.5);
@@ -2065,13 +2086,13 @@
         doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(26, 38, 64);
-        const labelTitulo = `${e.numero} — ${e.local} (${e.tipo} • ${e.capacidade})`;
+        const labelTitulo = `${pdfTxt(e.numero)} — ${pdfTxt(e.local)} (${pdfTxt(e.tipo)} • ${e.capacidade})`;
         doc.text(labelTitulo, marg, y);
-        if (e.empresa) {
+        if (empresaCondoAtual) {
           doc.setFontSize(7.5);
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(96, 130, 200);
-          doc.text(`Empresa: ${e.empresa}`, marg, y + 5);
+          doc.text(`Empresa: ${empresaCondoAtual}`, marg, y + 5);
           y += 5;
         }
         y += 6;
