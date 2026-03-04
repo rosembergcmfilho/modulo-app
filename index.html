@@ -2075,6 +2075,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </main>
 <script>
+  // ── ESTADO GLOBAL ────────────────────────────────────────────
+  let currentSection = 'dashboard';
+  let extintores    = {};
+  let condoAtual    = '';
+  let fotosTemp     = [];
+  let filtroAtivo   = 'todos';
+  let empresasCondo = {};
+  let visDados      = {};
+  let visChaveAtual = null;
+  let visFiltroAtivo = 'todos';
+  let ocrFotosTemp  = [];
+  let acoDados      = {};
+  let acoChaveAtual = null;
+  let servFotosTemp = { antes: [], depois: [] };
+  let periodicos    = {};
+  let condoPerAtual = '';
+  let perFiltroAtivo = 'todos';
+  let alugueis      = [];
+  let alugContratoTemp = null;
+  let relDados      = {};
+
+
+
   // ── NAVEGAÇÃO DE SEÇÕES ──────────────────────────────────────
 
   // ── LOCALSTORAGE ─────────────────────────────────────────────
@@ -3563,6 +3586,17 @@
     if (proxima) a.dataReajuste = proxima;
     fecharModalReajuste(); renderAlugueis(); salvarDados(); showToast('Reajuste registrado!');
   }
+
+
+  // ── INICIALIZAÇÃO ─────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    carregarDados();
+    renderDashboard();
+    setTimeout(() => {
+      const badge = document.getElementById('badge-alugueis');
+      if (badge && alugueis.length > 0) renderAlugueis();
+    }, 200);
+  });
 
   // Load logo from GitHub Pages site
   (function loadModuloLogo() {
