@@ -797,18 +797,11 @@
 
   <div class="nav-section">
     <div class="nav-label">Gestão</div>
-    <div class="nav-item" onclick="setNav(this); showSection('dashboard')">
+    <div class="nav-item active" id="nav-dashboard" onclick="setNav(this); showSection('dashboard')">
       <span class="icon">⊞</span> Dashboard
     </div>
-    <div class="nav-item active" onclick="setNav(this); showSection('planos')">
-      <span class="icon">🗓</span> Planos de Manutenção
-    </div>
-    <div class="nav-item" onclick="setNav(this); showSection('checklists')">
-      <span class="icon">☑</span> Checklists
-    </div>
-    <div class="nav-item" onclick="setNav(this); showSection('chamados')">
-      <span class="icon">⚠</span> Chamados
-      <span class="nav-badge">3</span>
+    <div class="nav-item" id="nav-periodicos" onclick="setNav(this); showSection('periodicos')">
+      <span class="icon">🗓</span> Serv. Periódicos
     </div>
   </div>
 
@@ -841,7 +834,7 @@
 <main class="main">
 
 <!-- SECTION: PLANOS (default) -->
-<div id="section-planos">
+<div id="section-planos" style="display:none;">
   <div class="topbar">
     <div>
       <div class="topbar-title">Planos de Manutenção</div>
@@ -1119,6 +1112,211 @@
 
   </div>
 </main>
+
+<!-- SECTION: DASHBOARD -->
+<div id="section-dashboard" style="display:flex; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">⊞ Dashboard</div>
+      <div class="topbar-sub" id="dash-sub">Visão geral de vencimentos</div>
+    </div>
+    <div class="topbar-right">
+      <select id="dash-condo-filter" class="form-input" style="width:260px; font-size:12px;" onchange="renderDashboard()">
+        <option value="">Todos os condomínios</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
+        <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
+        <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
+        <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
+        <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
+        <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
+        <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
+        <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+      </select>
+    </div>
+  </div>
+  <div class="content">
+    <!-- Resumo cards -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px;" id="dash-cards"></div>
+    <!-- Lista de vencimentos críticos -->
+    <div class="card">
+      <div style="font-weight:700; font-size:15px; margin-bottom:14px; color:var(--text);">⚠️ Vencimentos nos próximos 30 dias</div>
+      <div id="dash-lista">
+        <div style="text-align:center; padding:32px; color:var(--muted); font-size:13px);">Nenhum vencimento crítico encontrado.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: SERVIÇOS PERIÓDICOS -->
+<div id="section-periodicos" style="display:none; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="per-titulo">Serviços Periódicos</div>
+      <div class="topbar-sub" id="per-subtitulo">Selecione o condomínio</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="abrirModalPeriodico()">+ Adicionar</button>
+    </div>
+  </div>
+  <div class="content">
+    <!-- Seletor -->
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <label style="font-size:13px; color:var(--muted2); white-space:nowrap;">Condomínio:</label>
+        <select id="per-condo-select" class="form-input" style="flex:1; min-width:200px; max-width:400px;" onchange="perSelecionarCondo()">
+          <option value="">— Selecione —</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option>
+          <option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option>
+          <option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option>
+          <option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option>
+          <option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option>
+          <option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option>
+          <option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tabela periódicos -->
+    <div class="card" id="per-tabela-card" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+        <div style="font-weight:600; font-size:15px; color:var(--text);">Serviços cadastrados</div>
+        <div style="display:flex; gap:8px;">
+          <button class="pill" id="per-filtro-todos" onclick="perFiltrar('todos')" style="background:var(--accent-glow);color:var(--accent);border:1px solid var(--accent);">Todos</button>
+          <button class="pill" id="per-filtro-ok" onclick="perFiltrar('ok')">✓ OK</button>
+          <button class="pill" id="per-filtro-alerta" onclick="perFiltrar('alerta')">⚠ Alerta</button>
+          <button class="pill" id="per-filtro-vencido" onclick="perFiltrar('vencido')">✗ Vencido</button>
+        </div>
+      </div>
+      <div id="per-lista">
+        <div style="text-align:center; padding:32px; color:var(--muted); font-size:13px;">Nenhum serviço cadastrado. Clique em "+ Adicionar".</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Serviço Periódico -->
+<div class="modal-overlay" id="periodicoModalOverlay" onclick="if(event.target===this) fecharModalPeriodico()">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div>
+        <div class="modal-title" id="per-modal-titulo">Novo Serviço Periódico</div>
+        <div class="modal-sub">Cadastro de serviço com controle de vencimento</div>
+      </div>
+      <button class="modal-close" onclick="fecharModalPeriodico()">✕</button>
+    </div>
+    <input type="hidden" id="per-edit-idx" value="">
+    <div class="form-group">
+      <label class="form-label">Tipo de serviço *</label>
+      <select class="form-input" id="per-tipo">
+        <option value="">— Selecione —</option>
+        <option>Seguro Obrigatório</option>
+        <option>Limpeza de Reservatórios</option>
+        <option>Recarga de Extintores</option>
+        <option>SPDA (Para-raios)</option>
+        <option>Revisão dos Elevadores</option>
+        <option>Revisão das Bombas</option>
+        <option>Dedetização / Controle de Pragas</option>
+        <option>Manutenção de Portões</option>
+        <option>Manutenção de Câmeras</option>
+        <option>Outro</option>
+      </select>
+    </div>
+    <div class="form-group" id="per-tipo-outro-group" style="display:none;">
+      <label class="form-label">Especifique *</label>
+      <input class="form-input" id="per-tipo-outro" placeholder="Descreva o serviço..." />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Empresa responsável</label>
+        <input class="form-input" id="per-empresa" placeholder="Ex: COOP Elevadores, Dgtel..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Periodicidade</label>
+        <select class="form-input" id="per-periodicidade">
+          <option value="">—</option>
+          <option>Mensal</option>
+          <option>Bimestral</option>
+          <option>Trimestral</option>
+          <option>Semestral</option>
+          <option>Anual</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Última realização</label>
+        <input class="form-input" type="date" id="per-ultima" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Próximo vencimento *</label>
+        <input class="form-input" type="date" id="per-proxima" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observações</label>
+      <input class="form-input" id="per-obs" placeholder="Nº da OS, apólice, contrato, etc." />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModalPeriodico()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPeriodico()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
 
 <!-- SECTION: EXTINTORES -->
 <div id="section-extintores" style="display:none; margin-left:220px; flex:1; flex-direction:column; min-height:100vh;">
@@ -1628,52 +1826,47 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   // ── NAVEGAÇÃO DE SEÇÕES ──────────────────────────────────────
+
+  // ── LOCALSTORAGE ─────────────────────────────────────────────
+  function salvarDados() {
+    try {
+      localStorage.setItem('modulo_extintores',   JSON.stringify(extintores));
+      localStorage.setItem('modulo_empresas',     JSON.stringify(empresasCondo));
+      localStorage.setItem('modulo_relDados',     JSON.stringify(relDados));
+      localStorage.setItem('modulo_periodicos',   JSON.stringify(periodicos));
+    } catch(e) { console.warn('localStorage cheio:', e); }
+  }
+
+  function carregarDados() {
+    try {
+      extintores    = JSON.parse(localStorage.getItem('modulo_extintores')  || '{}');
+      empresasCondo = JSON.parse(localStorage.getItem('modulo_empresas')    || '{}');
+      relDados      = JSON.parse(localStorage.getItem('modulo_relDados')    || '{}');
+      periodicos    = JSON.parse(localStorage.getItem('modulo_periodicos')  || '{}');
+    } catch(e) { console.warn('Erro ao carregar localStorage:', e); }
+  }
+
   let currentSection = 'planos';
 
   function showSection(section) {
     currentSection = section;
-    const all = ['planos','extintores','relatorio','dashboard','checklists','chamados'];
-    // Seções já construídas
-    document.getElementById('section-planos').style.display       = section === 'planos'    ? '' : 'none';
-    document.getElementById('section-extintores').style.display   = section === 'extintores'? 'flex' : 'none';
-    document.getElementById('section-relatorio').style.display    = section === 'relatorio' ? 'flex' : 'none';
+    const sections = {
+      'dashboard':  document.getElementById('section-dashboard'),
+      'periodicos': document.getElementById('section-periodicos'),
+      'extintores': document.getElementById('section-extintores'),
+      'relatorio':  document.getElementById('section-relatorio'),
+    };
+    // Ocultar seção antiga planos (mantida no DOM mas nunca exibida)
+    const planos = document.getElementById('section-planos');
+    if (planos) planos.style.display = 'none';
 
-    // Seções em construção — mostra tela placeholder
-    const emConstrucao = ['dashboard','checklists','chamados'];
-    let placeholder = document.getElementById('section-placeholder');
-    if (!placeholder) {
-      placeholder = document.createElement('div');
-      placeholder.id = 'section-placeholder';
-      placeholder.style.cssText = 'margin-left:220px; flex:1; display:flex; flex-direction:column; min-height:100vh;';
-      document.body.insertBefore(placeholder, document.getElementById('section-extintores').nextSibling);
-    }
-    if (emConstrucao.includes(section)) {
-      const nomes = { dashboard:'Dashboard', checklists:'Checklists', chamados:'Chamados' };
-      const icones = { dashboard:'⊞', checklists:'☑', chamados:'⚠' };
-      placeholder.style.display = 'flex';
-      placeholder.innerHTML = `
-        <div class="topbar">
-          <div>
-            <div class="topbar-title">${icones[section]} ${nomes[section]}</div>
-            <div class="topbar-sub">Em desenvolvimento</div>
-          </div>
-        </div>
-        <div class="content" style="display:flex; align-items:center; justify-content:center; flex:1; min-height:60vh;">
-          <div style="text-align:center; max-width:380px;">
-            <div style="font-size:56px; margin-bottom:16px; opacity:.4;">${icones[section]}</div>
-            <div style="font-family:'Syne',sans-serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px;">${nomes[section]}</div>
-            <div style="font-size:14px; color:var(--muted); line-height:1.6;">Este módulo está na fila de desenvolvimento.<br>Continue evoluindo o app e ele chegará em breve!</div>
-            <div style="margin-top:24px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; font-size:12px; color:var(--muted2); text-align:left;">
-              <div style="font-weight:600; color:var(--accent); margin-bottom:8px;">✓ Já disponíveis:</div>
-              <div>🗓 Planos de Manutenção</div>
-              <div style="margin-top:4px;">🧯 Vistoria de Extintores</div>
-              <div style="margin-top:4px;">📋 Relatório Mensal</div>
-            </div>
-          </div>
-        </div>`;
-    } else {
-      placeholder.style.display = 'none';
-    }
+    Object.entries(sections).forEach(([key, el]) => {
+      if (!el) return;
+      const isActive = key === section;
+      el.style.display = isActive ? 'flex' : 'none';
+    });
+    if (section === 'dashboard') renderDashboard();
+    if (section === 'periodicos') { /* seletor já controla */ }
   }
 
   // ── DADOS DE EXTINTORES (em memória) ────────────────────────
@@ -1702,6 +1895,7 @@
   function salvarEmpresaCondo() {
     if (!condoAtual) return;
     empresasCondo[condoAtual] = document.getElementById('ext-empresa-condo').value.trim();
+    salvarDados();
   }
 
   function calcularStatus(proximaRecarga) {
@@ -1843,6 +2037,7 @@
     if (!confirm('Excluir este extintor?')) return;
     extintores[condoAtual].splice(idx, 1);
     renderTabela();
+    salvarDados();
   }
 
   function previewFotos(event) {
@@ -2182,6 +2377,7 @@
   }
 
   // ── RELATÓRIO MENSAL ────────────────────────────────────────
+  let periodicos = {}; // { "NOME CONDO": [ {tipo, empresa, vencimento, obs} ] }
   let relDados = {}; // { "CONDO||2026-03": { atividades: [], servicos: [] } }
   let servFotosTemp = { antes: [], durante: [], depois: [] };
 
@@ -2277,6 +2473,7 @@
     if (!confirm('Excluir esta atividade?')) return;
     relDados[relChave()].atividades.splice(idx, 1);
     renderAtividades();
+    salvarDados();
   }
 
   function salvarAtividade() {
@@ -2297,6 +2494,7 @@
     }
     fecharModalAtividade();
     renderAtividades();
+    salvarDados();
     showToast('Atividade salva!');
   }
 
@@ -2392,6 +2590,7 @@
     if (!confirm('Excluir este serviço?')) return;
     relDados[relChave()].servicos.splice(idx, 1);
     renderServicos();
+    salvarDados();
   }
 
   function addFotosMomento(momento, event) {
@@ -2442,6 +2641,7 @@
     }
     fecharModalServico();
     renderServicos();
+    salvarDados();
     showToast('Serviço salvo!');
   }
 
@@ -2472,9 +2672,21 @@
     const W = 210, marg = 15;
     let y2 = 0;
 
+    // Captura logo para o PDF
+    let relLogoData = null;
+    try {
+      const imgEl = document.getElementById('modulo-logo');
+      if (imgEl && imgEl.src && imgEl.src.startsWith('data:image')) relLogoData = imgEl.src;
+    } catch(e) {}
+
     function cabecalho() {
       doc.setFillColor(26, 38, 64);
       doc.rect(0, 0, W, 38, 'F');
+      if (relLogoData) {
+        try { doc.addImage(relLogoData, 'PNG', W - 52, 4, 38, 16); } catch {
+          try { doc.addImage(relLogoData, 'JPEG', W - 52, 4, 38, 16); } catch {}
+        }
+      }
       doc.setTextColor(255,255,255);
       doc.setFontSize(16); doc.setFont('helvetica','bold');
       doc.text('MÓDULO ADMINISTRADORA', marg, 14);
@@ -2613,6 +2825,224 @@
 
     const nomeArquivo = `Relatorio_Mensal_${condoNome(condo).replace(/\s+/g,'_')}_${mes}.pdf`;
     doc.save(nomeArquivo);
+  }
+
+  // Inicializar dados do localStorage
+  carregarDados();
+
+  // ── SERVIÇOS PERIÓDICOS ──────────────────────────────────────
+  let condoPerAtual = '';
+  let perFiltroAtivo = 'todos';
+
+  const TIPO_ICONS = {
+    'Seguro Obrigatório':         '🛡️',
+    'Limpeza de Reservatórios':   '💧',
+    'Recarga de Extintores':      '🧯',
+    'SPDA (Para-raios)':          '⚡',
+    'Revisão dos Elevadores':     '🛗',
+    'Revisão das Bombas':         '⚙️',
+    'Dedetização / Controle de Pragas': '🐛',
+    'Manutenção de Portões':      '🚪',
+    'Manutenção de Câmeras':      '📷',
+    'Outro':                      '📋',
+  };
+
+  document.getElementById('per-tipo').addEventListener('change', function() {
+    document.getElementById('per-tipo-outro-group').style.display = this.value === 'Outro' ? '' : 'none';
+  });
+
+  function perSelecionarCondo() {
+    condoPerAtual = document.getElementById('per-condo-select').value;
+    if (!condoPerAtual) return;
+    if (!periodicos[condoPerAtual]) periodicos[condoPerAtual] = [];
+    const curto = condoPerAtual.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+    document.getElementById('per-titulo').textContent = curto;
+    document.getElementById('per-subtitulo').textContent = 'Serviços Periódicos';
+    document.getElementById('per-tabela-card').style.display = '';
+    perFiltroAtivo = 'todos';
+    renderPeriodicos();
+  }
+
+  function perFiltrar(f) {
+    perFiltroAtivo = f;
+    ['todos','ok','alerta','vencido'].forEach(x => {
+      const btn = document.getElementById('per-filtro-' + x);
+      if (!btn) return;
+      const isActive = x === f;
+      btn.style.background = isActive ? 'var(--accent-glow)' : '';
+      btn.style.color = isActive ? 'var(--accent)' : '';
+      btn.style.border = isActive ? '1px solid var(--accent)' : '';
+    });
+    renderPeriodicos();
+  }
+
+  function renderPeriodicos() {
+    if (!condoPerAtual) return;
+    const lista = (periodicos[condoPerAtual] || []);
+    const container = document.getElementById('per-lista');
+    const filtrada = perFiltroAtivo === 'todos' ? lista : lista.filter(p => calcularStatus(p.proxima) === perFiltroAtivo);
+    if (filtrada.length === 0) {
+      container.innerHTML = `<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Nenhum serviço ${perFiltroAtivo !== 'todos' ? 'com status "'+perFiltroAtivo+'"' : 'cadastrado'}.</div>`;
+      return;
+    }
+    const sorted = [...filtrada].sort((a,b) => (a.proxima||'').localeCompare(b.proxima||''));
+    container.innerHTML = sorted.map(p => {
+      const idx = lista.indexOf(p);
+      const st = calcularStatus(p.proxima);
+      const stLabel = st === 'ok' ? '<span style="color:var(--accent);font-weight:700;">✓ OK</span>' : st === 'alerta' ? '<span style="color:var(--warn);font-weight:700;">⚠ Alerta</span>' : st === 'vencido' ? '<span style="color:var(--danger);font-weight:700;">✗ Vencido</span>' : '<span style="color:var(--muted);">—</span>';
+      const icon = TIPO_ICONS[p.tipo] || '📋';
+      const [py,pm,pd] = p.proxima ? p.proxima.split('-') : ['','',''];
+      const proximaFmt = p.proxima ? `${pd}/${pm}/${py}` : '—';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:22px;width:32px;text-align:center;">${icon}</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:13px;color:var(--text);">${p.tipo}</div>
+          ${p.empresa ? `<div style="font-size:11px;color:var(--blue);margin-top:2px;">🏢 ${p.empresa}</div>` : ''}
+          ${p.periodicidade ? `<div style="font-size:11px;color:var(--muted);margin-top:1px;">🔁 ${p.periodicidade}</div>` : ''}
+          ${p.obs ? `<div style="font-size:11px;color:var(--muted2);margin-top:1px;">${p.obs}</div>` : ''}
+        </div>
+        <div style="text-align:right;min-width:90px;">
+          <div style="font-size:12px;color:${st==='vencido'?'var(--danger)':st==='alerta'?'var(--warn)':'var(--muted2)'};">${proximaFmt}</div>
+          <div style="margin-top:4px;font-size:12px;">${stLabel}</div>
+        </div>
+        <div style="display:flex;gap:4px;">
+          <button onclick="editarPeriodico(${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px;">✏️</button>
+          <button onclick="excluirPeriodico(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function abrirModalPeriodico() {
+    if (!condoPerAtual) { alert('Selecione o condomínio primeiro.'); return; }
+    document.getElementById('per-modal-titulo').textContent = 'Novo Serviço Periódico';
+    document.getElementById('per-edit-idx').value = '';
+    document.getElementById('per-tipo').value = '';
+    document.getElementById('per-tipo-outro').value = '';
+    document.getElementById('per-tipo-outro-group').style.display = 'none';
+    document.getElementById('per-empresa').value = '';
+    document.getElementById('per-periodicidade').value = '';
+    document.getElementById('per-ultima').value = '';
+    document.getElementById('per-proxima').value = '';
+    document.getElementById('per-obs').value = '';
+    document.getElementById('periodicoModalOverlay').classList.add('open');
+  }
+
+  function fecharModalPeriodico() {
+    document.getElementById('periodicoModalOverlay').classList.remove('open');
+  }
+
+  function editarPeriodico(idx) {
+    const p = periodicos[condoPerAtual][idx];
+    document.getElementById('per-modal-titulo').textContent = 'Editar Serviço';
+    document.getElementById('per-edit-idx').value = idx;
+    document.getElementById('per-tipo').value = TIPO_ICONS[p.tipo] ? p.tipo : 'Outro';
+    document.getElementById('per-tipo-outro').value = TIPO_ICONS[p.tipo] ? '' : p.tipo;
+    document.getElementById('per-tipo-outro-group').style.display = TIPO_ICONS[p.tipo] ? 'none' : '';
+    document.getElementById('per-empresa').value = p.empresa || '';
+    document.getElementById('per-periodicidade').value = p.periodicidade || '';
+    document.getElementById('per-ultima').value = p.ultima || '';
+    document.getElementById('per-proxima').value = p.proxima || '';
+    document.getElementById('per-obs').value = p.obs || '';
+    document.getElementById('periodicoModalOverlay').classList.add('open');
+  }
+
+  function excluirPeriodico(idx) {
+    if (!confirm('Excluir este serviço?')) return;
+    periodicos[condoPerAtual].splice(idx, 1);
+    renderPeriodicos();
+    salvarDados();
+  }
+
+  function salvarPeriodico() {
+    const tipoSelect = document.getElementById('per-tipo').value;
+    const tipoOutro = document.getElementById('per-tipo-outro').value.trim();
+    const tipo = tipoSelect === 'Outro' ? tipoOutro : tipoSelect;
+    const proxima = document.getElementById('per-proxima').value;
+    if (!tipo) { alert('Selecione o tipo de serviço.'); return; }
+    if (!proxima) { alert('Informe a data de próximo vencimento.'); return; }
+    const p = {
+      tipo,
+      empresa: document.getElementById('per-empresa').value.trim(),
+      periodicidade: document.getElementById('per-periodicidade').value,
+      ultima: document.getElementById('per-ultima').value,
+      proxima,
+      obs: document.getElementById('per-obs').value.trim(),
+    };
+    const editIdx = document.getElementById('per-edit-idx').value;
+    if (!periodicos[condoPerAtual]) periodicos[condoPerAtual] = [];
+    if (editIdx !== '') {
+      periodicos[condoPerAtual][parseInt(editIdx)] = p;
+    } else {
+      periodicos[condoPerAtual].push(p);
+    }
+    fecharModalPeriodico();
+    renderPeriodicos();
+    salvarDados();
+    showToast('Serviço salvo!');
+  }
+
+  // ── DASHBOARD ─────────────────────────────────────────────────
+  function renderDashboard() {
+    const filtro = document.getElementById('dash-condo-filter').value;
+    const condos = filtro ? [filtro] : Object.keys({...extintores, ...periodicos});
+    const hoje = new Date();
+
+    let totalExt = 0, alertaExt = 0, vencidoExt = 0;
+    let totalPer = 0, alertaPer = 0, vencidoPer = 0;
+    const itensUrgentes = [];
+
+    condos.forEach(condo => {
+      const exts = extintores[condo] || [];
+      exts.forEach(e => {
+        totalExt++;
+        const st = calcularStatus(e.proximaRecarga);
+        if (st === 'alerta') { alertaExt++; itensUrgentes.push({ condo, tipo: `🧯 Extintor: ${e.numero} — ${e.local}`, venc: e.proximaRecarga, st }); }
+        if (st === 'vencido') { vencidoExt++; itensUrgentes.push({ condo, tipo: `🧯 Extintor: ${e.numero} — ${e.local}`, venc: e.proximaRecarga, st }); }
+      });
+      const pers = periodicos[condo] || [];
+      pers.forEach(p => {
+        totalPer++;
+        const st = calcularStatus(p.proxima);
+        if (st === 'alerta') { alertaPer++; itensUrgentes.push({ condo, tipo: `${TIPO_ICONS[p.tipo]||'📋'} ${p.tipo}`, venc: p.proxima, st }); }
+        if (st === 'vencido') { vencidoPer++; itensUrgentes.push({ condo, tipo: `${TIPO_ICONS[p.tipo]||'📋'} ${p.tipo}`, venc: p.proxima, st }); }
+      });
+    });
+
+    // Cards de resumo
+    const cards = [
+      { label: 'Extintores cadastrados', val: totalExt, cor: '#3B82F6', icon: '🧯' },
+      { label: 'Extintores em alerta', val: alertaExt + vencidoExt, cor: alertaExt+vencidoExt > 0 ? '#F87171' : '#4ADE80', icon: '⚠️' },
+      { label: 'Serviços periódicos', val: totalPer, cor: '#8B5CF6', icon: '🗓' },
+      { label: 'Periódicos em alerta', val: alertaPer + vencidoPer, cor: alertaPer+vencidoPer > 0 ? '#F87171' : '#4ADE80', icon: '📅' },
+    ];
+    document.getElementById('dash-cards').innerHTML = cards.map(c => `
+      <div class="card" style="padding:18px; text-align:center;">
+        <div style="font-size:28px; margin-bottom:6px;">${c.icon}</div>
+        <div style="font-size:28px; font-weight:800; color:${c.cor}; font-family:'Syne',sans-serif;">${c.val}</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:4px;">${c.label}</div>
+      </div>`).join('');
+
+    // Lista urgentes
+    const lista = document.getElementById('dash-lista');
+    itensUrgentes.sort((a,b) => (a.venc||'').localeCompare(b.venc||''));
+    if (itensUrgentes.length === 0) {
+      lista.innerHTML = `<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">✅ Nenhum vencimento crítico! Tudo em dia.</div>`;
+      return;
+    }
+    lista.innerHTML = itensUrgentes.map(item => {
+      const [y,m,d] = item.venc ? item.venc.split('-') : ['','',''];
+      const vencFmt = item.venc ? `${d}/${m}/${y}` : '—';
+      const isVencido = item.st === 'vencido';
+      const condoNomeC = item.condo.replace('CONDOMÍNIO DO EDIFÍCIO ','').replace('CONDOMÍNIO DO ','').replace('CONDOMÍNIO ','');
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);">${item.tipo}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${condoNomeC}</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:${isVencido?'var(--danger)':'var(--warn)'};">${isVencido?'VENCIDO':'ALERTA'} — ${vencFmt}</div>
+      </div>`;
+    }).join('');
   }
 
   // Load logo from GitHub Pages site
