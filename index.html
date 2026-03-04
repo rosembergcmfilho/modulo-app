@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo — Gestão de Condomínios</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #16181f;
+    --surface2: #1e2029;
+    --border: #2a2d38;
+    --accent: #4ade80;
+    --accent2: #22c55e;
+    --accent-glow: rgba(74, 222, 128, 0.15);
+    --text: #f0f2f5;
+    --muted: #6b7280;
+    --muted2: #9ca3af;
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --blue: #60a5fa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    min-height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    padding: 0 20px 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .logo-mark {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav-section {
+    padding: 0 12px;
+    margin-bottom: 4px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 8px 6px;
+    font-weight: 500;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--muted2);
+    transition: all 0.15s;
+    font-weight: 400;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+
+  .nav-item.active {
+    background: var(--accent-glow);
+    color: var(--accent);
+    font-weight: 500;
+    border: 1px solid rgba(74,222,128,0.2);
+  }
+
+  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--danger);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px 12px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .user-info { flex: 1; }
+  .user-name { font-size: 12.5px; font-weight: 500; }
+  .user-role { font-size: 10.5px; color: var(--muted); }
+
+  /* MAIN */
+  .main {
+    margin-left: 220px;
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .topbar-sub {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-left: 2px;
+  }
+
+  .topbar-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--muted2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0f1117;
+    font-weight: 600;
+  }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74,222,128,0.3); }
+
+  /* CONTENT */
+  .content {
+    padding: 28px 32px;
+    flex: 1;
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--muted); }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-delta {
+    font-size: 11.5px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .delta-up { color: var(--accent); }
+  .delta-warn { color: var(--warn); }
+  .delta-danger { color: var(--danger); }
+
+  /* GRID */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  /* TABLE CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .card-count {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--muted2);
+  }
+
+  .card-action { margin-left: auto; font-size: 12px; color: var(--accent); cursor: pointer; }
+
+  /* PLANOS TABLE */
+  .plano-list { padding: 8px 0; }
+
+  .plano-item {
+    padding: 12px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .plano-item:last-child { border-bottom: none; }
+  .plano-item:hover { background: var(--surface2); }
+
+  .plano-icon {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .plano-info { flex: 1; min-width: 0; }
+
+  .plano-name {
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .plano-condo {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .plano-freq {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .freq-mensal { background: rgba(96,165,250,0.1); color: var(--blue); }
+  .freq-semanal { background: rgba(74,222,128,0.1); color: var(--accent); }
+  .freq-trimestral { background: rgba(251,191,36,0.1); color: var(--warn); }
+  .freq-anual { background: rgba(248,113,113,0.1); color: var(--danger); }
+
+  .plano-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-ok { background: var(--accent); box-shadow: 0 0 5px var(--accent); }
+  .dot-warn { background: var(--warn); box-shadow: 0 0 5px var(--warn); }
+  .dot-late { background: var(--danger); box-shadow: 0 0 5px var(--danger); }
+
+  .plano-date { font-size: 11px; color: var(--muted); }
+
+  /* SIDE PANEL */
+  .panel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* FORM NOVO PLANO */
+  .form-section { padding: 18px 20px; }
+
+  .form-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .form-group { margin-bottom: 14px; }
+
+  .form-label {
+    display: block;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  .form-input, .form-select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+
+  .form-input:focus, .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .form-select option { background: var(--surface2); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .freq-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .pill {
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    color: var(--muted2);
+    background: var(--surface2);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
+  .pill.selected { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0 16px; }
+
+  /* CALENDARIO MINI */
+  .mini-cal { padding: 0 20px 18px; }
+
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .cal-month { font-size: 12.5px; font-weight: 600; }
+  .cal-nav { color: var(--muted); cursor: pointer; font-size: 14px; }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    text-align: center;
+  }
+
+  .cal-day-name { font-size: 10px; color: var(--muted); padding: 4px 0; }
+
+  .cal-day {
+    font-size: 11.5px;
+    padding: 5px 2px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+
+  .cal-day:hover { background: var(--surface2); }
+  .cal-day.today { background: var(--accent-glow); color: var(--accent); font-weight: 600; border: 1px solid rgba(74,222,128,0.3); }
+  .cal-day.has-event { position: relative; }
+  .cal-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .cal-day.empty { cursor: default; }
+  .cal-day.other-month { color: var(--muted); }
+
+  /* CHECKLIST PREVIEW */
+  .checklist-section {
+    padding: 18px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .checklist-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .checklist-progress {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(42,45,56,0.5);
+    cursor: pointer;
+  }
+  .check-item:last-child { border-bottom: none; }
+
+  .checkbox {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    transition: all 0.15s;
+  }
+
+  .checkbox.checked { background: var(--accent); border-color: var(--accent); color: #0f1117; }
+
+  .check-label {
+    font-size: 12.5px;
+    transition: color 0.15s;
+  }
+
+  .check-label.checked { color: var(--muted); text-decoration: line-through; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-card { animation: fadeUp 0.4s ease both; }
+  .stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .stat-card:nth-child(2) { animation-delay: 0.1s; }
+  .stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+  .card { animation: fadeUp 0.4s ease 0.2s both; }
+  .panel-card { animation: fadeUp 0.4s ease 0.25s both; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 480px;
+    max-width: 90vw;
+    padding: 28px;
+    transform: scale(0.95);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: scale(1); }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .modal-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 22px; }
+
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* NOTIFICATION */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    box-shadow: 0 4px 20px rgba(74,222,128,0.2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    z-index: 300;
+    transform: translateY(60px);
+    opacity: 0;
+    transition: all 0.3s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { color: var(--accent); font-size: 16px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo" id="logo-container">
+    <img id="modulo-logo" 
+         style="height:52px; width:auto; object-fit:contain; display:none;"
+         alt="Módulo Administradora">
+    <div id="logo-fallback" style="display:flex; flex-direction:column;">
+      <div class="logo-mark">
+        <div class="logo-dot"></div>
+        Módulo
+      </div>
+      <div class="logo-sub">Administradora</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Gestão</div>
+    <div class="nav-item" onclick="setNav(this)">
+      <span class="icon">⊞</span> Dashboard
+    </div>
+    <div class="nav-item active" onclick="setNav(this)">
+      <span class="icon">🗓</span> Planos de Manutenção
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <span class="icon">☑</span> Checklists
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <span class="icon">⚠</span> Chamados
+      <span class="nav-badge">3</span>
+    </div>
+  </div>
+
+  <div class="nav-section" style="margin-top: 8px;">
+    <div class="nav-label">Relatórios</div>
+    <div class="nav-item" onclick="setNav(this)">
+      <span class="icon">📄</span> Relatórios
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <span class="icon">🏢</span> Condomínios
+    </div>
+    <div class="nav-item" onclick="setNav(this)">
+      <span class="icon">👤</span> Equipe
+    </div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar">RS</div>
+      <div class="user-info">
+        <div class="user-name">Rosemberg S.</div>
+        <div class="user-role">Supervisor</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Planos de Manutenção</div>
+      <div class="topbar-sub">41 condomínios ativos</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost">⬇ Exportar</button>
+      <button class="btn btn-primary" onclick="openModal()">+ Novo Plano</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Planos ativos</div>
+        <div class="stat-value" style="color: var(--text)">127</div>
+        <div class="stat-delta"><span class="delta-up">↑ 4</span> este mês</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Concluídos hoje</div>
+        <div class="stat-value" style="color: var(--accent)">18</div>
+        <div class="stat-delta"><span class="delta-up">↑ 3</span> vs ontem</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pendentes</div>
+        <div class="stat-value" style="color: var(--warn)">9</div>
+        <div class="stat-delta"><span class="delta-warn">⚡ 2</span> vencem hoje</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Em atraso</div>
+        <div class="stat-value" style="color: var(--danger)">3</div>
+        <div class="stat-delta"><span class="delta-danger">⚠</span> requer atenção</div>
+      </div>
+    </div>
+
+    <!-- GRID PRINCIPAL -->
+    <div class="grid-2">
+
+      <!-- LISTA DE PLANOS -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Planos Recentes</span>
+          <span class="card-count">127 total</span>
+          <span class="card-action">Ver todos →</span>
+        </div>
+        <div class="plano-list" id="planoList">
+
+          <div class="plano-item">
+            <div class="plano-icon" style="background: rgba(74,222,128,0.1)">🧹</div>
+            <div class="plano-info">
+              <div class="plano-name">Limpeza de Caixa d'Água</div>
+              <div class="plano-condo">Ed. Atlântico • Boa Viagem</div>
+            </div>
+            <span class="plano-freq freq-semanal">Semanal</span>
+            <div class="plano-status">
+              <div class="status-dot dot-ok"></div>
+              <div class="plano-date">Em dia</div>
+            </div>
+          </div>
+
+          <div class="plano-item">
+            <div class="plano-icon" style="background: rgba(96,165,250,0.1)">🔧</div>
+            <div class="plano-info">
+              <div class="plano-name">Revisão de Elevadores</div>
+              <div class="plano-condo">Res. Vila Nova • Olinda</div>
+            </div>
+            <span class="plano-freq freq-mensal">Mensal</span>
+            <div class="plano-status">
+              <div class="status-dot dot-warn"></div>
+              <div class="plano-date">Vence amanhã</div>
+            </div>
+          </div>
+
+          <div class="plano-item">
+            <div class="plano-icon" style="background: rgba(248,113,113,0.1)">⚡</div>
+            <div class="plano-info">
+              <div class="plano-name">Manutenção Elétrica Geral</div>
+              <div class="plano-condo">Cond. Sol Nascente • Recife</div>
+            </div>
+            <span class="plano-freq freq-trimestral">Trimestral</span>
+            <div class="plano-status">
+              <div class="status-dot dot-late"></div>
+              <div class="plano-date">3 dias atraso</div>
+            </div>
+          </div>
+
+          <div class="plano-item">
+            <div class="plano-icon" style="background: rgba(74,222,128,0.1)">🏊</div>
+            <div class="plano-info">
+              <div class="plano-name">Tratamento de Piscina</div>
+              <div class="plano-condo">Ed. Beira Mar • Boa Viagem</div>
+            </div>
+            <span class="plano-freq freq-semanal">Semanal</span>
+            <div class="plano-status">
+              <div class="status-dot dot-ok"></div>
+              <div class="plano-date">Em dia</div>
+            </div>
+          </div>
+
+          <div class="plano-item">
+            <div class="plano-icon" style="background: rgba(251,191,36,0.1)">🔥</div>
+            <div class="plano-info">
+              <div class="plano-name">Inspeção de Extintores</div>
+              <div class="plano-condo">Res. Jardim • Olinda</div>
+            </div>
+            <span class="plano-freq freq-anual">Anual</span>
+            <div class="plano-status">
+              <div class="status-dot dot-ok"></div>
+              <div class="plano-date">Em dia</div>
+            </div>
+          </div>
+
+          <div class="plano-item">
+            <div class="plano-icon" style="background: rgba(96,165,250,0.1)">🚿</div>
+            <div class="plano-info">
+              <div class="plano-name">Desentupimento Preventivo</div>
+              <div class="plano-condo">Ed. Primavera • Recife</div>
+            </div>
+            <span class="plano-freq freq-trimestral">Trimestral</span>
+            <div class="plano-status">
+              <div class="status-dot dot-warn"></div>
+              <div class="plano-date">Vence hoje</div>
+            </div>
+          </div>
+
+          <div class="plano-item">
+            <div class="plano-icon" style="background: rgba(74,222,128,0.1)">🌿</div>
+            <div class="plano-info">
+              <div class="plano-name">Jardinagem e Paisagismo</div>
+              <div class="plano-condo">Cond. Verde Vale • Olinda</div>
+            </div>
+            <span class="plano-freq freq-semanal">Semanal</span>
+            <div class="plano-status">
+              <div class="status-dot dot-ok"></div>
+              <div class="plano-date">Em dia</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PAINEL DIREITO -->
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+
+        <!-- FORM NOVO PLANO -->
+        <div class="panel-card">
+          <div class="form-section">
+            <div class="form-title">⚡ Criação Rápida</div>
+
+            <div class="form-group">
+              <label class="form-label">Condomínio</label>
+              <select class="form-select">
+                <option>Ed. Atlântico — Boa Viagem</option>
+                <option>Res. Vila Nova — Olinda</option>
+                <option>Cond. Sol Nascente — Recife</option>
+                <option>Ed. Beira Mar — Boa Viagem</option>
+                <option>Ed. Primavera — Recife</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tipo de serviço</label>
+              <input class="form-input" type="text" placeholder="Ex: Limpeza de reservatório..." />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Frequência</label>
+              <div class="freq-pills">
+                <button class="pill selected" onclick="selectPill(this)">Diária</button>
+                <button class="pill" onclick="selectPill(this)">Semanal</button>
+                <button class="pill" onclick="selectPill(this)">Quinzenal</button>
+                <button class="pill" onclick="selectPill(this)">Mensal</button>
+                <button class="pill" onclick="selectPill(this)">Trimestral</button>
+                <button class="pill" onclick="selectPill(this)">Semestral</button>
+                <button class="pill" onclick="selectPill(this)">Anual</button>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom: 0">
+                <label class="form-label">Início</label>
+                <input class="form-input" type="date" value="2025-03-03" />
+              </div>
+              <div class="form-group" style="margin-bottom: 0">
+                <label class="form-label">Fim (opcional)</label>
+                <input class="form-input" type="date" />
+              </div>
+            </div>
+          </div>
+
+          <div style="padding: 0 20px 18px;">
+            <button class="btn btn-primary" style="width: 100%;" onclick="showToast()">Criar Plano</button>
+          </div>
+        </div>
+
+        <!-- CHECKLIST RÁPIDO -->
+        <div class="panel-card">
+          <div class="checklist-section">
+            <div class="checklist-title">
+              <span>☑ Checklist do Dia</span>
+              <span style="font-size: 11px; color: var(--muted); font-weight: 400;" id="checkCount">5/7 concluídos</span>
+            </div>
+            <div class="checklist-progress">
+              <div class="progress-bar" id="progressBar" style="width: 71%"></div>
+            </div>
+
+            <div id="checkList">
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="checkbox checked">✓</div>
+                <span class="check-label checked">Limpeza área comum — Ed. Atlântico</span>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="checkbox checked">✓</div>
+                <span class="check-label checked">Verificar bomba d'água — Vila Nova</span>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="checkbox checked">✓</div>
+                <span class="check-label checked">Ronda segurança — Sol Nascente</span>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="checkbox"></div>
+                <span class="check-label">Inspeção portões — Ed. Beira Mar</span>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="checkbox checked">✓</div>
+                <span class="check-label checked">Recolher correspondências — Verde Vale</span>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="checkbox checked">✓</div>
+                <span class="check-label checked">Teste alarme incêndio — Ed. Primavera</span>
+              </div>
+              <div class="check-item" onclick="toggleCheck(this)">
+                <div class="checkbox"></div>
+                <span class="check-label">Relatório semanal — Res. Jardim</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">Novo Plano de Manutenção</div>
+    <div class="modal-sub">Configure os detalhes do serviço recorrente</div>
+
+    <div class="form-group">
+      <label class="form-label">Condomínio</label>
+      <select class="form-select">
+        <option value="">Selecione o condomínio...</option>
+        <option>Ed. Atlântico — Boa Viagem</option>
+        <option>Res. Vila Nova — Olinda</option>
+        <option>Cond. Sol Nascente — Recife</option>
+        <option>Ed. Beira Mar — Boa Viagem</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Serviço</label>
+      <input class="form-input" type="text" placeholder="Descreva o serviço..." />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Responsável</label>
+      <select class="form-select">
+        <option>Carlos — Manutenção</option>
+        <option>Ana — Limpeza</option>
+        <option>João — Elétrica</option>
+        <option>Prestador externo</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Frequência</label>
+      <div class="freq-pills">
+        <button class="pill" onclick="selectPill(this)">Diária</button>
+        <button class="pill selected" onclick="selectPill(this)">Semanal</button>
+        <button class="pill" onclick="selectPill(this)">Quinzenal</button>
+        <button class="pill" onclick="selectPill(this)">Mensal</button>
+        <button class="pill" onclick="selectPill(this)">Trimestral</button>
+        <button class="pill" onclick="selectPill(this)">Semestral</button>
+        <button class="pill" onclick="selectPill(this)">Anual</button>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom: 0">
+        <label class="form-label">Data início</label>
+        <input class="form-input" type="date" value="2025-03-03" />
+      </div>
+      <div class="form-group" style="margin-bottom: 0">
+        <label class="form-label">Data fim</label>
+        <input class="form-input" type="date" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal(); showToast()">Criar Plano</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  Plano criado com sucesso!
+</div>
+
+<script>
+  function setNav(el) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function selectPill(el) {
+    const container = el.closest('.freq-pills');
+    container.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function openModal() {
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function toggleCheck(item) {
+    const box = item.querySelector('.checkbox');
+    const label = item.querySelector('.check-label');
+    const isChecked = box.classList.contains('checked');
+
+    if (isChecked) {
+      box.classList.remove('checked');
+      box.textContent = '';
+      label.classList.remove('checked');
+    } else {
+      box.classList.add('checked');
+      box.textContent = '✓';
+      label.classList.add('checked');
+    }
+
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.check-item');
+    const done = document.querySelectorAll('.checkbox.checked');
+    const pct = Math.round((done.length / all.length) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('checkCount').textContent = `${done.length}/${all.length} concluídos`;
+  }
+
+  // Load logo from GitHub Pages site
+  (function loadModuloLogo() {
+    fetch('https://rosembergcmfilho.github.io/modulo-adm/')
+      .then(r => r.text())
+      .then(html => {
+        const match = html.match(/src="(data:image\/[^;]+;base64,[^"]+)"/);
+        if (match) {
+          const img = document.getElementById('modulo-logo');
+          const fallback = document.getElementById('logo-fallback');
+          img.src = match[1];
+          img.style.display = 'block';
+          fallback.style.display = 'none';
+        }
+      })
+      .catch(() => {});
+  })();
+</script>
+</body>
+</html>
