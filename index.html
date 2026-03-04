@@ -797,16 +797,16 @@
 
   <div class="nav-section">
     <div class="nav-label">Gestão</div>
-    <div class="nav-item" onclick="setNav(this)">
+    <div class="nav-item" onclick="setNav(this); showSection('dashboard')">
       <span class="icon">⊞</span> Dashboard
     </div>
-    <div class="nav-item active" onclick="setNav(this)">
+    <div class="nav-item active" onclick="setNav(this); showSection('planos')">
       <span class="icon">🗓</span> Planos de Manutenção
     </div>
-    <div class="nav-item" onclick="setNav(this)">
+    <div class="nav-item" onclick="setNav(this); showSection('checklists')">
       <span class="icon">☑</span> Checklists
     </div>
-    <div class="nav-item" onclick="setNav(this)">
+    <div class="nav-item" onclick="setNav(this); showSection('chamados')">
       <span class="icon">⚠</span> Chamados
       <span class="nav-badge">3</span>
     </div>
@@ -1626,11 +1626,48 @@
 
   function showSection(section) {
     currentSection = section;
-    document.getElementById('section-planos').style.display = section === 'planos' ? '' : 'none';
-    const extEl = document.getElementById('section-extintores');
-    extEl.style.display = section === 'extintores' ? 'flex' : 'none';
-    const relEl = document.getElementById('section-relatorio');
-    relEl.style.display = section === 'relatorio' ? 'flex' : 'none';
+    const all = ['planos','extintores','relatorio','dashboard','checklists','chamados'];
+    // Seções já construídas
+    document.getElementById('section-planos').style.display       = section === 'planos'    ? '' : 'none';
+    document.getElementById('section-extintores').style.display   = section === 'extintores'? 'flex' : 'none';
+    document.getElementById('section-relatorio').style.display    = section === 'relatorio' ? 'flex' : 'none';
+
+    // Seções em construção — mostra tela placeholder
+    const emConstrucao = ['dashboard','checklists','chamados'];
+    let placeholder = document.getElementById('section-placeholder');
+    if (!placeholder) {
+      placeholder = document.createElement('div');
+      placeholder.id = 'section-placeholder';
+      placeholder.style.cssText = 'margin-left:220px; flex:1; display:flex; flex-direction:column; min-height:100vh;';
+      document.body.insertBefore(placeholder, document.getElementById('section-extintores').nextSibling);
+    }
+    if (emConstrucao.includes(section)) {
+      const nomes = { dashboard:'Dashboard', checklists:'Checklists', chamados:'Chamados' };
+      const icones = { dashboard:'⊞', checklists:'☑', chamados:'⚠' };
+      placeholder.style.display = 'flex';
+      placeholder.innerHTML = `
+        <div class="topbar">
+          <div>
+            <div class="topbar-title">${icones[section]} ${nomes[section]}</div>
+            <div class="topbar-sub">Em desenvolvimento</div>
+          </div>
+        </div>
+        <div class="content" style="display:flex; align-items:center; justify-content:center; flex:1; min-height:60vh;">
+          <div style="text-align:center; max-width:380px;">
+            <div style="font-size:56px; margin-bottom:16px; opacity:.4;">${icones[section]}</div>
+            <div style="font-family:'Syne',sans-serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px;">${nomes[section]}</div>
+            <div style="font-size:14px; color:var(--muted); line-height:1.6;">Este módulo está na fila de desenvolvimento.<br>Continue evoluindo o app e ele chegará em breve!</div>
+            <div style="margin-top:24px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; font-size:12px; color:var(--muted2); text-align:left;">
+              <div style="font-weight:600; color:var(--accent); margin-bottom:8px;">✓ Já disponíveis:</div>
+              <div>🗓 Planos de Manutenção</div>
+              <div style="margin-top:4px;">🧯 Vistoria de Extintores</div>
+              <div style="margin-top:4px;">📋 Relatório Mensal</div>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      placeholder.style.display = 'none';
+    }
   }
 
   // ── DADOS DE EXTINTORES (em memória) ────────────────────────
