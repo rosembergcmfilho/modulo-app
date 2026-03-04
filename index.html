@@ -3343,104 +3343,109 @@
     const badge = document.getElementById('badge-alugueis');
 
     if (alugueis.length === 0) {
-      container.innerHTML = `<div style="text-align:center;padding:48px;color:var(--muted);font-size:14px;">
-        <div style="font-size:40px;margin-bottom:12px;opacity:.3;">🏢</div>
-        Nenhum contrato cadastrado. Clique em "+ Novo Contrato" para começar.</div>`;
+      container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--muted);font-size:14px;"><div style="font-size:40px;margin-bottom:12px;opacity:.3;">🏢</div>Nenhum contrato cadastrado.</div>';
       alertasArea.style.display = 'none';
       badge.style.display = 'none';
       return;
     }
 
-    // Calcular alertas (60 dias)
     const hoje = new Date();
     const limite = new Date(); limite.setDate(limite.getDate() + 60);
-    const alertas = alugueis.filter(a => {
-      if (!a.dataReajuste) return false;
-      const d = new Date(a.dataReajuste);
-      return d <= limite;
-    });
-
+    const alertas = alugueis.filter(a => a.dataReajuste && new Date(a.dataReajuste) <= limite);
     badge.style.display = alertas.length > 0 ? '' : 'none';
     badge.textContent = alertas.length;
 
     if (alertas.length > 0) {
       alertasArea.style.display = '';
-      alertasArea.innerHTML = `<div style="background:rgba(251,191,36,.1);border:1px solid var(--warn);border-radius:12px;padding:14px 18px;">
-        <div style="font-weight:700;color:var(--warn);font-size:13px;margin-bottom:8px;">⚠️ ${alertas.length} reajuste(s) nos próximos 60 dias</div>
-        ${alertas.map(a => {
-          const [y,m,d] = a.dataReajuste.split('-');
-          const dias = Math.ceil((new Date(a.dataReajuste) - hoje) / 86400000);
-          return `<div style="font-size:12px;color:var(--text);margin-top:4px;">
-            🏢 <strong>${a.imovel} — ${a.unidade}</strong> (${a.inquilino}) — Reajuste em ${d}/${m}/${y}
-            <span style="color:${dias<=0?'var(--danger)':'var(--warn)'};font-weight:700;margin-left:8px;">${dias<=0?'VENCIDO':dias+' dias'}</span>
-          </div>`;
-        }).join('')}
-      </div>`;
+      let alertHtml = '<div style="background:rgba(251,191,36,.1);border:1px solid var(--warn);border-radius:12px;padding:14px 18px;">';
+      alertHtml += '<div style="font-weight:700;color:var(--warn);font-size:13px;margin-bottom:8px;">⚠️ ' + alertas.length + ' reajuste(s) nos próximos 60 dias</div>';
+      alertas.forEach(function(a) {
+        const parts = a.dataReajuste.split('-');
+        const dias = Math.ceil((new Date(a.dataReajuste) - hoje) / 86400000);
+        const cor = dias <= 0 ? 'var(--danger)' : 'var(--warn)';
+        const txt = dias <= 0 ? 'VENCIDO' : dias + ' dias';
+        alertHtml += '<div style="font-size:12px;color:var(--text);margin-top:4px;">🏢 <strong>' + a.imovel + ' — ' + a.unidade + '</strong> (' + a.inquilino + ') — Reajuste em ' + parts[2] + '/' + parts[1] + '/' + parts[0] + ' <span style="color:' + cor + ';font-weight:700;margin-left:8px;">' + txt + '</span></div>';
+      });
+      alertHtml += '</div>';
+      alertasArea.innerHTML = alertHtml;
     } else {
       alertasArea.style.display = 'none';
     }
 
-    container.innerHTML = alugueis.map((a, idx) => {
+    let html = '';
+    alugueis.forEach(function(a, idx) {
       const valorFmt = a.valor ? 'R$ ' + parseFloat(a.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '—';
-      const [ry,rm,rd] = a.dataReajuste ? a.dataReajuste.split('-') : ['','',''];
-      const [vy,vm,vd] = a.dataVencContrato ? a.dataVencContrato.split('-') : ['','',''];
-      const reajFmt = a.dataReajuste ? `${rd}/${rm}/${ry}` : '—';
-      const vencFmt = a.dataVencContrato ? `${vd}/${vm}/${vy}` : '—';
+      const rp = a.dataReajuste ? a.dataReajuste.split('-') : ['','',''];
+      const vp = a.dataVencContrato ? a.dataVencContrato.split('-') : ['','',''];
+      const reajFmt = a.dataReajuste ? rp[2]+'/'+rp[1]+'/'+rp[0] : '—';
+      const vencFmt = a.dataVencContrato ? vp[2]+'/'+vp[1]+'/'+vp[0] : '—';
       const dias = a.dataReajuste ? Math.ceil((new Date(a.dataReajuste) - hoje) / 86400000) : null;
       const alertaReaj = dias !== null && dias <= 60;
       const vencido = dias !== null && dias <= 0;
+      const reajCor = vencido ? 'var(--danger)' : alertaReaj ? 'var(--warn)' : 'var(--text)';
 
-      return `<div class="servico-card" style="margin-bottom:14px;">
-        <div class="servico-card-header">
-          <div style="flex:1;">
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <span style="font-weight:700;font-size:15px;color:var(--text);">🏢 ${a.imovel}</span>
-              <span style="background:rgba(96,165,250,.15);color:var(--blue);font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;">${a.unidade}</span>
-            </div>
-            <div style="font-size:13px;color:var(--muted2);margin-top:4px;">👤 ${a.inquilino}${a.contato?' · '+a.contato:''}</div>
-          </div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            ${a.contrato ? `<button onclick="verContrato(${idx})" style="background:rgba(96,165,250,.1);border:1px solid var(--blue);color:var(--blue);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;">📄 Contrato</button>` : ''}
-            <button onclick="abrirModalReajuste(${idx})" style="background:rgba(74,222,128,.1);border:1px solid var(--accent);color:var(--accent);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;">↑ Reajuste</button>
-            <button onclick="editarAluguel(${idx})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:16px;">✏️</button>
-            <button onclick="excluirAluguel(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">🗑️</button>
-          </div>
-        </div>
+      html += '<div class="servico-card" style="margin-bottom:14px;">';
+      // Header
+      html += '<div class="servico-card-header">';
+      html += '<div style="flex:1;">';
+      html += '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
+      html += '<span style="font-weight:700;font-size:15px;color:var(--text);">🏢 ' + a.imovel + '</span>';
+      html += '<span style="background:rgba(96,165,250,.15);color:var(--blue);font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;">' + a.unidade + '</span>';
+      html += '</div>';
+      html += '<div style="font-size:13px;color:var(--muted2);margin-top:4px;">👤 ' + a.inquilino + (a.contato ? ' · ' + a.contato : '') + '</div>';
+      html += '</div>';
+      html += '<div style="display:flex;gap:6px;align-items:center;">';
+      if (a.contrato) {
+        html += '<button onclick="verContrato(' + idx + ')" style="background:rgba(96,165,250,.1);border:1px solid var(--blue);color:var(--blue);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;">📄 Contrato</button>';
+      }
+      html += '<button onclick="abrirModalReajuste(' + idx + ')" style="background:rgba(74,222,128,.1);border:1px solid var(--accent);color:var(--accent);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;">↑ Reajuste</button>';
+      html += '<button onclick="editarAluguel(' + idx + ')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:16px;">✏️</button>';
+      html += '<button onclick="excluirAluguel(' + idx + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;">🗑️</button>';
+      html += '</div></div>';
 
-        <!-- Dados financeiros -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--border);">
-          ${[
-            {l:'Valor atual', v:valorFmt, cor:'var(--accent)'},
-            {l:'Índice', v:a.indice||(a.percFixo?a.percFixo+'% a.a.':'—'), cor:'var(--text)'},
-            {l:'Próx. reajuste', v:reajFmt, cor: vencido?'var(--danger)':alertaReaj?'var(--warn)':'var(--text)'},
-            {l:'Venc. contrato', v:vencFmt, cor:'var(--muted2)'},
-          ].map((item,i) => `<div style="padding:12px;${i<3?'border-right:1px solid var(--border)':''}">
-            <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">${item.l}</div>
-            <div style="font-size:13px;font-weight:700;color:${item.cor};">${item.v}</div>
-          </div>`).join('')}
-        </div>
+      // Dados grid
+      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);">';
+      const cols = [
+        {l:'Valor atual', v:valorFmt, cor:'var(--accent)'},
+        {l:'Índice', v:a.indice || (a.percFixo ? a.percFixo + '% a.a.' : '—'), cor:'var(--text)'},
+        {l:'Próx. reajuste', v:reajFmt, cor:reajCor},
+        {l:'Venc. contrato', v:vencFmt, cor:'var(--muted2)'},
+      ];
+      cols.forEach(function(col, ci) {
+        html += '<div style="padding:12px;' + (ci < 3 ? 'border-right:1px solid var(--border);' : '') + '">';
+        html += '<div style="font-size:10px;color:var(--muted);margin-bottom:3px;">' + col.l + '</div>';
+        html += '<div style="font-size:13px;font-weight:700;color:' + col.cor + ';">' + col.v + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
 
-        <!-- Histórico de reajustes -->
-        ${a.historico && a.historico.length > 0 ? `
-        <div style="border-top:1px solid var(--border);padding:10px 14px;">
-          <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;">HISTÓRICO DE REAJUSTES</div>
-          ${a.historico.slice().reverse().map(h => {
-            const [hy,hm,hd] = h.data.split('-');
-            const pct = h.valorAnt ? (((h.valorNovo-h.valorAnt)/h.valorAnt)*100).toFixed(1) : null;
-            return `<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--border);">
-              <span style="color:var(--muted);min-width:70px;">${hd}/${hm}/${hy}</span>
-              <span style="color:var(--muted2);">R$ ${parseFloat(h.valorAnt).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
-              <span style="color:var(--muted);">→</span>
-              <span style="color:var(--accent);font-weight:600;">R$ ${parseFloat(h.valorNovo).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
-              ${pct ? `<span style="color:var(--accent);font-size:11px;">(+${pct}%)</span>` : ''}
-              ${h.obs ? `<span style="color:var(--muted);font-size:11px;margin-left:4px;">— ${h.obs}</span>` : ''}
-            </div>`;
-          }).join('')}
-        </div>` : ''}
+      // Histórico
+      if (a.historico && a.historico.length > 0) {
+        html += '<div style="border-top:1px solid var(--border);padding:10px 14px;">';
+        html += '<div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;">HISTÓRICO DE REAJUSTES</div>';
+        a.historico.slice().reverse().forEach(function(h) {
+          const hp = h.data.split('-');
+          const pct = h.valorAnt ? (((h.valorNovo - h.valorAnt) / h.valorAnt) * 100).toFixed(1) : null;
+          const vAnt = parseFloat(h.valorAnt).toLocaleString('pt-BR', {minimumFractionDigits:2});
+          const vNovo = parseFloat(h.valorNovo).toLocaleString('pt-BR', {minimumFractionDigits:2});
+          html += '<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--border);">';
+          html += '<span style="color:var(--muted);min-width:70px;">' + hp[2] + '/' + hp[1] + '/' + hp[0] + '</span>';
+          html += '<span style="color:var(--muted2);">R$ ' + vAnt + '</span>';
+          html += '<span style="color:var(--muted);">→</span>';
+          html += '<span style="color:var(--accent);font-weight:600;">R$ ' + vNovo + '</span>';
+          if (pct) html += '<span style="color:var(--accent);font-size:11px;">(+' + pct + '%)</span>';
+          if (h.obs) html += '<span style="color:var(--muted);font-size:11px;margin-left:4px;">— ' + h.obs + '</span>';
+          html += '</div>';
+        });
+        html += '</div>';
+      }
 
-        ${a.obs ? `<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted2);">📝 ${a.obs}</div>` : ''}
-      </div>`;
-    }).join('');
+      if (a.obs) {
+        html += '<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted2);">📝 ' + a.obs + '</div>';
+      }
+      html += '</div>';
+    });
+    container.innerHTML = html;
   }
 
   function abrirModalAluguel() {
