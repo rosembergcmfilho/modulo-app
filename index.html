@@ -1382,45 +1382,99 @@ function pdfRodape(doc, p, total, texto, W) {
 
 function extPDF() {
   if (!extCondoAtual) return;
-  var lista=extintores[extCondoAtual]||[];
-  if (lista.length===0) { alert('Nenhum extintor para gerar PDF.'); return; }
-  var emp=empresasCondo[extCondoAtual]||'';
-  var {jsPDF}=window.jspdf;
-  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var W=210,marg=15;
-  var curto=condoShort(extCondoAtual);
-  pdfCabecalho(doc,'Relatorio de Extintores',curto+(emp?' | '+emp:''),W,marg);
-  var y=50;
-  lista.forEach(function(e,i){
-    if(y>240){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;}
-    var st=calcStatus(e.proxima);
-    var stRGB={ok:[39,174,96],alerta:[200,140,0],vencido:[220,50,50]};
-    doc.setFillColor(26,38,64); doc.rect(marg,y,W-marg*2,8,'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text(pdfTxt('Extintor '+e.numero+' — '+e.local+' ('+e.tipo+' '+e.capacidade+')'),marg+2,y+5.5);
-    y+=9;
-    doc.setTextColor(...stRGB[st]); doc.setFontSize(7); doc.setFont('helvetica','bold');
-    doc.text((st==='ok'?'OK':st==='alerta'?'ALERTA':'VENCIDO'),marg+2,y+4);
-    doc.setTextColor(80,80,80); doc.setFont('helvetica','normal');
-    doc.text('Ultima: '+fmtData(e.ultima)+'   Proxima: '+fmtData(e.proxima),marg+30,y+4);
-    y+=8;
-    if(e.obs){var ls=doc.splitTextToSize(pdfTxt(e.obs),W-marg*2-4);doc.setTextColor(100,100,100);doc.setFontSize(7.5);doc.text(ls,marg+2,y);y+=ls.length*5+2;}
-    if(e.fotos&&e.fotos.length>0){
-      if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;}
-      var fx=marg;
-      e.fotos.forEach(function(foto){
-        if(fx+55>W-marg){fx=marg;y+=56;}
-        if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;fx=marg;}
-        try{doc.addImage(foto,'JPEG',fx,y,52,52);}catch(er){try{doc.addImage(foto,'PNG',fx,y,52,52);}catch(er2){}}
-        fx+=56;
-      });
-      y+=56;
-    }
-    doc.setDrawColor(42,45,56); doc.line(marg,y,W-marg,y); y+=6;
+  var lista = extintores[extCondoAtual] || [];
+  if (lista.length === 0) { alert('Nenhum extintor para gerar PDF.'); return; }
+  var emp = empresasCondo[extCondoAtual] || '';
+  var {jsPDF} = window.jspdf;
+  var doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+  var W = 210, marg = 15;
+  var curto = condoShort(extCondoAtual);
+
+  // Contagens para o resumo
+  var nOk      = lista.filter(function(e){ return calcStatus(e.proxima) === 'ok'; }).length;
+  var nAlerta  = lista.filter(function(e){ return calcStatus(e.proxima) === 'alerta'; }).length;
+  var nVencido = lista.filter(function(e){ return calcStatus(e.proxima) === 'vencido'; }).length;
+
+  pdfCabecalho(doc, 'Relatorio de Extintores', curto + (emp ? ' | ' + emp : ''), W, marg);
+  var y = 50;
+
+  // ── CARDS DE RESUMO ──────────────────────────────────────────
+  var cardW = (W - marg * 2 - 9) / 4; // 4 cards com gap de 3mm
+  var resumo = [
+    {l:'Total', v:lista.length, r:96,  g:165, b:250},
+    {l:'Em dia',    v:nOk,      r:74,  g:222, b:128},
+    {l:'Alerta',   v:nAlerta,   r:251, g:191, b:36},
+    {l:'Vencido',  v:nVencido,  r:248, g:113, b:113},
+  ];
+  resumo.forEach(function(box, i) {
+    var bx = marg + i * (cardW + 3);
+    // fundo com alpha
+    doc.setFillColor(box.r, box.g, box.b);
+    doc.setDrawColor(box.r, box.g, box.b);
+    doc.roundedRect(bx, y, cardW, 18, 2, 2, 'FD');
+    doc.setTextColor(20, 20, 20);
+    doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+    doc.text(String(box.v), bx + cardW / 2, y + 10, {align:'center'});
+    doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+    doc.text(box.l, bx + cardW / 2, y + 15.5, {align:'center'});
   });
-  var total=doc.internal.getNumberOfPages();
-  for(var p=1;p<=total;p++){doc.setPage(p);pdfRodape(doc,p,total,'Modulo Administradora — '+curto,W);}
-  doc.save('Extintores_'+curto.replace(/\s+/g,'_')+'.pdf');
+  y += 26;
+
+  // Linha separadora
+  doc.setDrawColor(42, 45, 56);
+  doc.line(marg, y, W - marg, y);
+  y += 8;
+
+  // ── LISTA DE EXTINTORES ───────────────────────────────────────
+  lista.forEach(function(e) {
+    if (y > 240) { doc.addPage(); pdfCabecalho(doc, 'Relatorio de Extintores', curto, W, marg); y = 50; }
+    var st = calcStatus(e.proxima);
+    var stRGB = {ok:[39,174,96], alerta:[200,140,0], vencido:[220,50,50]};
+    var stLabel = {ok:'OK', alerta:'ALERTA', vencido:'VENCIDO'};
+
+    // Cabeçalho do extintor
+    doc.setFillColor(26, 38, 64); doc.rect(marg, y, W - marg * 2, 8, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    doc.text(pdfTxt('Extintor ' + e.numero + ' — ' + e.local + ' (' + e.tipo + ' ' + e.capacidade + ')'), marg + 2, y + 5.5);
+    y += 9;
+
+    // Status badge colorido
+    var rgb = stRGB[st];
+    doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+    doc.roundedRect(marg + 2, y + 1, 22, 5, 1, 1, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+    doc.text(stLabel[st], marg + 13, y + 4.5, {align:'center'});
+
+    // Datas
+    doc.setTextColor(80, 80, 80); doc.setFont('helvetica', 'normal');
+    doc.text('Ultima: ' + fmtData(e.ultima) + '   Proxima: ' + fmtData(e.proxima), marg + 27, y + 4.5);
+    y += 9;
+
+    // Observação
+    if (e.obs) {
+      var ls = doc.splitTextToSize(pdfTxt(e.obs), W - marg * 2 - 4);
+      doc.setTextColor(100, 100, 100); doc.setFontSize(7.5); doc.text(ls, marg + 2, y); y += ls.length * 5 + 2;
+    }
+
+    // Fotos
+    if (e.fotos && e.fotos.length > 0) {
+      if (y + 55 > 270) { doc.addPage(); pdfCabecalho(doc, 'Relatorio de Extintores', curto, W, marg); y = 50; }
+      var fx = marg;
+      e.fotos.forEach(function(foto) {
+        if (fx + 55 > W - marg) { fx = marg; y += 56; }
+        if (y + 55 > 270) { doc.addPage(); pdfCabecalho(doc, 'Relatorio de Extintores', curto, W, marg); y = 50; fx = marg; }
+        try { doc.addImage(foto, 'JPEG', fx, y, 52, 52); } catch(er) { try { doc.addImage(foto, 'PNG', fx, y, 52, 52); } catch(er2) {} }
+        fx += 56;
+      });
+      y += 56;
+    }
+
+    doc.setDrawColor(42, 45, 56); doc.line(marg, y, W - marg, y); y += 6;
+  });
+
+  var total = doc.internal.getNumberOfPages();
+  for (var p = 1; p <= total; p++) { doc.setPage(p); pdfRodape(doc, p, total, 'Modulo Administradora — ' + curto, W); }
+  doc.save('Extintores_' + curto.replace(/\s+/g, '_') + '.pdf');
 }
 
 function visPDF() {
