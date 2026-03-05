@@ -1331,7 +1331,7 @@ function renderDashboard() {
     {label:'Per. em Alerta',   v:alertaPer, cor: alertaPer>0 ? 'var(--warn)'   : 'var(--accent)'},
   ];
   cardsEl.innerHTML = c4.map(function(x) {
-    return '<div class="card" style="text-align:center;padding:20px 12px;">'
+    return '<div class="card" style="text-align:center;padding:20px 12px;height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;">'
       +'<div style="font-size:32px;font-weight:800;color:'+x.cor+';line-height:1">'+x.v+'</div>'
       +'<div style="font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.5px">'+x.label+'</div>'
       +'</div>';
