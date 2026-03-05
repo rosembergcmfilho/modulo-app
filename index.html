@@ -171,7 +171,7 @@ tr:hover td { background: var(--surface2); }
     </div>
   </div>
   <div class="content">
-    <div id="dash-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;"></div>
+    <div id="dash-cards" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:24px;"></div>
     <div class="card">
       <div style="font-size:13px;font-weight:700;margin-bottom:16px;">⚠️ Vencimentos nos próximos 30 dias</div>
       <div id="dash-lista"></div>
@@ -1284,44 +1284,85 @@ function reajSalvar() {
 // DASHBOARD
 // ══════════════════════════════════════════════════════════════════
 function renderDashboard() {
-  var filtro=document.getElementById('dash-filter').value;
-  var condos=filtro?[filtro]:Object.keys(Object.assign({},extintores,periodicos));
-  var totalExt=0,alertaExt=0,totalPer=0,alertaPer=0;
-  var urgentes=[];
-  var hoje=new Date(); hoje.setHours(0,0,0,0);
-  var limite30=new Date(); limite30.setDate(limite30.getDate()+30); limite30.setHours(0,0,0,0);
-  condos.forEach(function(c){
-    var exts=extintores[c]||[];
-    exts.forEach(function(e){
-      totalExt++;
-      var st=calcStatus(e.proxima);
-      if(st==='alerta'||st==='vencido'){ alertaExt++;
-        if(e.proxima&&new Date(e.proxima+'T00:00:00')<=limite30) urgentes.push({tipo:'🧯 Extintor '+e.numero+' ('+e.local+')',condo:condoShort(c),venc:e.proxima,st:st});
+  var filtro = document.getElementById('dash-filter').value;
+  var condos = filtro ? [filtro] : Object.keys(Object.assign({}, extintores, periodicos));
+  var totalExt=0, alertaExt=0, totalPer=0, alertaPer=0;
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var limite30 = new Date(); limite30.setDate(limite30.getDate()+30); limite30.setHours(0,0,0,0);
+
+  // Agrupar urgentes por condomínio
+  var porCondo = {};
+
+  condos.forEach(function(condo) {
+    var exts = extintores[condo] || [];
+    var pers = periodicos[condo] || [];
+    totalExt += exts.length;
+    totalPer += pers.length;
+
+    exts.forEach(function(e) {
+      var st = calcStatus(e.proxima);
+      if (st==='alerta'||st==='vencido') {
+        alertaExt++;
+        if (e.proxima && new Date(e.proxima+'T00:00:00') <= limite30) {
+          if (!porCondo[condo]) porCondo[condo] = [];
+          porCondo[condo].push({icon:'🧯', nome:'Extintor '+e.numero+' ('+e.local+')', venc:e.proxima, st:st});
+        }
       }
     });
-    var pers=periodicos[c]||[];
-    pers.forEach(function(p){
-      totalPer++;
-      var st=calcStatus(p.proxima);
-      if(st==='alerta'||st==='vencido'){ alertaPer++;
-        if(p.proxima&&new Date(p.proxima+'T00:00:00')<=limite30) urgentes.push({tipo:(TIPO_ICONS[p.tipo]||'📋')+' '+(p.tipo==='Outro'?p.outro||'Outro':p.tipo),condo:condoShort(c),venc:p.proxima,st:st});
+    pers.forEach(function(p) {
+      var st = calcStatus(p.proxima);
+      if (st==='alerta'||st==='vencido') {
+        alertaPer++;
+        if (p.proxima && new Date(p.proxima+'T00:00:00') <= limite30) {
+          if (!porCondo[condo]) porCondo[condo] = [];
+          var label = p.tipo==='Outro' ? (p.outro||'Outro') : p.tipo;
+          porCondo[condo].push({icon:(TIPO_ICONS[p.tipo]||'📋'), nome:label, venc:p.proxima, st:st});
+        }
       }
     });
   });
-  urgentes.sort(function(a,b){ return a.venc<b.venc?-1:1; });
-  var cards=document.getElementById('dash-cards');
-  var c4=[{l:'Extintores',v:totalExt,c:'#4ade80'},{l:'Ext. em Alerta',v:alertaExt,c:alertaExt>0?'#f87171':'#4ade80'},{l:'Serv. Periódicos',v:totalPer,c:'#60a5fa'},{l:'Per. em Alerta',v:alertaPer,c:alertaPer>0?'#fbbf24':'#4ade80'}];
-  cards.innerHTML=c4.map(function(x){
-    return '<div class="card" style="text-align:center"><div style="font-size:28px;font-weight:700;color:'+x.c+'">'+x.v+'</div><div style="font-size:11px;color:var(--muted);margin-top:4px">'+x.l+'</div></div>';
-  }).join('');
-  var lista=document.getElementById('dash-lista');
-  if(urgentes.length===0){ lista.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">✅ Nenhum vencimento crítico encontrado.</div>'; return; }
-  lista.innerHTML=urgentes.map(function(item){
-    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">'
-      +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+item.tipo+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+item.condo+'</div></div>'
-      +'<div style="font-size:12px;font-weight:700;color:'+(item.st==='vencido'?'var(--danger)':'var(--warn)')+'\">'+(item.st==='vencido'?'VENCIDO':'ALERTA')+' — '+fmtData(item.venc)+'</div>'
+
+  // Cards superiores — tamanho fixo, sem emoji
+  var cardsEl = document.getElementById('dash-cards');
+  var c4 = [
+    {label:'Extintores',       v:totalExt,  cor: totalExt>0  ? 'var(--blue)'   : 'var(--muted)'},
+    {label:'Ext. em Alerta',   v:alertaExt, cor: alertaExt>0 ? 'var(--danger)' : 'var(--accent)'},
+    {label:'Serv. Periódicos', v:totalPer,  cor: totalPer>0  ? 'var(--blue)'   : 'var(--muted)'},
+    {label:'Per. em Alerta',   v:alertaPer, cor: alertaPer>0 ? 'var(--warn)'   : 'var(--accent)'},
+  ];
+  cardsEl.innerHTML = c4.map(function(x) {
+    return '<div class="card" style="text-align:center;padding:20px 12px;">'
+      +'<div style="font-size:32px;font-weight:800;color:'+x.cor+';line-height:1">'+x.v+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.5px">'+x.label+'</div>'
       +'</div>';
   }).join('');
+
+  // Lista agrupada por condomínio
+  var lista = document.getElementById('dash-lista');
+  var condosComAlerta = Object.keys(porCondo);
+  if (condosComAlerta.length === 0) {
+    lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">✅ Nenhum vencimento crítico encontrado.</div>';
+    return;
+  }
+
+  var html = '';
+  condosComAlerta.forEach(function(condo) {
+    var itens = porCondo[condo];
+    itens.sort(function(a,b){ return a.venc < b.venc ? -1 : 1; });
+    html += '<div style="margin-bottom:18px;">';
+    html += '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px;">'+condoShort(condo)+'</div>';
+    itens.forEach(function(item) {
+      var cor = item.st==='vencido' ? 'var(--danger)' : 'var(--warn)';
+      var label = item.st==='vencido' ? 'VENCIDO' : 'ALERTA';
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.04);">';
+      html += '<span style="font-size:15px">'+item.icon+'</span>';
+      html += '<span style="font-size:13px;flex:1;color:var(--text)">'+item.nome+'</span>';
+      html += '<span style="font-size:11px;font-weight:700;color:'+cor+'">'+label+' — '+fmtData(item.venc)+'</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  lista.innerHTML = html;
 }
 
 // ══════════════════════════════════════════════════════════════════
