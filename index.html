@@ -118,44 +118,37 @@ tr:hover td { background: var(--surface2); }
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-    const firebaseConfig = {
+  <!-- Firebase Compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    var _fbApp = firebase.initializeApp({
       apiKey: "AIzaSyAuTP7xKt1Zhgf30n1bolsbMQjvzllZ_6U",
       authDomain: "modulo-app-90ae6.firebaseapp.com",
       projectId: "modulo-app-90ae6",
       storageBucket: "modulo-app-90ae6.firebasestorage.app",
       messagingSenderId: "57720087380",
       appId: "1:57720087380:web:7c68ed4a316980c3c65ec1"
+    });
+    var _db = firebase.firestore();
+
+    window.salvarFirebase = function() {
+      _db.collection('modulo').doc('dados').set({
+        extintores:    JSON.stringify(window._ext  || {}),
+        empresasCondo: JSON.stringify(window._emp  || {}),
+        periodicos:    JSON.stringify(window._per  || {}),
+        visDados:      JSON.stringify(window._vis  || {}),
+        acoDados:      JSON.stringify(window._aco  || {}),
+        alugueis:      JSON.stringify(window._alug || []),
+        atualizado:    new Date().toISOString()
+      }).then(function(){ console.log('✓ Firebase salvo'); })
+        .catch(function(e){ console.warn('Firebase erro:', e); });
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Salva todos os dados no Firestore
-    window.salvarFirebase = async function() {
-      try {
-        await setDoc(doc(db, 'modulo', 'dados'), {
-          extintores:    JSON.stringify(window._ext    || {}),
-          empresasCondo: JSON.stringify(window._emp    || {}),
-          periodicos:    JSON.stringify(window._per    || {}),
-          visDados:      JSON.stringify(window._vis    || {}),
-          acoDados:      JSON.stringify(window._aco    || {}),
-          alugueis:      JSON.stringify(window._alug   || []),
-          atualizado:    new Date().toISOString()
-        });
-      } catch(e) { console.warn('Firebase save error:', e); }
-    };
-
-    // Carrega dados do Firestore
-    window.carregarFirebase = async function() {
-      try {
-        const snap = await getDoc(doc(db, 'modulo', 'dados'));
-        if (snap.exists()) {
-          const d = snap.data();
+    window.carregarFirebase = function() {
+      return _db.collection('modulo').doc('dados').get().then(function(snap) {
+        if (snap.exists) {
+          var d = snap.data();
           window._ext  = JSON.parse(d.extintores    || '{}');
           window._emp  = JSON.parse(d.empresasCondo || '{}');
           window._per  = JSON.parse(d.periodicos    || '{}');
@@ -165,7 +158,7 @@ tr:hover td { background: var(--surface2); }
           return true;
         }
         return false;
-      } catch(e) { console.warn('Firebase load error:', e); return false; }
+      }).catch(function(e){ console.warn('Firebase load erro:', e); return false; });
     };
   </script>
 </head>
