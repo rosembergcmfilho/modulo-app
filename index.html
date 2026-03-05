@@ -118,6 +118,56 @@ tr:hover td { background: var(--surface2); }
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAuTP7xKt1Zhgf30n1bolsbMQjvzllZ_6U",
+      authDomain: "modulo-app-90ae6.firebaseapp.com",
+      projectId: "modulo-app-90ae6",
+      storageBucket: "modulo-app-90ae6.firebasestorage.app",
+      messagingSenderId: "57720087380",
+      appId: "1:57720087380:web:7c68ed4a316980c3c65ec1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Salva todos os dados no Firestore
+    window.salvarFirebase = async function() {
+      try {
+        await setDoc(doc(db, 'modulo', 'dados'), {
+          extintores:    JSON.stringify(window._ext    || {}),
+          empresasCondo: JSON.stringify(window._emp    || {}),
+          periodicos:    JSON.stringify(window._per    || {}),
+          visDados:      JSON.stringify(window._vis    || {}),
+          acoDados:      JSON.stringify(window._aco    || {}),
+          alugueis:      JSON.stringify(window._alug   || []),
+          atualizado:    new Date().toISOString()
+        });
+      } catch(e) { console.warn('Firebase save error:', e); }
+    };
+
+    // Carrega dados do Firestore
+    window.carregarFirebase = async function() {
+      try {
+        const snap = await getDoc(doc(db, 'modulo', 'dados'));
+        if (snap.exists()) {
+          const d = snap.data();
+          window._ext  = JSON.parse(d.extintores    || '{}');
+          window._emp  = JSON.parse(d.empresasCondo || '{}');
+          window._per  = JSON.parse(d.periodicos    || '{}');
+          window._vis  = JSON.parse(d.visDados      || '{}');
+          window._aco  = JSON.parse(d.acoDados      || '{}');
+          window._alug = JSON.parse(d.alugueis      || '[]');
+          return true;
+        }
+        return false;
+      } catch(e) { console.warn('Firebase load error:', e); return false; }
+    };
+  </script>
 </head>
 <body>
 
@@ -684,6 +734,14 @@ function salvar() {
     localStorage.setItem('mod_aco', JSON.stringify(acoDados));
     localStorage.setItem('mod_alug', JSON.stringify(alugueis));
   } catch(e) {}
+  // Sincroniza com Firebase
+  window._ext  = extintores;
+  window._emp  = empresasCondo;
+  window._per  = periodicos;
+  window._vis  = visDados;
+  window._aco  = acoDados;
+  window._alug = alugueis;
+  if (window.salvarFirebase) window.salvarFirebase();
 }
 function carregar() {
   try {
@@ -1546,8 +1604,50 @@ function acoPDF() {
 
 // ── INIT ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
-  carregar();
-  renderDashboard();
+  // Tenta carregar do Firebase, senão usa localStorage
+  function iniciar() {
+    carregar(); // localStorage como fallback
+    renderDashboard();
+  }
+  if (window.carregarFirebase) {
+    window.carregarFirebase().then(function(ok) {
+      if (ok) {
+        extintores    = window._ext  || {};
+        empresasCondo = window._emp  || {};
+        periodicos    = window._per  || {};
+        visDados      = window._vis  || {};
+        acoDados      = window._aco  || {};
+        alugueis      = window._alug || [];
+        // Salva no localStorage também como cache
+        try {
+          localStorage.setItem('mod_ext',  JSON.stringify(extintores));
+          localStorage.setItem('mod_emp',  JSON.stringify(empresasCondo));
+          localStorage.setItem('mod_per',  JSON.stringify(periodicos));
+          localStorage.setItem('mod_vis',  JSON.stringify(visDados));
+          localStorage.setItem('mod_aco',  JSON.stringify(acoDados));
+          localStorage.setItem('mod_alug', JSON.stringify(alugueis));
+        } catch(e) {}
+      }
+      renderDashboard();
+    }).catch(function() { iniciar(); });
+  } else {
+    // Firebase ainda não carregou, aguarda 1s e tenta de novo
+    setTimeout(function() {
+      if (window.carregarFirebase) {
+        window.carregarFirebase().then(function(ok) {
+          if (ok) {
+            extintores    = window._ext  || {};
+            empresasCondo = window._emp  || {};
+            periodicos    = window._per  || {};
+            visDados      = window._vis  || {};
+            acoDados      = window._aco  || {};
+            alugueis      = window._alug || [];
+          } else { carregar(); }
+          renderDashboard();
+        }).catch(function() { iniciar(); });
+      } else { iniciar(); }
+    }, 1000);
+  }
   // Logo
   fetch('https://rosembergcmfilho.github.io/modulo-adm/')
     .then(function(r){return r.text();})
