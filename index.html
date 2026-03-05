@@ -727,14 +727,19 @@ function salvar() {
     localStorage.setItem('mod_aco', JSON.stringify(acoDados));
     localStorage.setItem('mod_alug', JSON.stringify(alugueis));
   } catch(e) {}
-  // Sincroniza com Firebase
-  window._ext  = extintores;
-  window._emp  = empresasCondo;
-  window._per  = periodicos;
-  window._vis  = visDados;
-  window._aco  = acoDados;
-  window._alug = alugueis;
-  if (window.salvarFirebase) window.salvarFirebase();
+  // Sincroniza com Firebase diretamente
+  if (typeof _db !== 'undefined') {
+    _db.collection('modulo').doc('dados').set({
+      extintores:    JSON.stringify(extintores),
+      empresasCondo: JSON.stringify(empresasCondo),
+      periodicos:    JSON.stringify(periodicos),
+      visDados:      JSON.stringify(visDados),
+      acoDados:      JSON.stringify(acoDados),
+      alugueis:      JSON.stringify(alugueis),
+      atualizado:    new Date().toISOString()
+    }).then(function(){ console.log('✓ Firebase salvo'); })
+      .catch(function(e){ console.warn('Firebase erro:', e); });
+  }
 }
 function carregar() {
   try {
@@ -1597,49 +1602,37 @@ function acoPDF() {
 
 // ── INIT ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
-  // Tenta carregar do Firebase, senão usa localStorage
-  function iniciar() {
-    carregar(); // localStorage como fallback
-    renderDashboard();
-  }
-  if (window.carregarFirebase) {
-    window.carregarFirebase().then(function(ok) {
-      if (ok) {
-        extintores    = window._ext  || {};
-        empresasCondo = window._emp  || {};
-        periodicos    = window._per  || {};
-        visDados      = window._vis  || {};
-        acoDados      = window._aco  || {};
-        alugueis      = window._alug || [];
-        // Salva no localStorage também como cache
-        try {
-          localStorage.setItem('mod_ext',  JSON.stringify(extintores));
-          localStorage.setItem('mod_emp',  JSON.stringify(empresasCondo));
-          localStorage.setItem('mod_per',  JSON.stringify(periodicos));
-          localStorage.setItem('mod_vis',  JSON.stringify(visDados));
-          localStorage.setItem('mod_aco',  JSON.stringify(acoDados));
-          localStorage.setItem('mod_alug', JSON.stringify(alugueis));
-        } catch(e) {}
-      }
-      renderDashboard();
-    }).catch(function() { iniciar(); });
-  } else {
-    // Firebase ainda não carregou, aguarda 1s e tenta de novo
-    setTimeout(function() {
-      if (window.carregarFirebase) {
-        window.carregarFirebase().then(function(ok) {
-          if (ok) {
-            extintores    = window._ext  || {};
-            empresasCondo = window._emp  || {};
-            periodicos    = window._per  || {};
-            visDados      = window._vis  || {};
-            acoDados      = window._aco  || {};
-            alugueis      = window._alug || [];
-          } else { carregar(); }
+  carregar(); // carrega localStorage primeiro (mostra algo imediatamente)
+  renderDashboard();
+
+  // Depois tenta Firebase
+  if (typeof _db !== 'undefined') {
+    _db.collection('modulo').doc('dados').get()
+      .then(function(snap) {
+        if (snap.exists) {
+          var d = snap.data();
+          extintores    = JSON.parse(d.extintores    || '{}');
+          empresasCondo = JSON.parse(d.empresasCondo || '{}');
+          periodicos    = JSON.parse(d.periodicos    || '{}');
+          visDados      = JSON.parse(d.visDados      || '{}');
+          acoDados      = JSON.parse(d.acoDados      || '{}');
+          alugueis      = JSON.parse(d.alugueis      || '[]');
+          // Atualiza localStorage com dados do Firebase
+          try {
+            localStorage.setItem('mod_ext',  JSON.stringify(extintores));
+            localStorage.setItem('mod_emp',  JSON.stringify(empresasCondo));
+            localStorage.setItem('mod_per',  JSON.stringify(periodicos));
+            localStorage.setItem('mod_vis',  JSON.stringify(visDados));
+            localStorage.setItem('mod_aco',  JSON.stringify(acoDados));
+            localStorage.setItem('mod_alug', JSON.stringify(alugueis));
+          } catch(e) {}
           renderDashboard();
-        }).catch(function() { iniciar(); });
-      } else { iniciar(); }
-    }, 1000);
+          console.log('✓ Dados carregados do Firebase');
+        } else {
+          console.log('Firebase: sem dados ainda');
+        }
+      })
+      .catch(function(e) { console.warn('Firebase load erro:', e); });
   }
   // Logo
   fetch('https://rosembergcmfilho.github.io/modulo-adm/')
