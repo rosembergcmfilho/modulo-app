@@ -236,7 +236,7 @@ tr:hover td { background: var(--surface2); }
         <button class="pill" id="ef-alerta" onclick="extFiltrar('alerta')">⚠️ Alerta</button>
         <button class="pill" id="ef-vencido" onclick="extFiltrar('vencido')">🔴 Vencido</button>
       </div>
-      <div id="ext-resumo-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
+      <div id="ext-resumo-cards" style="margin-bottom:16px;"></div>
       <div id="ext-alertas" style="display:none;background:rgba(248,113,113,.1);border:1px solid var(--danger);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--danger);"></div>
       <div class="table-wrap card" style="padding:0;">
         <table>
@@ -738,10 +738,12 @@ function extRender() {
   var cards = document.getElementById('ext-resumo-cards');
   if (cards) {
     cards.innerHTML =
-      '<div class="card" style="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.4);text-align:center;padding:16px 12px"><div style="font-size:22px;margin-bottom:4px">🧯</div><div style="font-size:28px;font-weight:800;color:var(--blue)">'+lista.length+'</div><div style="font-size:11px;color:var(--muted2);margin-top:3px">Total</div></div>'
-    + '<div class="card" style="background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.4);text-align:center;padding:16px 12px"><div style="font-size:22px;margin-bottom:4px">✅</div><div style="font-size:28px;font-weight:800;color:var(--accent)">'+nOk+'</div><div style="font-size:11px;color:var(--muted2);margin-top:3px">Em dia</div></div>'
-    + '<div class="card" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.4);text-align:center;padding:16px 12px"><div style="font-size:22px;margin-bottom:4px">⚠️</div><div style="font-size:28px;font-weight:800;color:var(--warn)">'+nAlerta+'</div><div style="font-size:11px;color:var(--muted2);margin-top:3px">Alerta</div></div>'
-    + '<div class="card" style="background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);text-align:center;padding:16px 12px"><div style="font-size:22px;margin-bottom:4px">🔴</div><div style="font-size:28px;font-weight:800;color:var(--danger)">'+nVencido+'</div><div style="font-size:11px;color:var(--muted2);margin-top:3px">Vencidos</div></div>';
+      '<div style="display:inline-flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:13px;">'
+      + '<div style="padding:8px 20px;border-right:1px solid var(--border);background:var(--surface2)"><span style="color:var(--muted);font-size:11px">Total&nbsp;</span><strong style="color:var(--text)">'+lista.length+'</strong></div>'
+      + '<div style="padding:8px 20px;border-right:1px solid var(--border)"><span style="color:var(--muted);font-size:11px">Em dia&nbsp;</span><strong style="color:var(--accent)">'+nOk+'</strong></div>'
+      + '<div style="padding:8px 20px;border-right:1px solid var(--border)"><span style="color:var(--muted);font-size:11px">Alerta&nbsp;</span><strong style="color:var(--warn)">'+nAlerta+'</strong></div>'
+      + '<div style="padding:8px 20px"><span style="color:var(--muted);font-size:11px">Vencido&nbsp;</span><strong style="color:var(--danger)">'+nVencido+'</strong></div>'
+      + '</div>';
   }
 
   var filtrada = lista.filter(function(e){
