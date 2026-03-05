@@ -230,30 +230,18 @@ tr:hover td { background: var(--surface2); }
       </div>
     </div>
     <div id="ext-conteudo" style="display:none;">
-      <!-- Resumo cards -->
-      <div id="ext-resumo-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
-
-      <!-- Filtros -->
-      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
         <button class="pill active" id="ef-todos" onclick="extFiltrar('todos')">Todos</button>
         <button class="pill" id="ef-ok" onclick="extFiltrar('ok')">✅ OK</button>
         <button class="pill" id="ef-alerta" onclick="extFiltrar('alerta')">⚠️ Alerta</button>
         <button class="pill" id="ef-vencido" onclick="extFiltrar('vencido')">🔴 Vencido</button>
       </div>
-
-      <!-- Tabela -->
+      <div id="ext-alertas" style="display:none;background:rgba(248,113,113,.1);border:1px solid var(--danger);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--danger);"></div>
       <div class="table-wrap card" style="padding:0;">
         <table>
           <thead><tr>
-            <th style="padding:12px 14px;">Nº/ID</th>
-            <th>Localização</th>
-            <th>Tipo</th>
-            <th>Cap.</th>
-            <th>Últ. Recarga</th>
-            <th>Próx. Recarga</th>
-            <th>Status</th>
-            <th style="text-align:center">Fotos</th>
-            <th></th>
+            <th>Nº</th><th>Local</th><th>Tipo</th><th>Capacidade</th>
+            <th>Última Recarga</th><th>Próxima Recarga</th><th>Status</th><th>Fotos</th><th>Ações</th>
           </tr></thead>
           <tbody id="ext-tbody"></tbody>
         </table>
@@ -740,70 +728,26 @@ function extRender() {
   var lista = extintores[extCondoAtual] || [];
   var tbody = document.getElementById('ext-tbody');
   var empty = document.getElementById('ext-empty');
-  var cards = document.getElementById('ext-resumo-cards');
-
-  // Contagens
-  var total = lista.length;
-  var nOk = lista.filter(function(e){ return calcStatus(e.proxima)==='ok'; }).length;
-  var nAlerta = lista.filter(function(e){ return calcStatus(e.proxima)==='alerta'; }).length;
-  var nVencido = lista.filter(function(e){ return calcStatus(e.proxima)==='vencido'; }).length;
-
-  // Cards de resumo
-  if (cards) {
-    var resumoItems = [
-      {icon:'🧯', label:'Total de Extintores', v:total, cor:'var(--blue)', bg:'rgba(96,165,250,.12)'},
-      {icon:'✅', label:'Em dia', v:nOk, cor:'var(--accent)', bg:'rgba(74,222,128,.12)'},
-      {icon:'⚠️', label:'Em alerta', v:nAlerta, cor:'var(--warn)', bg:'rgba(251,191,36,.12)'},
-      {icon:'🔴', label:'Vencidos', v:nVencido, cor:'var(--danger)', bg:'rgba(248,113,113,.12)'},
-    ];
-    cards.innerHTML = resumoItems.map(function(r){
-      return '<div class="card" style="background:'+r.bg+';border-color:'+r.cor+';border-width:1px;text-align:center;padding:16px 12px;">'
-        +'<div style="font-size:22px;margin-bottom:6px">'+r.icon+'</div>'
-        +'<div style="font-size:26px;font-weight:800;color:'+r.cor+'">'+r.v+'</div>'
-        +'<div style="font-size:11px;color:var(--muted2);margin-top:3px">'+r.label+'</div>'
-        +'</div>';
-    }).join('');
-  }
-
-  // Filtro
+  var alertaEl = document.getElementById('ext-alertas');
   var filtrada = lista.filter(function(e){
     if (extFiltroAtivo === 'todos') return true;
     return calcStatus(e.proxima) === extFiltroAtivo;
   });
-
-  if (filtrada.length === 0) { tbody.innerHTML = ''; empty.style.display = ''; return; }
-  empty.style.display = 'none';
-
-  tbody.innerHTML = filtrada.map(function(e, i) {
+  var nalerta = lista.filter(function(e){ var s=calcStatus(e.proxima); return s==='alerta'||s==='vencido'; }).length;
+  if (nalerta > 0) {
+    alertaEl.style.display=''; alertaEl.textContent = '⚠️ '+nalerta+' extintor(es) com recarga vencida ou em alerta.';
+  } else { alertaEl.style.display='none'; }
+  if (filtrada.length===0) { tbody.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  tbody.innerHTML = filtrada.map(function(e,i){
     var idx = lista.indexOf(e);
     var st = calcStatus(e.proxima);
-    var stConfig = {
-      ok:      {label:'OK',      bg:'rgba(74,222,128,.15)',  color:'#4ade80', border:'#4ade80'},
-      alerta:  {label:'ALERTA',  bg:'rgba(251,191,36,.18)',  color:'#fbbf24', border:'#fbbf24'},
-      vencido: {label:'VENCIDO', bg:'rgba(248,113,113,.18)', color:'#f87171', border:'#f87171'},
-    };
-    var sc = stConfig[st] || stConfig.ok;
-    var badgeStyle = 'display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:.5px;background:'+sc.bg+';color:'+sc.color+';border:1px solid '+sc.border;
-
-    // Linha com destaque diferente se alerta/vencido
-    var rowBg = st === 'vencido' ? 'background:rgba(248,113,113,.04);' : st === 'alerta' ? 'background:rgba(251,191,36,.04);' : '';
-
-    return '<tr style="'+rowBg+'border-bottom:1px solid var(--border);">'
-      +'<td style="padding:12px 14px;font-weight:700;font-size:13px;color:var(--text);">Extintor '+e.numero+'</td>'
-      +'<td style="font-size:13px;color:var(--muted2)">'+e.local+'</td>'
-      +'<td style="font-size:13px">'+e.tipo+'</td>'
-      +'<td style="font-size:13px;font-weight:600">'+e.capacidade+'</td>'
-      +'<td style="font-size:12px;color:var(--muted2)">'+fmtData(e.ultima)+'</td>'
-      +'<td style="font-size:12px;font-weight:'+(st!=='ok'?'700':'400')+';color:'+(st!=='ok'?sc.color:'var(--muted2)')+'">'+fmtData(e.proxima)+'</td>'
-      +'<td><span style="'+badgeStyle+'">'+sc.label+'</span></td>'
-      +'<td style="text-align:center">'+(e.fotos&&e.fotos.length>0
-        ?'<button onclick="verFotos(extintores[''+extCondoAtual+'']['+idx+'].fotos)" style="background:rgba(96,165,250,.1);border:1px solid var(--blue);color:var(--blue);border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer">'+e.fotos.length+' 📷</button>'
-        :'<span style="color:var(--muted);font-size:12px">—</span>')
-      +'</td>'
-      +'<td style="white-space:nowrap">'
-      +'<button onclick="extEditar('+idx+')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:15px;padding:2px 4px">✏️</button>'
-      +'<button onclick="extExcluir('+idx+')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:15px;padding:2px 4px">🗑️</button>'
-      +'</td></tr>';
+    var badge = '<span class="badge badge-'+st+'">'+(st==='ok'?'OK':st==='alerta'?'Alerta':'Vencido')+'</span>';
+    return '<tr><td>'+e.numero+'</td><td>'+e.local+'</td><td>'+e.tipo+'</td><td>'+e.capacidade+'</td>'
+      +'<td>'+fmtData(e.ultima)+'</td><td>'+fmtData(e.proxima)+'</td><td>'+badge+'</td>'
+      +'<td style="text-align:center">'+(e.fotos&&e.fotos.length>0?'<button onclick="verFotos(extintores[\''+extCondoAtual+'\']['+idx+'].fotos)" style="background:rgba(96,165,250,.1);border:1px solid var(--blue);color:var(--blue);border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer">'+e.fotos.length+' 📷</button>':'—')+'</td>'
+      +'<td style="white-space:nowrap"><button onclick="extEditar('+idx+')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px">✏️</button>'
+      +'<button onclick="extExcluir('+idx+')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px">🗑️</button></td></tr>';
   }).join('');
 }
 function abrirModalExt() {
