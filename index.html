@@ -230,15 +230,13 @@ tr:hover td { background: var(--surface2); }
       </div>
     </div>
     <div id="ext-conteudo" style="display:none;">
-      <!-- Cards de resumo -->
-      <div id="ext-resumo-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
-
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
         <button class="pill active" id="ef-todos" onclick="extFiltrar('todos')">Todos</button>
         <button class="pill" id="ef-ok" onclick="extFiltrar('ok')">✅ OK</button>
         <button class="pill" id="ef-alerta" onclick="extFiltrar('alerta')">⚠️ Alerta</button>
         <button class="pill" id="ef-vencido" onclick="extFiltrar('vencido')">🔴 Vencido</button>
       </div>
+      <div id="ext-resumo-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
       <div id="ext-alertas" style="display:none;background:rgba(248,113,113,.1);border:1px solid var(--danger);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--danger);"></div>
       <div class="table-wrap card" style="padding:0;">
         <table>
@@ -732,73 +730,43 @@ function extRender() {
   var tbody = document.getElementById('ext-tbody');
   var empty = document.getElementById('ext-empty');
   var alertaEl = document.getElementById('ext-alertas');
-  var cards = document.getElementById('ext-resumo-cards');
-
-  // Contagens
-  var nOk      = lista.filter(function(e){ return calcStatus(e.proxima)==='ok'; }).length;
-  var nAlerta  = lista.filter(function(e){ return calcStatus(e.proxima)==='alerta'; }).length;
-  var nVencido = lista.filter(function(e){ return calcStatus(e.proxima)==='vencido'; }).length;
 
   // Cards de resumo
+  var nOk = lista.filter(function(e){ return calcStatus(e.proxima)==='ok'; }).length;
+  var nAlerta = lista.filter(function(e){ return calcStatus(e.proxima)==='alerta'; }).length;
+  var nVencido = lista.filter(function(e){ return calcStatus(e.proxima)==='vencido'; }).length;
+  var cards = document.getElementById('ext-resumo-cards');
   if (cards) {
-    var ri = [
-      {icon:'🧯', label:'Total', v:lista.length, cor:'var(--blue)', bg:'rgba(96,165,250,.12)', bord:'rgba(96,165,250,.4)'},
-      {icon:'✅', label:'Em dia', v:nOk, cor:'var(--accent)', bg:'rgba(74,222,128,.12)', bord:'rgba(74,222,128,.4)'},
-      {icon:'⚠️', label:'Em alerta', v:nAlerta, cor:'var(--warn)', bg:'rgba(251,191,36,.12)', bord:'rgba(251,191,36,.4)'},
-      {icon:'🔴', label:'Vencidos', v:nVencido, cor:'var(--danger)', bg:'rgba(248,113,113,.12)', bord:'rgba(248,113,113,.4)'},
-    ];
-    cards.innerHTML = ri.map(function(r){
-      return '<div class="card" style="background:'+r.bg+';border:1px solid '+r.bord+';text-align:center;padding:16px 12px;">'
-        +'<div style="font-size:22px;margin-bottom:4px">'+r.icon+'</div>'
-        +'<div style="font-size:28px;font-weight:800;color:'+r.cor+'">'+r.v+'</div>'
-        +'<div style="font-size:11px;color:var(--muted2);margin-top:3px">'+r.label+'</div>'
-        +'</div>';
-    }).join('');
+    cards.innerHTML =
+      '<div class="card" style="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.4);text-align:center;padding:16px 12px"><div style="font-size:22px;margin-bottom:4px">🧯</div><div style="font-size:28px;font-weight:800;color:var(--blue)">'+lista.length+'</div><div style="font-size:11px;color:var(--muted2);margin-top:3px">Total</div></div>'
+    + '<div class="card" style="background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.4);text-align:center;padding:16px 12px"><div style="font-size:22px;margin-bottom:4px">✅</div><div style="font-size:28px;font-weight:800;color:var(--accent)">'+nOk+'</div><div style="font-size:11px;color:var(--muted2);margin-top:3px">Em dia</div></div>'
+    + '<div class="card" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.4);text-align:center;padding:16px 12px"><div style="font-size:22px;margin-bottom:4px">⚠️</div><div style="font-size:28px;font-weight:800;color:var(--warn)">'+nAlerta+'</div><div style="font-size:11px;color:var(--muted2);margin-top:3px">Alerta</div></div>'
+    + '<div class="card" style="background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4);text-align:center;padding:16px 12px"><div style="font-size:22px;margin-bottom:4px">🔴</div><div style="font-size:28px;font-weight:800;color:var(--danger)">'+nVencido+'</div><div style="font-size:11px;color:var(--muted2);margin-top:3px">Vencidos</div></div>';
   }
 
-  // Alerta geral
-  var nalerta = nAlerta + nVencido;
-  if (nalerta > 0) {
-    alertaEl.style.display = '';
-    alertaEl.textContent = '⚠️ ' + nalerta + ' extintor(es) com recarga vencida ou em alerta.';
-  } else { alertaEl.style.display = 'none'; }
-
-  // Filtro
   var filtrada = lista.filter(function(e){
     if (extFiltroAtivo === 'todos') return true;
     return calcStatus(e.proxima) === extFiltroAtivo;
   });
-
-  if (filtrada.length === 0) { tbody.innerHTML = ''; empty.style.display = ''; return; }
-  empty.style.display = 'none';
-
-  tbody.innerHTML = filtrada.map(function(e) {
+  var nalerta = lista.filter(function(e){ var s=calcStatus(e.proxima); return s==='alerta'||s==='vencido'; }).length;
+  if (nalerta > 0) {
+    alertaEl.style.display=''; alertaEl.textContent = '⚠️ '+nalerta+' extintor(es) com recarga vencida ou em alerta.';
+  } else { alertaEl.style.display='none'; }
+  if (filtrada.length===0) { tbody.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  tbody.innerHTML = filtrada.map(function(e,i){
     var idx = lista.indexOf(e);
     var st = calcStatus(e.proxima);
-    var stCfg = {
-      ok:      {label:'OK',      bg:'rgba(74,222,128,.15)',  color:'#4ade80', bord:'#4ade80'},
-      alerta:  {label:'ALERTA',  bg:'rgba(251,191,36,.2)',   color:'#fbbf24', bord:'#fbbf24'},
-      vencido: {label:'VENCIDO', bg:'rgba(248,113,113,.2)',  color:'#f87171', bord:'#f87171'},
-    };
-    var sc = stCfg[st];
-    var rowBg = st==='vencido'?'background:rgba(248,113,113,.04);':st==='alerta'?'background:rgba(251,191,36,.04);':'';
-    var badge = '<span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:.5px;background:'+sc.bg+';color:'+sc.color+';border:1px solid '+sc.bord+'">'+sc.label+'</span>';
-    return '<tr style="'+rowBg+'border-bottom:1px solid var(--border);">'
-      +'<td style="padding:12px 14px;font-weight:700;font-size:13px">Extintor '+e.numero+'</td>'
-      +'<td style="font-size:13px;color:var(--muted2)">'+e.local+'</td>'
-      +'<td style="font-size:13px">'+e.tipo+'</td>'
-      +'<td style="font-size:13px;font-weight:600">'+e.capacidade+'</td>'
-      +'<td style="font-size:12px;color:var(--muted2)">'+fmtData(e.ultima)+'</td>'
-      +'<td style="font-size:12px;font-weight:'+(st!=='ok'?'700':'400')+';color:'+(st!=='ok'?sc.color:'var(--muted2)')+'">'+fmtData(e.proxima)+'</td>'
-      +'<td>'+badge+'</td>'
-      +'<td style="text-align:center">'+(e.fotos&&e.fotos.length>0
-        ?'<button onclick="verFotos(extintores[''+extCondoAtual+'']['+idx+'].fotos)" style="background:rgba(96,165,250,.1);border:1px solid var(--blue);color:var(--blue);border-radius:5px;padding:3px 10px;font-size:11px;cursor:pointer">'+e.fotos.length+' 📷</button>'
-        :'<span style="color:var(--muted);font-size:12px">—</span>')
-      +'</td>'
-      +'<td style="white-space:nowrap">'
-      +'<button onclick="extEditar('+idx+')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:15px;padding:2px 4px">✏️</button>'
-      +'<button onclick="extExcluir('+idx+')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:15px;padding:2px 4px">🗑️</button>'
-      +'</td></tr>';
+    var stBg    = st==='ok'?'rgba(74,222,128,.15)':st==='alerta'?'rgba(251,191,36,.2)':'rgba(248,113,113,.2)';
+    var stColor = st==='ok'?'#4ade80':st==='alerta'?'#fbbf24':'#f87171';
+    var stBord  = stColor;
+    var stTxt   = st==='ok'?'OK':st==='alerta'?'ALERTA':'VENCIDO';
+    var badge   = '<span style="display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:800;background:'+stBg+';color:'+stColor+';border:1px solid '+stBord+'">'+stTxt+'</span>';
+    return '<tr><td>'+e.numero+'</td><td>'+e.local+'</td><td>'+e.tipo+'</td><td>'+e.capacidade+'</td>'
+      +'<td>'+fmtData(e.ultima)+'</td><td>'+fmtData(e.proxima)+'</td><td>'+badge+'</td>'
+      +'<td style="text-align:center">'+(e.fotos&&e.fotos.length>0?'<button onclick="verFotos(extintores[\''+extCondoAtual+'\']['+idx+'].fotos)" style="background:rgba(96,165,250,.1);border:1px solid var(--blue);color:var(--blue);border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer">'+e.fotos.length+' 📷</button>':'—')+'</td>'
+      +'<td style="white-space:nowrap"><button onclick="extEditar('+idx+')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px">✏️</button>'
+      +'<button onclick="extExcluir('+idx+')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px">🗑️</button></td></tr>';
   }).join('');
 }
 function abrirModalExt() {
@@ -1377,89 +1345,59 @@ function pdfRodape(doc, p, total, texto, W) {
 
 function extPDF() {
   if (!extCondoAtual) return;
-  var lista = extintores[extCondoAtual] || [];
-  if (lista.length === 0) { alert('Nenhum extintor para gerar PDF.'); return; }
-  var emp = empresasCondo[extCondoAtual] || '';
-  var {jsPDF} = window.jspdf;
-  var doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
-  var W = 210, marg = 15;
-  var curto = condoShort(extCondoAtual);
-
-  var nOk     = lista.filter(function(e){ return calcStatus(e.proxima)==='ok'; }).length;
-  var nAlerta = lista.filter(function(e){ return calcStatus(e.proxima)==='alerta'; }).length;
-  var nVencido= lista.filter(function(e){ return calcStatus(e.proxima)==='vencido'; }).length;
-
-  pdfCabecalho(doc, 'Relatorio de Extintores', curto + (emp ? ' | ' + emp : ''), W, marg);
-  var y = 50;
-
-  // ── CARDS DE RESUMO ──
-  var cardW = (W - marg * 2 - 9) / 4;
-  var resumo = [
-    {l:'Total',    v:lista.length, r:96,  g:165, b:250},
-    {l:'Em dia',   v:nOk,          r:74,  g:222, b:128},
-    {l:'Alerta',   v:nAlerta,      r:251, g:191, b:36},
-    {l:'Vencido',  v:nVencido,     r:248, g:113, b:113},
-  ];
-  resumo.forEach(function(box, i) {
-    var bx = marg + i * (cardW + 3);
-    doc.setFillColor(box.r, box.g, box.b);
-    doc.setDrawColor(box.r, box.g, box.b);
-    doc.roundedRect(bx, y, cardW, 18, 2, 2, 'FD');
-    doc.setTextColor(20, 20, 20);
-    doc.setFontSize(18); doc.setFont('helvetica', 'bold');
-    doc.text(String(box.v), bx + cardW / 2, y + 10, {align:'center'});
-    doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-    doc.text(box.l, bx + cardW / 2, y + 15.5, {align:'center'});
+  var lista=extintores[extCondoAtual]||[];
+  if (lista.length===0) { alert('Nenhum extintor para gerar PDF.'); return; }
+  var emp=empresasCondo[extCondoAtual]||'';
+  var {jsPDF}=window.jspdf;
+  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  var W=210,marg=15;
+  var curto=condoShort(extCondoAtual);
+  pdfCabecalho(doc,'Relatorio de Extintores',curto+(emp?' | '+emp:''),W,marg);
+  var y=50;
+  var pNok=lista.filter(function(e){return calcStatus(e.proxima)==='ok';}).length;
+  var pNal=lista.filter(function(e){return calcStatus(e.proxima)==='alerta';}).length;
+  var pNve=lista.filter(function(e){return calcStatus(e.proxima)==='vencido';}).length;
+  var cardW=(W-marg*2-9)/4;
+  [{l:'Total',v:lista.length,r:96,g:165,b:250},{l:'Em dia',v:pNok,r:74,g:222,b:128},{l:'Alerta',v:pNal,r:251,g:191,b:36},{l:'Vencido',v:pNve,r:248,g:113,b:113}].forEach(function(box,i){
+    var bx=marg+i*(cardW+3);
+    doc.setFillColor(box.r,box.g,box.b); doc.setDrawColor(box.r,box.g,box.b);
+    doc.roundedRect(bx,y,cardW,18,2,2,'FD');
+    doc.setTextColor(20,20,20); doc.setFontSize(18); doc.setFont('helvetica','bold');
+    doc.text(String(box.v),bx+cardW/2,y+10,{align:'center'});
+    doc.setFontSize(7); doc.setFont('helvetica','normal');
+    doc.text(box.l,bx+cardW/2,y+15.5,{align:'center'});
   });
-  y += 26;
-
-  doc.setDrawColor(42, 45, 56);
-  doc.line(marg, y, W - marg, y);
-  y += 8;
-
-  // ── LISTA ──
-  lista.forEach(function(e) {
-    if (y > 240) { doc.addPage(); pdfCabecalho(doc, 'Relatorio de Extintores', curto, W, marg); y = 50; }
-    var st = calcStatus(e.proxima);
-    var stRGB   = {ok:[39,174,96], alerta:[200,140,0], vencido:[220,50,50]};
-    var stLabel = {ok:'OK', alerta:'ALERTA', vencido:'VENCIDO'};
-
-    doc.setFillColor(26, 38, 64); doc.rect(marg, y, W - marg * 2, 8, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-    doc.text(pdfTxt('Extintor ' + e.numero + ' — ' + e.local + ' (' + e.tipo + ' ' + e.capacidade + ')'), marg + 2, y + 5.5);
-    y += 9;
-
-    var rgb = stRGB[st];
-    doc.setFillColor(rgb[0], rgb[1], rgb[2]);
-    doc.roundedRect(marg + 2, y + 1, 22, 5, 1, 1, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(7); doc.setFont('helvetica', 'bold');
-    doc.text(stLabel[st], marg + 13, y + 4.5, {align:'center'});
-    doc.setTextColor(80, 80, 80); doc.setFont('helvetica', 'normal');
-    doc.text('Ultima: ' + fmtData(e.ultima) + '   Proxima: ' + fmtData(e.proxima), marg + 27, y + 4.5);
-    y += 9;
-
-    if (e.obs) {
-      var ls = doc.splitTextToSize(pdfTxt(e.obs), W - marg * 2 - 4);
-      doc.setTextColor(100, 100, 100); doc.setFontSize(7.5); doc.text(ls, marg + 2, y); y += ls.length * 5 + 2;
-    }
-
-    if (e.fotos && e.fotos.length > 0) {
-      if (y + 55 > 270) { doc.addPage(); pdfCabecalho(doc, 'Relatorio de Extintores', curto, W, marg); y = 50; }
-      var fx = marg;
-      e.fotos.forEach(function(foto) {
-        if (fx + 55 > W - marg) { fx = marg; y += 56; }
-        if (y + 55 > 270) { doc.addPage(); pdfCabecalho(doc, 'Relatorio de Extintores', curto, W, marg); y = 50; fx = marg; }
-        try { doc.addImage(foto, 'JPEG', fx, y, 52, 52); } catch(er) { try { doc.addImage(foto, 'PNG', fx, y, 52, 52); } catch(er2) {} }
-        fx += 56;
+  y+=26; doc.setDrawColor(42,45,56); doc.line(marg,y,W-marg,y); y+=8;
+  lista.forEach(function(e,i){
+    if(y>240){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;}
+    var st=calcStatus(e.proxima);
+    var stRGB={ok:[39,174,96],alerta:[200,140,0],vencido:[220,50,50]};
+    doc.setFillColor(26,38,64); doc.rect(marg,y,W-marg*2,8,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text(pdfTxt('Extintor '+e.numero+' — '+e.local+' ('+e.tipo+' '+e.capacidade+')'),marg+2,y+5.5);
+    y+=9;
+    doc.setTextColor(...stRGB[st]); doc.setFontSize(7); doc.setFont('helvetica','bold');
+    doc.text((st==='ok'?'OK':st==='alerta'?'ALERTA':'VENCIDO'),marg+2,y+4);
+    doc.setTextColor(80,80,80); doc.setFont('helvetica','normal');
+    doc.text('Ultima: '+fmtData(e.ultima)+'   Proxima: '+fmtData(e.proxima),marg+30,y+4);
+    y+=8;
+    if(e.obs){var ls=doc.splitTextToSize(pdfTxt(e.obs),W-marg*2-4);doc.setTextColor(100,100,100);doc.setFontSize(7.5);doc.text(ls,marg+2,y);y+=ls.length*5+2;}
+    if(e.fotos&&e.fotos.length>0){
+      if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;}
+      var fx=marg;
+      e.fotos.forEach(function(foto){
+        if(fx+55>W-marg){fx=marg;y+=56;}
+        if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;fx=marg;}
+        try{doc.addImage(foto,'JPEG',fx,y,52,52);}catch(er){try{doc.addImage(foto,'PNG',fx,y,52,52);}catch(er2){}}
+        fx+=56;
       });
-      y += 56;
+      y+=56;
     }
-    doc.setDrawColor(42, 45, 56); doc.line(marg, y, W - marg, y); y += 6;
+    doc.setDrawColor(42,45,56); doc.line(marg,y,W-marg,y); y+=6;
   });
-
-  var total = doc.internal.getNumberOfPages();
-  for (var p = 1; p <= total; p++) { doc.setPage(p); pdfRodape(doc, p, total, 'Modulo Administradora — ' + curto, W); }
-  doc.save('Extintores_' + curto.replace(/\s+/g, '_') + '.pdf');
+  var total=doc.internal.getNumberOfPages();
+  for(var p=1;p<=total;p++){doc.setPage(p);pdfRodape(doc,p,total,'Modulo Administradora — '+curto,W);}
+  doc.save('Extintores_'+curto.replace(/\s+/g,'_')+'.pdf');
 }
 
 function visPDF() {
