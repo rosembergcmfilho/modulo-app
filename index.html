@@ -2128,26 +2128,17 @@
 
   function showSection(section) {
     currentSection = section;
-    const sections = {
-      'dashboard':  document.getElementById('section-dashboard'),
-      'periodicos': document.getElementById('section-periodicos'),
-      'extintores': document.getElementById('section-extintores'),
-      'vistoria':       document.getElementById('section-vistoria'),
-      'acompanhamento':  document.getElementById('section-acompanhamento'),
-      'alugueis':       document.getElementById('section-alugueis'),
-    };
-    // Ocultar seção antiga planos (mantida no DOM mas nunca exibida)
-    const planos = document.getElementById('section-planos');
-    if (planos) planos.style.display = 'none';
-
-    Object.entries(sections).forEach(([key, el]) => {
-      if (!el) return;
-      const isActive = key === section;
-      el.style.display = isActive ? 'flex' : 'none';
-    });
+    // Hide ALL sections first
+    var allSections = document.querySelectorAll('[id^="section-"]');
+    allSections.forEach(function(el) { el.style.display = 'none'; });
+    // Show target section
+    var target = document.getElementById('section-' + section);
+    if (target) {
+      target.style.display = 'flex';
+    }
+    // Run section-specific logic
     if (section === 'dashboard') renderDashboard();
     if (section === 'alugueis') renderAlugueis();
-    if (section === 'periodicos') { /* seletor já controla */ }
   }
 
   // ── DADOS DE EXTINTORES (em memória) ────────────────────────
@@ -3597,11 +3588,7 @@
   // ── INICIALIZAÇÃO ─────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
     carregarDados();
-    renderDashboard();
-    setTimeout(() => {
-      const badge = document.getElementById('badge-alugueis');
-      if (badge && alugueis.length > 0) renderAlugueis();
-    }, 200);
+    showSection('dashboard');
   });
 
   // Load logo from GitHub Pages site
