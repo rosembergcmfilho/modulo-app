@@ -304,7 +304,7 @@ tr:hover td { background: var(--surface2); }
 <!-- ═══════════════════ VISTORIA ═══════════════════ -->
 <div id="pg-vistoria" class="section">
   <div class="topbar">
-    <div><div class="topbar-title" id="vis-title">Vistoria</div><div class="topbar-sub">Selecione o condomínio e mês</div></div>
+    <div><div class="topbar-title" id="vis-title">Vistoria</div><div class="topbar-sub" id="rel-topbar-sub">Selecione o condomínio e mês</div></div>
     <div class="topbar-right">
       <button class="btn btn-ghost" id="btn-vis-pdf" onclick="visPDF()" style="display:none;">📄 PDF</button>
       <button class="btn btn-primary" onclick="abrirModalOcr()">+ Ocorrência</button>
@@ -340,7 +340,7 @@ tr:hover td { background: var(--surface2); }
 <!-- ═══════════════════ RELATÓRIO MENSAL ═══════════════════ -->
 <div id="pg-relatorio" class="section">
   <div class="topbar">
-    <div><div class="topbar-title" id="rel-title">Relatório Mensal</div><div class="topbar-sub">Selecione o condomínio e mês</div></div>
+    <div><div class="topbar-title" id="rel-title">Relatório Mensal</div><div class="topbar-sub" id="rel-topbar-sub">Selecione o condomínio e mês</div></div>
     <div class="topbar-right">
       <select id="rel-pdf-layout" class="form-input" style="display:none;width:220px;font-size:12px;" >
         <option value="lado">Antes/Depois lado a lado</option>
@@ -1170,10 +1170,11 @@ function relCarregar() {
   var curto = condoShort(condo);
   var comp  = nomeMes(mes);
   document.getElementById('rel-title').textContent = 'Relatório Mensal — ' + curto;
-  document.getElementById('topbar-sub') && (document.getElementById('topbar-sub').textContent = comp);
+  var subEl = document.getElementById('rel-topbar-sub'); if(subEl) subEl.textContent = comp;
   document.getElementById('rel-conteudo').style.display = '';
   document.getElementById('btn-rel-pdf').style.display  = '';
   document.getElementById('btn-rel-add').style.display  = '';
+  document.getElementById('rel-pdf-layout').style.display = '';
   relRender();
 }
 
