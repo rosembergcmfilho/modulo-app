@@ -820,7 +820,25 @@ function verFotos(arr) {
 }
 
 // ── LOCALSTORAGE ─────────────────────────────────────────────────
+function compressImage(base64, maxW, maxH, quality, callback) {
+  var img = new Image();
+  img.onload = function() {
+    var w = img.width, h = img.height;
+    var ratio = Math.min(maxW/w, maxH/h, 1);
+    w = Math.round(w * ratio); h = Math.round(h * ratio);
+    var canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    callback(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src = base64;
+}
+
 function salvar() {
+  console.log('salvar() chamado - relDados keys:', Object.keys(relDados));
+  var chaves = Object.keys(relDados);
+  chaves.forEach(function(k){ console.log('  relDados['+k+'] servicos:', (relDados[k].servicos||[]).length); });
   try {
     localStorage.setItem('mod_ext', JSON.stringify(extintores));
     localStorage.setItem('mod_emp', JSON.stringify(empresasCondo));
@@ -841,7 +859,7 @@ function salvar() {
       relDados:      JSON.stringify(relDados),
       alugueis:      JSON.stringify(alugueis),
       atualizado:    new Date().toISOString()
-    }).then(function(){ console.log('✓ Firebase salvo'); })
+    }).then(function(){ console.log('✓ Firebase salvo com relDados keys:', Object.keys(relDados)); })
       .catch(function(e){ console.warn('Firebase erro:', e); });
   }
 }
@@ -944,7 +962,11 @@ function abrirModalExt() {
 }
 function extAddFotos(event) {
   Array.from(event.target.files).forEach(function(f){
-    var r=new FileReader(); r.onload=function(e){ extFotosTemp.push(e.target.result); extRenderPrev(); }; r.readAsDataURL(f);
+    var r=new FileReader(); r.onload=function(e){
+      compressImage(e.target.result, 1200, 1200, 0.7, function(compressed){
+        extFotosTemp.push(compressed); extRenderPrev();
+      });
+    }; r.readAsDataURL(f);
   });
 }
 function extRemoveFoto(i) { extFotosTemp.splice(i,1); extRenderPrev(); }
@@ -1145,7 +1167,11 @@ function abrirModalOcr() {
 }
 function ocrAddFotos(event) {
   Array.from(event.target.files).forEach(function(f){
-    var r=new FileReader(); r.onload=function(e){ ocrFotosTemp.push(e.target.result); ocrRenderPrev(); }; r.readAsDataURL(f);
+    var r=new FileReader(); r.onload=function(e){
+      compressImage(e.target.result, 1200, 1200, 0.7, function(compressed){
+        ocrFotosTemp.push(compressed); ocrRenderPrev();
+      });
+    }; r.readAsDataURL(f);
   });
 }
 function ocrRemoveFoto(i) { ocrFotosTemp.splice(i,1); ocrRenderPrev(); }
@@ -1429,9 +1455,11 @@ function relAddFotos(lado, event) {
   Array.from(files).forEach(function(f) {
     var r = new FileReader();
     r.onload = function(e) {
-      arr.push(e.target.result);
-      pending--;
-      if (pending === 0) relRenderFotosPrev(lado);
+      compressImage(e.target.result, 1400, 1400, 0.75, function(compressed){
+        arr.push(compressed);
+        pending--;
+        if (pending === 0) relRenderFotosPrev(lado);
+      });
     };
     r.readAsDataURL(f);
   });
@@ -1504,6 +1532,7 @@ function relSalvar() {
     };
   }
 
+  console.log('relSalvar - chave:', relChave, '- relDados[chave]:', JSON.stringify(relDados[relChave]).substring(0,100));
   salvar();
   fechar('m-relatorio');
   relRender();
@@ -1786,6 +1815,7 @@ document.addEventListener('DOMContentLoaded', function() {
           visDados      = JSON.parse(d.visDados      || '{}');
           acoDados      = JSON.parse(d.acoDados      || '{}');
           relDados      = JSON.parse(d.relDados      || '{}');
+          console.log('Firebase carregou relDados keys:', Object.keys(relDados));
           alugueis      = JSON.parse(d.alugueis      || '[]');
           // Atualiza localStorage com dados do Firebase
           try {
