@@ -115,6 +115,18 @@ tr:hover td { background: var(--surface2); }
 #fotoViewer.open { display: flex; }
 #fotoViewer .close-btn { position: fixed; top: 16px; right: 20px; background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; z-index: 501; }
 
+/* LOGIN */
+.login-screen { position:fixed; inset:0; background:var(--bg); z-index:999; display:flex; align-items:center; justify-content:center; }
+.login-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:40px 36px; width:100%; max-width:380px; }
+.login-logo { text-align:center; margin-bottom:28px; }
+.login-logo img { height:48px; }
+.login-title { font-size:20px; font-weight:700; text-align:center; margin-bottom:6px; }
+.login-sub { font-size:12px; color:var(--muted); text-align:center; margin-bottom:28px; }
+.login-error { background:rgba(248,113,113,.12); border:1px solid var(--danger); color:var(--danger); border-radius:8px; padding:9px 14px; font-size:12px; margin-bottom:16px; display:none; }
+.login-btn { width:100%; padding:11px; font-size:14px; font-weight:700; border-radius:10px; background:var(--accent); color:#0f1117; border:none; cursor:pointer; margin-top:6px; font-family:inherit; transition:filter .15s; }
+.login-btn:hover { filter:brightness(1.1); }
+.login-btn:disabled { opacity:.6; cursor:not-allowed; }
+
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
@@ -144,6 +156,7 @@ tr:hover td { background: var(--surface2); }
   <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script>
     var _fbApp = firebase.initializeApp({
       apiKey: "AIzaSyAuTP7xKt1Zhgf30n1bolsbMQjvzllZ_6U",
@@ -204,8 +217,9 @@ tr:hover td { background: var(--surface2); }
   </div>
 
   <div class="sidebar-footer">
-    <div class="user-name">Rosemberg S.</div>
+    <div class="user-name" id="user-name-display">Rosemberg S.</div>
     <div class="user-role">Supervisor</div>
+    <button onclick="fazerLogout()" style="margin-top:10px;width:100%;background:rgba(248,113,113,.1);border:1px solid var(--danger);color:var(--danger);border-radius:7px;padding:7px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;">↩ Sair</button>
   </div>
 </aside>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMenu()"></div>
@@ -1816,6 +1830,59 @@ function relPDF() {
 
 
 // ── INIT ─────────────────────────────────────────────────────────
+// ── AUTH ────────────────────────────────────────────────────────
+var _auth = firebase.auth();
+
+function fazerLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  var senha = document.getElementById('login-senha').value;
+  var btn   = document.getElementById('login-btn');
+  var err   = document.getElementById('login-error');
+  if (!email || !senha) { mostrarErroLogin('Preencha e-mail e senha.'); return; }
+  btn.disabled = true; btn.textContent = 'Entrando...';
+  err.style.display = 'none';
+  _auth.signInWithEmailAndPassword(email, senha)
+    .then(function() { btn.disabled = false; btn.textContent = 'Entrar'; })
+    .catch(function(e) {
+      btn.disabled = false; btn.textContent = 'Entrar';
+      var msg = 'E-mail ou senha incorretos.';
+      if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Tente novamente em alguns minutos.';
+      if (e.code === 'auth/network-request-failed') msg = 'Sem conexão. Verifique sua internet.';
+      mostrarErroLogin(msg);
+    });
+}
+
+function mostrarErroLogin(msg) {
+  var err = document.getElementById('login-error');
+  err.textContent = msg; err.style.display = '';
+}
+
+function fazerLogout() {
+  if (!confirm('Deseja sair?')) return;
+  _auth.signOut();
+}
+
+// Observa estado de autenticação
+_auth.onAuthStateChanged(function(user) {
+  var loginScreen = document.getElementById('login-screen');
+  if (user) {
+    // Logado — esconde tela de login
+    loginScreen.style.display = 'none';
+    // Atualiza nome do usuário na sidebar
+    var nome = user.email.split('@')[0];
+    nome = nome.charAt(0).toUpperCase() + nome.slice(1);
+    var nameEl = document.querySelector('.user-name');
+    if (nameEl) nameEl.textContent = nome;
+  } else {
+    // Não logado — mostra tela de login
+    loginScreen.style.display = 'flex';
+    // Limpa campos
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-senha').value = '';
+    document.getElementById('login-error').style.display = 'none';
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   carregar(); // carrega localStorage primeiro (mostra algo imediatamente)
   renderDashboard();
@@ -2558,6 +2625,31 @@ function relCalcNF() {
       <button class="btn btn-ghost" onclick="document.getElementById('rel-modal').style.display='none'">Cancelar</button>
       <button class="btn btn-primary" onclick="relSalvar()">Salvar</button>
     </div>
+  </div>
+</div>
+
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <img id="login-logo-img" src="" alt="" style="display:none">
+      <div id="login-logo-text" style="font-size:28px;font-weight:800;color:var(--accent)">● Módulo</div>
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px">Administradora</div>
+    </div>
+    <div class="login-title">Bem-vindo</div>
+    <div class="login-sub">Acesse com suas credenciais</div>
+    <div class="login-error" id="login-error"></div>
+    <div class="form-group">
+      <label class="form-label">E-mail</label>
+      <input class="form-input" type="email" id="login-email" placeholder="seu@email.com" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Senha</label>
+      <input class="form-input" type="password" id="login-senha" placeholder="••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') fazerLogin()" />
+    </div>
+    <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
   </div>
 </div>
 
