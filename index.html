@@ -800,6 +800,7 @@ function salvar() {
       acoDados:      JSON.stringify(acoDados),
       relDados:      JSON.stringify(relDados),
       alugueis:      JSON.stringify(alugueis),
+      relDados:      JSON.stringify(relDados),
       atualizado:    new Date().toISOString()
     }).then(function(){ console.log('✓ Firebase salvo'); })
       .catch(function(e){ console.warn('Firebase erro:', e); });
@@ -813,6 +814,7 @@ function carregar() {
     visDados      = JSON.parse(localStorage.getItem('mod_vis')  || '{}');
     acoDados      = JSON.parse(localStorage.getItem('mod_aco')  || '{}');
     alugueis      = JSON.parse(localStorage.getItem('mod_alug') || '[]');
+    relDados      = JSON.parse(localStorage.getItem('mod_rel') || '{}');
   } catch(e) {}
 }
 
@@ -1481,6 +1483,7 @@ function relPDF() {
   var d = relDados[relChave] || {};
   var curto = condoShort(condo);
   var comp  = nomeMes(mes);
+  if (!window.jspdf) { alert('Biblioteca PDF não carregada. Tente novamente.'); return; }
   var {jsPDF} = window.jspdf;
   var doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
   var W = 210, marg = 15;
@@ -1708,6 +1711,7 @@ document.addEventListener('DOMContentLoaded', function() {
           acoDados      = JSON.parse(d.acoDados      || '{}');
           relDados      = JSON.parse(d.relDados      || '{}');
           alugueis      = JSON.parse(d.alugueis      || '[]');
+          relDados      = JSON.parse(d.relDados      || '{}');
           // Atualiza localStorage com dados do Firebase
           try {
             localStorage.setItem('mod_ext',  JSON.stringify(extintores));
