@@ -1753,10 +1753,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function renderDashboard() {
-  var filtro = document.getElementById('dash-filter').value;
+  console.log('renderDashboard - extintores:', Object.keys(extintores).length, 'condos, periodicos:', Object.keys(periodicos).length);
+  var filtro = document.getElementById('dash-filter') ? document.getElementById('dash-filter').value : '';
   var condos = filtro ? [filtro] : Object.keys(Object.assign({}, extintores, periodicos));
   var totalExt=0, alertaExt=0, totalPer=0, alertaPer=0;
-  var hoje = new Date(); hoje.setHours(0,0,0,0);
   var limite30 = new Date(); limite30.setDate(limite30.getDate()+30); limite30.setHours(0,0,0,0);
   var porCondo = {};
 
@@ -1769,24 +1769,22 @@ function renderDashboard() {
       var st = calcStatus(e.proxima);
       if (st==='alerta'||st==='vencido') {
         alertaExt++;
-        if (e.proxima && new Date(e.proxima+'T00:00:00') <= limite30) {
-          if (!porCondo[condo]) porCondo[condo] = [];
-          porCondo[condo].push({icon:'🧯', nome:'Extintor '+e.numero+' ('+e.local+')', venc:e.proxima, st:st});
-        }
+        if (!porCondo[condo]) porCondo[condo] = [];
+        porCondo[condo].push({icon:'🧯', nome:'Extintor '+(e.numero||e.num||'')+(e.local?' ('+e.local+')':''), venc:e.proxima, st:st});
       }
     });
     pers.forEach(function(p) {
       var st = calcStatus(p.proxima);
       if (st==='alerta'||st==='vencido') {
         alertaPer++;
-        if (p.proxima && new Date(p.proxima+'T00:00:00') <= limite30) {
-          if (!porCondo[condo]) porCondo[condo] = [];
-          var label = p.tipo==='Outro' ? (p.outro||'Outro') : p.tipo;
-          porCondo[condo].push({icon:(TIPO_ICONS[p.tipo]||'📋'), nome:label, venc:p.proxima, st:st});
-        }
+        if (!porCondo[condo]) porCondo[condo] = [];
+        var label = p.tipo==='Outro' ? (p.outro||'Outro') : (p.tipo||'Serviço');
+        porCondo[condo].push({icon:(TIPO_ICONS[p.tipo]||'📋'), nome:label, venc:p.proxima, st:st});
       }
     });
   });
+
+  console.log('Dashboard - totalExt:', totalExt, 'alertaExt:', alertaExt, 'condosAlerta:', Object.keys(porCondo).length);
 
   var cardsEl = document.getElementById('dash-cards');
   if (cardsEl) {
