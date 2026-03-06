@@ -155,19 +155,6 @@ tr:hover td { background: var(--surface2); }
     });
     var _db = firebase.firestore();
 
-    window.salvarFirebase = function() {
-      _db.collection('modulo').doc('dados').set({
-        extintores:    JSON.stringify(window._ext  || {}),
-        empresasCondo: JSON.stringify(window._emp  || {}),
-        periodicos:    JSON.stringify(window._per  || {}),
-        visDados:      JSON.stringify(window._vis  || {}),
-        acoDados:      JSON.stringify(window._aco  || {}),
-        alugueis:      JSON.stringify(window._alug || []),
-        atualizado:    new Date().toISOString()
-      }).then(function(){ console.log('✓ Firebase salvo'); })
-        .catch(function(e){ console.warn('Firebase erro:', e); });
-    };
-
     window.carregarFirebase = function() {
       return _db.collection('modulo').doc('dados').get().then(function(snap) {
         if (snap.exists) {
@@ -853,7 +840,6 @@ function salvar() {
       acoDados:      JSON.stringify(acoDados),
       relDados:      JSON.stringify(relDados),
       alugueis:      JSON.stringify(alugueis),
-      relDados:      JSON.stringify(relDados),
       atualizado:    new Date().toISOString()
     }).then(function(){ console.log('✓ Firebase salvo'); })
       .catch(function(e){ console.warn('Firebase erro:', e); });
@@ -1801,7 +1787,6 @@ document.addEventListener('DOMContentLoaded', function() {
           acoDados      = JSON.parse(d.acoDados      || '{}');
           relDados      = JSON.parse(d.relDados      || '{}');
           alugueis      = JSON.parse(d.alugueis      || '[]');
-          relDados      = JSON.parse(d.relDados      || '{}');
           // Atualiza localStorage com dados do Firebase
           try {
             localStorage.setItem('mod_ext',  JSON.stringify(extintores));
