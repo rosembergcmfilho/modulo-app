@@ -186,7 +186,7 @@ tr:hover td { background: var(--surface2); }
   <div class="nav-group">
     <div class="nav-label">Relatórios</div>
     <div class="nav-item" onclick="nav(this,'vistoria')"><span>🔍</span> Vistoria</div>
-    <div class="nav-item" onclick="nav(this,'acompanhamento')"><span>🔧</span> Acompan. Serviços</div>
+    <div class="nav-item" onclick="nav(this,'relatorio')"><span>📋</span> Rel. Mensal</div>
   </div>
   <div class="nav-group">
     <div class="nav-label">Imóveis</div>
@@ -329,29 +329,44 @@ tr:hover td { background: var(--surface2); }
   </div>
 </div>
 
-<!-- ═══════════════════ ACOMPANHAMENTO ═══════════════════ -->
-<div id="pg-acompanhamento" class="section">
+<!-- ═══════════════════ RELATÓRIO MENSAL ═══════════════════ -->
+<div id="pg-relatorio" class="section">
   <div class="topbar">
-    <div><div class="topbar-title" id="aco-title">Acompanhamento de Serviços</div><div class="topbar-sub">Selecione o condomínio e mês</div></div>
+    <div><div class="topbar-title" id="rel-title">Relatório Mensal</div><div class="topbar-sub">Selecione o condomínio e mês</div></div>
     <div class="topbar-right">
-      <button class="btn btn-ghost" id="btn-aco-pdf" onclick="acoPDF()" style="display:none;">📄 PDF</button>
-      <button class="btn btn-primary" onclick="abrirModalServ()">+ Serviço</button>
+      <button class="btn btn-ghost" id="btn-rel-pdf" onclick="relPDF()" style="display:none;">📄 Gerar PDF</button>
+      <button class="btn btn-primary" onclick="relAbrirModal()" id="btn-rel-add" style="display:none;">+ Lançamento</button>
     </div>
   </div>
   <div class="content">
+    <!-- Seletor -->
     <div class="card" style="margin-bottom:20px;">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <label class="form-label" style="margin:0;">Condomínio:</label>
-        <select id="aco-condo" class="form-input" style="flex:1;min-width:200px;max-width:420px;">
+        <select id="rel-condo" class="form-input" style="flex:1;min-width:200px;max-width:420px;">
           <option value="">— Selecione —</option>
           <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option><option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option><option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option><option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option><option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option><option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option><option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option><option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option><option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option><option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option><option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option><option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option><option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option><option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option><option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option><option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option><option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option><option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option><option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option><option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option><option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option><option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option><option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option><option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option><option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option><option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option><option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option><option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option><option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option><option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option><option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option><option>CONDOMÍNIO JARDIM DOS COQUEIRAIS HOTEL RESIDENCIA</option><option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option><option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option><option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
         </select>
         <label class="form-label" style="margin:0;">Mês:</label>
-        <input type="month" id="aco-mes" class="form-input" style="width:160px;" />
-        <button class="btn btn-ghost" onclick="acoCarregar()">▶ Carregar</button>
+        <input type="month" id="rel-mes" class="form-input" style="width:160px;" />
+        <button class="btn btn-ghost" onclick="relCarregar()">▶ Carregar</button>
       </div>
     </div>
-    <div id="aco-conteudo" style="display:none;"><div id="aco-lista"></div></div>
+
+    <div id="rel-conteudo" style="display:none;">
+      <!-- Seções ativas -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Seções do relatório</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="rel-sec-servicos" checked onchange="relRender()"> 📸 Serviços Realizados</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="rel-sec-contratos" checked onchange="relRender()"> 📋 Contratos / OS</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="rel-sec-ressarc" onchange="relRender()"> 🧾 Ressarcimento NF</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="rel-sec-historico" checked onchange="relRender()"> 📅 Histórico Administrativo</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="rel-sec-fianca" onchange="relRender()"> 🔒 Carta Fiança</label>
+        </div>
+      </div>
+      <div id="rel-lista"></div>
+    </div>
   </div>
 </div>
 
@@ -509,45 +524,92 @@ tr:hover td { background: var(--surface2); }
   </div>
 </div>
 
-<!-- Modal Serviço Acompanhamento -->
-<div class="modal-overlay" id="m-serv">
-  <div class="modal" style="max-width:560px;">
+<!-- Modal Relatório Mensal -->
+<div class="modal-overlay" id="m-relatorio">
+  <div class="modal" style="max-width:600px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-      <div><div class="modal-title" id="m-serv-titulo">Novo Serviço</div></div>
-      <button class="modal-close" onclick="fechar('m-serv')">✕</button>
+      <div class="modal-title" id="rel-modal-title">Lançamento</div>
+      <button class="modal-close" onclick="fechar('m-relatorio')">✕</button>
     </div>
-    <input type="hidden" id="serv-idx">
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Descrição *</label><input class="form-input" id="si-desc" placeholder="Ex: Troca de luminárias" /></div>
-      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="si-data" /></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Empresa</label><input class="form-input" id="si-empresa" placeholder="Empresa / responsável" /></div>
-      <div class="form-group"><label class="form-label">Status</label>
-        <select class="form-input" id="si-status">
-          <option value="andamento">🟡 Em andamento</option>
-          <option value="concluido">🟢 Concluído</option>
-        </select>
+    <input type="hidden" id="rel-modal-tipo">
+    <input type="hidden" id="rel-modal-idx">
+
+    <!-- SERVIÇO REALIZADO -->
+    <div id="rel-modal-sec-servico">
+      <div class="form-row">
+        <div class="form-group" style="flex:2"><label class="form-label">Descrição *</label><input class="form-input" id="rel-serv-desc" placeholder="Ex: Pintura da fachada" /></div>
+        <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="rel-serv-data" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="flex:2"><label class="form-label">Empresa / Responsável</label><input class="form-input" id="rel-serv-empresa" placeholder="Ex: Pinturas Silva" /></div>
+        <div class="form-group"><label class="form-label">Status</label>
+          <select class="form-input" id="rel-serv-status">
+            <option value="andamento">🟡 Em Andamento</option>
+            <option value="concluido">🟢 Concluído</option>
+            <option value="cancelado">🔴 Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Observações</label><textarea class="form-input" id="rel-serv-obs" rows="2" style="resize:vertical"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+        <div class="foto-bloco">
+          <div class="foto-bloco-label" style="background:rgba(96,165,250,.15);color:var(--blue)">📷 ANTES</div>
+          <div class="foto-drop" onclick="document.getElementById('rel-antes-inp').click()"><div style="font-size:18px">➕</div></div>
+          <input type="file" id="rel-antes-inp" accept="image/*" multiple style="display:none" onchange="relAddFotos('antes',event)">
+          <div id="rel-antes-prev" class="foto-mini-grid"></div>
+        </div>
+        <div class="foto-bloco">
+          <div class="foto-bloco-label" style="background:rgba(74,222,128,.15);color:var(--accent)">📷 DEPOIS</div>
+          <div class="foto-drop" onclick="document.getElementById('rel-depois-inp').click()"><div style="font-size:18px">➕</div></div>
+          <input type="file" id="rel-depois-inp" accept="image/*" multiple style="display:none" onchange="relAddFotos('depois',event)">
+          <div id="rel-depois-prev" class="foto-mini-grid"></div>
+        </div>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">Observações</label><textarea class="form-input" id="si-obs" rows="2" style="resize:vertical"></textarea></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
-      <div class="foto-bloco">
-        <div class="foto-bloco-label" style="background:rgba(96,165,250,.15);color:var(--blue)">📷 ANTES</div>
-        <div class="foto-drop" onclick="document.getElementById('si-antes-inp').click()"><div style="font-size:18px">➕</div></div>
-        <input type="file" id="si-antes-inp" accept="image/*" multiple style="display:none" onchange="servAddFotos('antes',event)">
-        <div id="si-antes-prev" class="foto-mini-grid"></div>
+
+    <!-- CONTRATO / OS -->
+    <div id="rel-modal-sec-contrato" style="display:none">
+      <div class="form-row">
+        <div class="form-group" style="flex:2"><label class="form-label">Empresa *</label><input class="form-input" id="rel-os-empresa" placeholder="Ex: COOP (Elevadores)" /></div>
+        <div class="form-group"><label class="form-label">Nº OS</label><input class="form-input" id="rel-os-os" placeholder="68092308" /></div>
       </div>
-      <div class="foto-bloco">
-        <div class="foto-bloco-label" style="background:rgba(74,222,128,.15);color:var(--accent)">📷 DEPOIS</div>
-        <div class="foto-drop" onclick="document.getElementById('si-depois-inp').click()"><div style="font-size:18px">➕</div></div>
-        <input type="file" id="si-depois-inp" accept="image/*" multiple style="display:none" onchange="servAddFotos('depois',event)">
-        <div id="si-depois-prev" class="foto-mini-grid"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="rel-os-data" /></div>
+        <div class="form-group" style="flex:2"><label class="form-label">Descrição *</label><input class="form-input" id="rel-os-desc" placeholder="Ex: Manutenção Preventiva (Serviço A)" /></div>
       </div>
     </div>
+
+    <!-- RESSARCIMENTO NF -->
+    <div id="rel-modal-sec-ressarc" style="display:none">
+      <div class="form-group"><label class="form-label">Produto *</label><input class="form-input" id="rel-nf-produto" placeholder="Ex: Rolo de espuma, tinta esmalte" /></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Quantidade</label><input class="form-input" id="rel-nf-qtd" placeholder="-" /></div>
+        <div class="form-group"><label class="form-label">Valor Unit. (R$)</label><input class="form-input" type="number" id="rel-nf-valor" placeholder="0,00" /></div>
+        <div class="form-group"><label class="form-label">Total (R$) *</label><input class="form-input" type="number" id="rel-nf-total" placeholder="0,00" /></div>
+      </div>
+      <div class="form-group"><label class="form-label">Observação</label><input class="form-input" id="rel-nf-obs" placeholder="Ex: As notas foram enviadas por e-mail" /></div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div id="rel-modal-sec-historico" style="display:none">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="rel-hist-data" /></div>
+        <div class="form-group" style="flex:3"><label class="form-label">Atividade *</label><input class="form-input" id="rel-hist-desc" placeholder="Ex: Envio de remessas" /></div>
+      </div>
+    </div>
+
+    <!-- CARTA FIANÇA -->
+    <div id="rel-modal-sec-fianca" style="display:none">
+      <div class="form-group"><label class="form-label">Texto / Informações</label><textarea class="form-input" id="rel-fianca-texto" rows="4" style="resize:vertical" placeholder="Ex: Entramos em contato com a seguradora..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nº Protocolo</label><input class="form-input" id="rel-fianca-protocolo" /></div>
+        <div class="form-group"><label class="form-label">Atendente</label><input class="form-input" id="rel-fianca-atendente" /></div>
+      </div>
+    </div>
+
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="fechar('m-serv')">Cancelar</button>
-      <button class="btn btn-primary" onclick="servSalvar()">💾 Salvar</button>
+      <button class="btn btn-ghost" onclick="fechar('m-relatorio')">Cancelar</button>
+      <button class="btn btn-primary" onclick="relSalvar()">💾 Salvar</button>
     </div>
   </div>
 </div>
@@ -725,6 +787,7 @@ function salvar() {
     localStorage.setItem('mod_per', JSON.stringify(periodicos));
     localStorage.setItem('mod_vis', JSON.stringify(visDados));
     localStorage.setItem('mod_aco', JSON.stringify(acoDados));
+    localStorage.setItem('mod_rel', JSON.stringify(relDados));
     localStorage.setItem('mod_alug', JSON.stringify(alugueis));
   } catch(e) {}
   // Sincroniza com Firebase diretamente
@@ -735,6 +798,7 @@ function salvar() {
       periodicos:    JSON.stringify(periodicos),
       visDados:      JSON.stringify(visDados),
       acoDados:      JSON.stringify(acoDados),
+      relDados:      JSON.stringify(relDados),
       alugueis:      JSON.stringify(alugueis),
       atualizado:    new Date().toISOString()
     }).then(function(){ console.log('✓ Firebase salvo'); })
@@ -1076,529 +1140,555 @@ function ocrSalvar() {
 // ══════════════════════════════════════════════════════════════════
 // ACOMPANHAMENTO
 // ══════════════════════════════════════════════════════════════════
-function acoCarregar() {
-  var condo=document.getElementById('aco-condo').value;
-  var mes=document.getElementById('aco-mes').value;
-  if (!condo||!mes) { alert('Selecione condomínio e mês.'); return; }
-  acoChave=condo+'||'+mes;
-  if (!acoDados[acoChave]) acoDados[acoChave]=[];
-  document.getElementById('aco-title').textContent=condoShort(condo);
-  document.getElementById('btn-aco-pdf').style.display='';
-  document.getElementById('aco-conteudo').style.display='';
-  acoRender();
-}
-function acoRender() {
-  if (!acoChave) return;
-  var lista=acoDados[acoChave]||[];
-  var container=document.getElementById('aco-lista');
-  if (lista.length===0) { container.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Nenhum serviço cadastrado.</div>'; return; }
-  var html='';
-  lista.forEach(function(s,idx){
-    var stLabel=s.status==='concluido'?'🟢 Concluído':'🟡 Em andamento';
-    var stCor=s.status==='concluido'?'var(--accent)':'var(--warn)';
-    var total=(s.antes||[]).length+(s.depois||[]).length;
-    html+='<div class="scard" style="margin-bottom:12px">';
-    html+='<div class="scard-header">';
-    html+='<div style="flex:1"><div style="font-weight:600;font-size:13px">'+s.desc+'</div>';
-    if(s.empresa) html+='<div style="font-size:11px;color:var(--blue);margin-top:3px">🏢 '+s.empresa+'</div>';
-    if(s.obs) html+='<div style="font-size:12px;color:var(--muted2);margin-top:3px">'+s.obs+'</div>';
-    html+='</div>';
-    html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">';
-    html+='<span style="font-size:11px;color:var(--muted)">'+fmtData(s.data)+'</span>';
-    html+='<span style="font-size:11px;font-weight:700;color:'+stCor+'">'+stLabel+'</span>';
-    html+='<span style="font-size:11px;background:rgba(74,222,128,.1);color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:1px 7px">'+total+' foto'+(total!==1?'s':'')+'</span>';
-    html+='<div><button onclick="servEditar('+idx+')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px">✏️</button>';
-    html+='<button onclick="servExcluir('+idx+')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px">🗑️</button></div>';
-    html+='</div></div>';
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)">';
-    ['antes','depois'].forEach(function(m){
-      var fotos=s[m]||[];
-      var cor=m==='antes'?'var(--blue)':'var(--accent)';
-      var bg=m==='antes'?'rgba(96,165,250,.15)':'rgba(74,222,128,.15)';
-      html+='<div style="padding:10px;'+(m==='antes'?'border-right:1px solid var(--border)':'')+'">';
-      html+='<div style="font-size:10px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:4px;display:inline-block;background:'+bg+';color:'+cor+';margin-bottom:6px">📷 '+m.toUpperCase()+'</div>';
-      html+='<div style="display:flex;flex-wrap:wrap;gap:5px">';
-      if(fotos.length>0) fotos.forEach(function(f){ html+='<img src="'+f+'" style="width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer" onclick="verFotos(acoDados[\''+acoChave+'\']['+idx+'][\''+m+'\'])">'; });
-      else html+='<span style="font-size:11px;color:var(--muted)">Sem fotos</span>';
-      html+='</div></div>';
-    });
-    html+='</div></div>';
-  });
-  container.innerHTML=html;
-}
-function abrirModalServ() {
-  if (!acoChave) { alert('Carregue um mês primeiro.'); return; }
-  document.getElementById('m-serv-titulo').textContent='Novo Serviço';
-  document.getElementById('serv-idx').value='';
-  document.getElementById('si-desc').value=''; document.getElementById('si-empresa').value='';
-  document.getElementById('si-obs').value=''; document.getElementById('si-status').value='andamento';
-  document.getElementById('si-data').value=new Date().toISOString().split('T')[0];
-  servFotosTemp={antes:[],depois:[]};
-  ['antes','depois'].forEach(function(m){ document.getElementById('si-'+m+'-prev').innerHTML=''; document.getElementById('si-'+m+'-inp').value=''; });
-  abrir('m-serv');
-}
-function servAddFotos(momento, event) {
-  Array.from(event.target.files).forEach(function(f){
-    var r=new FileReader(); r.onload=function(e){ servFotosTemp[momento].push(e.target.result); servRenderPrev(momento); }; r.readAsDataURL(f);
-  });
-}
-function servRemoveFoto(momento, i) { servFotosTemp[momento].splice(i,1); servRenderPrev(momento); }
-function servRenderPrev(momento) {
-  document.getElementById('si-'+momento+'-prev').innerHTML=servFotosTemp[momento].map(function(s,i){
-    return miniPreview(s,i,servFotosTemp[momento],'function(x){servRemoveFoto(\''+momento+'\',x)}');
-  }).join('');
-}
-function servEditar(idx) {
-  var s=acoDados[acoChave][idx];
-  document.getElementById('m-serv-titulo').textContent='Editar Serviço';
-  document.getElementById('serv-idx').value=idx;
-  document.getElementById('si-desc').value=s.desc||''; document.getElementById('si-empresa').value=s.empresa||'';
-  document.getElementById('si-obs').value=s.obs||''; document.getElementById('si-data').value=s.data||'';
-  document.getElementById('si-status').value=s.status||'andamento';
-  servFotosTemp={antes:[...(s.antes||[])],depois:[...(s.depois||[])]};
-  ['antes','depois'].forEach(servRenderPrev);
-  abrir('m-serv');
-}
-function servExcluir(idx) {
-  if (!confirm('Excluir?')) return;
-  acoDados[acoChave].splice(idx,1); acoRender(); salvar();
-}
-function servSalvar() {
-  var desc=document.getElementById('si-desc').value.trim();
-  if (!desc) { alert('Informe a descrição.'); return; }
-  var obj={desc:desc,empresa:document.getElementById('si-empresa').value.trim(),obs:document.getElementById('si-obs').value.trim(),data:document.getElementById('si-data').value,status:document.getElementById('si-status').value,antes:[...servFotosTemp.antes],depois:[...servFotosTemp.depois]};
-  var idx=document.getElementById('serv-idx').value;
-  if (idx!=='') acoDados[acoChave][parseInt(idx)]=obj;
-  else acoDados[acoChave].push(obj);
-  fechar('m-serv'); acoRender(); salvar(); toast('Serviço salvo!');
+// ── RELATÓRIO MENSAL ─────────────────────────────────────────────
+
+var relDados = {}; // relDados[condo||mes] = { servicos:[], contratos:[], ressarc:[], historico:[], fianca:{} }
+var relChave = '';
+
+function relCarregar() {
+  var condo = document.getElementById('rel-condo').value;
+  var mes   = document.getElementById('rel-mes').value;
+  if (!condo || !mes) { alert('Selecione o condomínio e o mês.'); return; }
+  relChave = condo + '||' + mes;
+  if (!relDados[relChave]) relDados[relChave] = { servicos:[], contratos:[], ressarc:[], historico:[], fianca:{} };
+  var curto = condoShort(condo);
+  var comp  = nomeMes(mes);
+  document.getElementById('rel-title').textContent = 'Relatório Mensal — ' + curto;
+  document.getElementById('topbar-sub') && (document.getElementById('topbar-sub').textContent = comp);
+  document.getElementById('rel-conteudo').style.display = '';
+  document.getElementById('btn-rel-pdf').style.display  = '';
+  document.getElementById('btn-rel-add').style.display  = '';
+  relRender();
 }
 
-// ══════════════════════════════════════════════════════════════════
-// ALUGUÉIS
-// ══════════════════════════════════════════════════════════════════
-function alugIndiceChange() {
-  document.getElementById('ai-perc-wrap').style.display=document.getElementById('ai-indice').value==='Fixo (% ao ano)'?'':'none';
-}
-function alugAnexar(event) {
-  var f=event.target.files[0]; if(!f) return;
-  var r=new FileReader(); r.onload=function(e){
-    alugPDFTemp={nome:f.name,base64:e.target.result};
-    document.getElementById('ai-pdf-nome').textContent=f.name;
-    document.getElementById('ai-pdf-preview').style.display='';
-  }; r.readAsDataURL(f);
-}
-function alugRemoverPDF() {
-  alugPDFTemp=null;
-  document.getElementById('ai-pdf-preview').style.display='none';
-  document.getElementById('ai-pdf-inp').value='';
-}
-function renderAlugueis() {
-  var container=document.getElementById('alug-lista');
-  var alertaEl=document.getElementById('alug-alertas');
-  var badge=document.getElementById('badge-alug');
-  if (alugueis.length===0) {
-    container.innerHTML='<div style="text-align:center;padding:48px;color:var(--muted);font-size:14px"><div style="font-size:40px;margin-bottom:12px;opacity:.3">🏢</div>Nenhum contrato cadastrado.</div>';
-    alertaEl.style.display='none'; badge.style.display='none'; return;
-  }
-  var hoje=new Date(); hoje.setHours(0,0,0,0);
-  var limite=new Date(); limite.setDate(limite.getDate()+60); limite.setHours(0,0,0,0);
-  var alertas=alugueis.filter(function(a){ return a.reajuste&&new Date(a.reajuste+'T00:00:00')<=limite; });
-  badge.style.display=alertas.length>0?'':'none';
-  badge.textContent=alertas.length;
-  if (alertas.length>0) {
-    var ah='<div style="background:rgba(251,191,36,.1);border:1px solid var(--warn);border-radius:12px;padding:14px 18px">';
-    ah+='<div style="font-weight:700;color:var(--warn);font-size:13px;margin-bottom:8px">⚠️ '+alertas.length+' reajuste(s) nos próximos 60 dias</div>';
-    alertas.forEach(function(a){
-      var dias=Math.ceil((new Date(a.reajuste+'T00:00:00')-hoje)/86400000);
-      ah+='<div style="font-size:12px;color:var(--text);margin-top:4px">🏢 <strong>'+a.imovel+' — '+a.unidade+'</strong> ('+a.inquilino+') ';
-      ah+='<span style="color:'+(dias<=0?'var(--danger)':'var(--warn)')+';font-weight:700;margin-left:8px">'+(dias<=0?'VENCIDO':dias+' dias')+'</span></div>';
-    });
-    ah+='</div>';
-    alertaEl.innerHTML=ah; alertaEl.style.display='';
-  } else { alertaEl.style.display='none'; }
-
-  var html='';
-  alugueis.forEach(function(a,idx){
-    var dias=a.reajuste?Math.ceil((new Date(a.reajuste+'T00:00:00')-hoje)/86400000):null;
-    var reajCor=dias!==null&&dias<=0?'var(--danger)':dias!==null&&dias<=60?'var(--warn)':'var(--text)';
-    html+='<div class="scard" style="margin-bottom:14px">';
-    html+='<div class="scard-header">';
-    html+='<div style="flex:1">';
-    html+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
-    html+='<span style="font-weight:700;font-size:15px">🏢 '+a.imovel+'</span>';
-    html+='<span style="background:rgba(96,165,250,.15);color:var(--blue);font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px">'+a.unidade+'</span>';
-    html+='</div>';
-    html+='<div style="font-size:13px;color:var(--muted2);margin-top:4px">👤 '+a.inquilino+(a.contato?' · '+a.contato:'')+'</div>';
-    html+='</div>';
-    html+='<div style="display:flex;gap:6px;align-items:center">';
-    if(a.pdf) html+='<button onclick="alugVerPDF('+idx+')" style="background:rgba(96,165,250,.1);border:1px solid var(--blue);color:var(--blue);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer">📄 Contrato</button>';
-    html+='<button onclick="abrirModalReaj('+idx+')" style="background:rgba(74,222,128,.1);border:1px solid var(--accent);color:var(--accent);border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer">↑ Reajuste</button>';
-    html+='<button onclick="alugEditar('+idx+')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:16px">✏️</button>';
-    html+='<button onclick="alugExcluir('+idx+')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px">🗑️</button>';
-    html+='</div></div>';
-    html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border)">';
-    var cols=[{l:'Valor atual',v:fmtValor(a.valor),c:'var(--accent)'},{l:'Índice',v:a.indice||(a.perc?a.perc+'% a.a.':'—'),c:'var(--text)'},{l:'Próx. reajuste',v:fmtData(a.reajuste),c:reajCor},{l:'Venc. contrato',v:fmtData(a.vencContrato),c:'var(--muted2)'}];
-    cols.forEach(function(col,ci){
-      html+='<div style="padding:12px;'+(ci<3?'border-right:1px solid var(--border)':'')+'">';
-      html+='<div style="font-size:10px;color:var(--muted);margin-bottom:3px">'+col.l+'</div>';
-      html+='<div style="font-size:13px;font-weight:700;color:'+col.c+'">'+col.v+'</div></div>';
-    });
-    html+='</div>';
-    if(a.historico&&a.historico.length>0) {
-      html+='<div style="border-top:1px solid var(--border);padding:10px 14px">';
-      html+='<div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px">HISTÓRICO DE REAJUSTES</div>';
-      a.historico.slice().reverse().forEach(function(h){
-        var pct=h.ant?((((h.novo-h.ant)/h.ant)*100).toFixed(1)):null;
-        html+='<div style="display:flex;align-items:center;gap:10px;font-size:12px;padding:3px 0;border-bottom:1px dashed var(--border)">';
-        html+='<span style="color:var(--muted);min-width:70px">'+fmtData(h.data)+'</span>';
-        html+='<span style="color:var(--muted2)">'+fmtValor(h.ant)+'</span>';
-        html+='<span style="color:var(--muted)">→</span>';
-        html+='<span style="color:var(--accent);font-weight:600">'+fmtValor(h.novo)+'</span>';
-        if(pct) html+='<span style="color:var(--accent);font-size:11px">(+'+pct+'%)</span>';
-        if(h.obs) html+='<span style="color:var(--muted);font-size:11px">— '+h.obs+'</span>';
-        html+='</div>';
-      });
-      html+='</div>';
-    }
-    if(a.obs) html+='<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted2)">📝 '+a.obs+'</div>';
-    html+='</div>';
-  });
-  container.innerHTML=html;
-}
-function abrirModalAlug() {
-  document.getElementById('m-alug-titulo').textContent='Novo Contrato';
-  document.getElementById('alug-idx').value='';
-  ['ai-imovel','ai-unidade','ai-inquilino','ai-contato','ai-valor','ai-dia','ai-perc','ai-obs'].forEach(function(id){ document.getElementById(id).value=''; });
-  document.getElementById('ai-indice').value=''; document.getElementById('ai-reajuste').value='';
-  document.getElementById('ai-venc-contrato').value=''; document.getElementById('ai-perc-wrap').style.display='none';
-  alugPDFTemp=null; document.getElementById('ai-pdf-preview').style.display='none';
-  document.getElementById('ai-pdf-inp').value='';
-  abrir('m-alug');
-}
-function alugEditar(idx) {
-  var a=alugueis[idx];
-  document.getElementById('m-alug-titulo').textContent='Editar Contrato';
-  document.getElementById('alug-idx').value=idx;
-  document.getElementById('ai-imovel').value=a.imovel||''; document.getElementById('ai-unidade').value=a.unidade||'';
-  document.getElementById('ai-inquilino').value=a.inquilino||''; document.getElementById('ai-contato').value=a.contato||'';
-  document.getElementById('ai-valor').value=a.valor||''; document.getElementById('ai-dia').value=a.dia||'';
-  document.getElementById('ai-indice').value=a.indice||''; document.getElementById('ai-perc').value=a.perc||'';
-  document.getElementById('ai-perc-wrap').style.display=a.indice==='Fixo (% ao ano)'?'':'none';
-  document.getElementById('ai-reajuste').value=a.reajuste||''; document.getElementById('ai-venc-contrato').value=a.vencContrato||'';
-  document.getElementById('ai-obs').value=a.obs||'';
-  alugPDFTemp=a.pdf||null;
-  if(alugPDFTemp){ document.getElementById('ai-pdf-nome').textContent=alugPDFTemp.nome; document.getElementById('ai-pdf-preview').style.display=''; }
-  else document.getElementById('ai-pdf-preview').style.display='none';
-  abrir('m-alug');
-}
-function alugExcluir(idx) {
-  if (!confirm('Excluir este contrato?')) return;
-  alugueis.splice(idx,1); renderAlugueis(); salvar();
-}
-function alugVerPDF(idx) {
-  var a=alugueis[idx]; if(!a.pdf) return;
-  var link=document.createElement('a'); link.href=a.pdf.base64; link.download=a.pdf.nome; link.click();
-}
-function alugSalvar() {
-  var imovel=document.getElementById('ai-imovel').value.trim();
-  var unidade=document.getElementById('ai-unidade').value.trim();
-  var inquilino=document.getElementById('ai-inquilino').value.trim();
-  var reajuste=document.getElementById('ai-reajuste').value;
-  if (!imovel||!unidade||!inquilino||!reajuste) { alert('Preencha imóvel, unidade, inquilino e data do próximo reajuste.'); return; }
-  var obj={imovel:imovel,unidade:unidade,inquilino:inquilino,contato:document.getElementById('ai-contato').value.trim(),valor:document.getElementById('ai-valor').value,dia:document.getElementById('ai-dia').value,indice:document.getElementById('ai-indice').value,perc:document.getElementById('ai-perc').value,reajuste:reajuste,vencContrato:document.getElementById('ai-venc-contrato').value,obs:document.getElementById('ai-obs').value.trim(),pdf:alugPDFTemp};
-  var idx=document.getElementById('alug-idx').value;
-  if (idx!=='') { obj.historico=alugueis[parseInt(idx)].historico||[]; alugueis[parseInt(idx)]=obj; }
-  else { obj.historico=[]; alugueis.push(obj); }
-  fechar('m-alug'); renderAlugueis(); salvar(); toast('Contrato salvo!');
-}
-function abrirModalReaj(idx) {
-  var a=alugueis[idx];
-  document.getElementById('reaj-idx').value=idx;
-  document.getElementById('m-reaj-sub').textContent=a.imovel+' — '+a.unidade+' ('+a.inquilino+')';
-  document.getElementById('ri-ant').value=a.valor||'';
-  document.getElementById('ri-novo').value='';
-  document.getElementById('ri-data').value=new Date().toISOString().split('T')[0];
-  document.getElementById('ri-proxima').value=a.reajuste||'';
-  document.getElementById('ri-obs').value='';
-  abrir('m-reaj');
-}
-function reajSalvar() {
-  var idx=parseInt(document.getElementById('reaj-idx').value);
-  var novo=document.getElementById('ri-novo').value;
-  var data=document.getElementById('ri-data').value;
-  if (!novo||!data) { alert('Informe o novo valor e a data.'); return; }
-  var a=alugueis[idx];
-  if(!a.historico) a.historico=[];
-  a.historico.push({data:data,ant:a.valor,novo:novo,obs:document.getElementById('ri-obs').value.trim()});
-  a.valor=novo;
-  var prox=document.getElementById('ri-proxima').value;
-  if(prox) a.reajuste=prox;
-  fechar('m-reaj'); renderAlugueis(); salvar(); toast('Reajuste registrado!');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// DASHBOARD
-// ══════════════════════════════════════════════════════════════════
-function renderDashboard() {
-  var filtro = document.getElementById('dash-filter').value;
-  var condos = filtro ? [filtro] : Object.keys(Object.assign({}, extintores, periodicos));
-  var totalExt=0, alertaExt=0, totalPer=0, alertaPer=0;
-  var hoje = new Date(); hoje.setHours(0,0,0,0);
-  var limite30 = new Date(); limite30.setDate(limite30.getDate()+30); limite30.setHours(0,0,0,0);
-
-  // Agrupar urgentes por condomínio
-  var porCondo = {};
-
-  condos.forEach(function(condo) {
-    var exts = extintores[condo] || [];
-    var pers = periodicos[condo] || [];
-    totalExt += exts.length;
-    totalPer += pers.length;
-
-    exts.forEach(function(e) {
-      var st = calcStatus(e.proxima);
-      if (st==='alerta'||st==='vencido') {
-        alertaExt++;
-        if (e.proxima && new Date(e.proxima+'T00:00:00') <= limite30) {
-          if (!porCondo[condo]) porCondo[condo] = [];
-          porCondo[condo].push({icon:'🧯', nome:'Extintor '+e.numero+' ('+e.local+')', venc:e.proxima, st:st});
-        }
-      }
-    });
-    pers.forEach(function(p) {
-      var st = calcStatus(p.proxima);
-      if (st==='alerta'||st==='vencido') {
-        alertaPer++;
-        if (p.proxima && new Date(p.proxima+'T00:00:00') <= limite30) {
-          if (!porCondo[condo]) porCondo[condo] = [];
-          var label = p.tipo==='Outro' ? (p.outro||'Outro') : p.tipo;
-          porCondo[condo].push({icon:(TIPO_ICONS[p.tipo]||'📋'), nome:label, venc:p.proxima, st:st});
-        }
-      }
-    });
-  });
-
-  // Cards superiores — tamanho fixo, sem emoji
-  var cardsEl = document.getElementById('dash-cards');
-  var c4 = [
-    {label:'Extintores',       v:totalExt,  cor: totalExt>0  ? 'var(--blue)'   : 'var(--muted)'},
-    {label:'Ext. em Alerta',   v:alertaExt, cor: alertaExt>0 ? 'var(--danger)' : 'var(--accent)'},
-    {label:'Serv. Periódicos', v:totalPer,  cor: totalPer>0  ? 'var(--blue)'   : 'var(--muted)'},
-    {label:'Per. em Alerta',   v:alertaPer, cor: alertaPer>0 ? 'var(--warn)'   : 'var(--accent)'},
-  ];
-  cardsEl.innerHTML = c4.map(function(x) {
-    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center;height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;">'
-      +'<div style="font-size:32px;font-weight:800;color:'+x.cor+';line-height:1">'+x.v+'</div>'
-      +'<div style="font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.5px">'+x.label+'</div>'
-      +'</div>';
-  }).join('');
-
-  // Lista agrupada por condomínio
-  var lista = document.getElementById('dash-lista');
-  var condosComAlerta = Object.keys(porCondo);
-  if (condosComAlerta.length === 0) {
-    lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">✅ Nenhum vencimento crítico encontrado.</div>';
-    return;
-  }
-
+function relRender() {
+  if (!relChave) return;
+  var d = relDados[relChave] || { servicos:[], contratos:[], ressarc:[], historico:[], fianca:{} };
+  var secServicos  = document.getElementById('rel-sec-servicos').checked;
+  var secContratos = document.getElementById('rel-sec-contratos').checked;
+  var secRessarc   = document.getElementById('rel-sec-ressarc').checked;
+  var secHistorico = document.getElementById('rel-sec-historico').checked;
+  var secFianca    = document.getElementById('rel-sec-fianca').checked;
   var html = '';
-  condosComAlerta.forEach(function(condo) {
-    var itens = porCondo[condo];
-    itens.sort(function(a,b){ return a.venc < b.venc ? -1 : 1; });
-    html += '<div style="margin-bottom:18px;">';
-    html += '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:8px;">'+condoShort(condo)+'</div>';
-    itens.forEach(function(item) {
-      var cor = item.st==='vencido' ? 'var(--danger)' : 'var(--warn)';
-      var label = item.st==='vencido' ? 'VENCIDO' : 'ALERTA';
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.04);">';
-      html += '<span style="font-size:15px">'+item.icon+'</span>';
-      html += '<span style="font-size:13px;flex:1;color:var(--text)">'+item.nome+'</span>';
-      html += '<span style="font-size:11px;font-weight:700;color:'+cor+'">'+label+' — '+fmtData(item.venc)+'</span>';
-      html += '</div>';
-    });
+
+  // SERVIÇOS REALIZADOS
+  if (secServicos) {
+    html += '<div class="card" style="margin-bottom:16px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--text)">📸 Serviços Realizados</div>';
+    html += '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="relAbrirModal(\'servico\')">+ Serviço</button>';
     html += '</div>';
-  });
-  lista.innerHTML = html;
-}
-
-// ══════════════════════════════════════════════════════════════════
-// PDFs
-// ══════════════════════════════════════════════════════════════════
-function getLogo() {
-  try { var el=document.getElementById('modulo-logo'); if(el&&el.src&&el.src.startsWith('data:')) return el.src; } catch(e){}
-  return null;
-}
-function pdfCabecalho(doc, titulo, subtitulo, W, marg) {
-  doc.setFillColor(26,38,64); doc.rect(0,0,W,38,'F');
-  var logo=getLogo();
-  if(logo){ try{doc.addImage(logo,'PNG',W-52,4,38,16);}catch(e){try{doc.addImage(logo,'JPEG',W-52,4,38,16);}catch(e2){}} }
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.text('MODULO ADMINISTRADORA',marg,13);
-  doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text(titulo,marg,21);
-  doc.setFontSize(8); doc.text(subtitulo,marg,29); doc.text('Gerado: '+new Date().toLocaleDateString('pt-BR'),W-marg-40,29);
-}
-function pdfRodape(doc, p, total, texto, W) {
-  doc.setFontSize(7); doc.setTextColor(150,150,150);
-  doc.text(texto+' — Pag. '+p+'/'+total, W/2, 292, {align:'center'});
-}
-
-function extPDF() {
-  if (!extCondoAtual) return;
-  var lista=extintores[extCondoAtual]||[];
-  if (lista.length===0) { alert('Nenhum extintor para gerar PDF.'); return; }
-  var emp=empresasCondo[extCondoAtual]||'';
-  var {jsPDF}=window.jspdf;
-  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var W=210,marg=15;
-  var curto=condoShort(extCondoAtual);
-  pdfCabecalho(doc,'Relatorio de Extintores',curto+(emp?' | '+emp:''),W,marg);
-  var y=50;
-  var pNok=lista.filter(function(e){return calcStatus(e.proxima)==='ok';}).length;
-  var pNal=lista.filter(function(e){return calcStatus(e.proxima)==='alerta';}).length;
-  var pNve=lista.filter(function(e){return calcStatus(e.proxima)==='vencido';}).length;
-  var cardW=(W-marg*2-9)/4;
-  [{l:'Total',v:lista.length,r:96,g:165,b:250},{l:'Em dia',v:pNok,r:74,g:222,b:128},{l:'Alerta',v:pNal,r:251,g:191,b:36},{l:'Vencido',v:pNve,r:248,g:113,b:113}].forEach(function(box,i){
-    var bx=marg+i*(cardW+3);
-    doc.setFillColor(box.r,box.g,box.b); doc.setDrawColor(box.r,box.g,box.b);
-    doc.roundedRect(bx,y,cardW,18,2,2,'FD');
-    doc.setTextColor(20,20,20); doc.setFontSize(18); doc.setFont('helvetica','bold');
-    doc.text(String(box.v),bx+cardW/2,y+10,{align:'center'});
-    doc.setFontSize(7); doc.setFont('helvetica','normal');
-    doc.text(box.l,bx+cardW/2,y+15.5,{align:'center'});
-  });
-  y+=26; doc.setDrawColor(42,45,56); doc.line(marg,y,W-marg,y); y+=8;
-  lista.forEach(function(e,i){
-    if(y>240){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;}
-    var st=calcStatus(e.proxima);
-    var stRGB={ok:[39,174,96],alerta:[200,140,0],vencido:[220,50,50]};
-    doc.setFillColor(26,38,64); doc.rect(marg,y,W-marg*2,8,'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text(pdfTxt('Extintor '+e.numero+' — '+e.local+' ('+e.tipo+' '+e.capacidade+')'),marg+2,y+5.5);
-    y+=9;
-    doc.setTextColor(...stRGB[st]); doc.setFontSize(7); doc.setFont('helvetica','bold');
-    doc.text((st==='ok'?'OK':st==='alerta'?'ALERTA':'VENCIDO'),marg+2,y+4);
-    doc.setTextColor(80,80,80); doc.setFont('helvetica','normal');
-    doc.text('Ultima: '+fmtData(e.ultima)+'   Proxima: '+fmtData(e.proxima),marg+30,y+4);
-    y+=8;
-    if(e.obs){var ls=doc.splitTextToSize(pdfTxt(e.obs),W-marg*2-4);doc.setTextColor(100,100,100);doc.setFontSize(7.5);doc.text(ls,marg+2,y);y+=ls.length*5+2;}
-    if(e.fotos&&e.fotos.length>0){
-      if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;}
-      var fx=marg;
-      e.fotos.forEach(function(foto){
-        if(fx+55>W-marg){fx=marg;y+=56;}
-        if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;fx=marg;}
-        try{doc.addImage(foto,'JPEG',fx,y,52,52);}catch(er){try{doc.addImage(foto,'PNG',fx,y,52,52);}catch(er2){}}
-        fx+=56;
+    if (d.servicos.length === 0) {
+      html += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Nenhum serviço lançado</div>';
+    } else {
+      d.servicos.forEach(function(s, i) {
+        var stCor = s.status === 'concluido' ? 'var(--accent)' : s.status === 'cancelado' ? 'var(--danger)' : 'var(--warn)';
+        var stTxt = s.status === 'concluido' ? 'Concluído' : s.status === 'cancelado' ? 'Cancelado' : 'Em Andamento';
+        html += '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">';
+        html += '<div><div style="font-size:13px;font-weight:700">' + s.desc + '</div>';
+        if (s.empresa) html += '<div style="font-size:11px;color:var(--muted2);margin-top:2px">' + s.empresa + (s.data ? ' — ' + fmtData(s.data) : '') + '</div>';
+        html += '</div>';
+        html += '<div style="display:flex;align-items:center;gap:8px;">';
+        html += '<span style="font-size:11px;font-weight:700;color:' + stCor + ';border:1px solid ' + stCor + ';border-radius:6px;padding:2px 8px">' + stTxt + '</span>';
+        html += '<button onclick="relEditarServico(' + i + ')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:13px">✏️</button>';
+        html += '<button onclick="relExcluirItem(\'servicos\',' + i + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px">🗑️</button>';
+        html += '</div></div>';
+        if (s.obs) html += '<div style="font-size:12px;color:var(--muted2);margin-bottom:8px">' + s.obs + '</div>';
+        // Fotos antes/depois
+        if ((s.antes && s.antes.length) || (s.depois && s.depois.length)) {
+          html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">';
+          html += '<div>';
+          if (s.antes && s.antes.length) {
+            html += '<div style="font-size:10px;color:var(--blue);font-weight:700;margin-bottom:4px">ANTES</div>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+            s.antes.forEach(function(f){ html += '<img src="' + f + '" style="width:70px;height:70px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="verFotos([\''+f+'\'])">'; });
+            html += '</div>';
+          }
+          html += '</div><div>';
+          if (s.depois && s.depois.length) {
+            html += '<div style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px">DEPOIS</div>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+            s.depois.forEach(function(f){ html += '<img src="' + f + '" style="width:70px;height:70px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="verFotos([\''+f+'\'])">'; });
+            html += '</div>';
+          }
+          html += '</div></div>';
+        }
+        html += '</div>';
       });
-      y+=56;
     }
-    doc.setDrawColor(42,45,56); doc.line(marg,y,W-marg,y); y+=6;
-  });
-  var total=doc.internal.getNumberOfPages();
-  for(var p=1;p<=total;p++){doc.setPage(p);pdfRodape(doc,p,total,'Modulo Administradora — '+curto,W);}
-  doc.save('Extintores_'+curto.replace(/\s+/g,'_')+'.pdf');
-}
+    html += '</div>';
+  }
 
-function visPDF() {
-  if (!visChave) return;
-  var parts=visChave.split('||');
-  var condo=parts[0], mes=parts[1];
-  var lista=visDados[visChave]||[];
-  var curto=condoShort(condo);
-  var comp=nomeMes(mes);
-  var {jsPDF}=window.jspdf;
-  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var W=210,marg=15;
-  pdfCabecalho(doc,'Relatorio de Vistoria',curto+' | '+comp,W,marg);
-  var y=50;
-  var ids=lista.filter(function(o){return o.status==='identificado';}).length;
-  var ands=lista.filter(function(o){return o.status==='andamento';}).length;
-  var res=lista.filter(function(o){return o.status==='resolvido';}).length;
-  [{l:'Total',v:lista.length,r:180,g:180,b:180},{l:'Identificado',v:ids,r:248,g:113,b:113},{l:'Em andamento',v:ands,r:251,g:191,b:36},{l:'Resolvido',v:res,r:74,g:222,b:128}].forEach(function(b,i){
-    var bx=marg+i*47;
-    doc.setFillColor(b.r,b.g,b.b);doc.roundedRect(bx,y,43,16,3,3,'F');
-    doc.setTextColor(30,30,30);doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text(String(b.v),bx+21.5,y+9,{align:'center'});
-    doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(b.l,bx+21.5,y+14,{align:'center'});
-  });
-  y+=24;
-  lista.forEach(function(o){
-    if(y>240){doc.addPage();pdfCabecalho(doc,'Relatorio de Vistoria',curto,W,marg);y=50;}
-    var stRGB={identificado:[220,50,50],andamento:[200,140,0],resolvido:[39,174,96]};
-    doc.setFillColor(26,38,64);doc.rect(marg,y,W-marg*2,8,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');
-    doc.text(pdfTxt(o.tipo)+(o.local?' — '+pdfTxt(o.local):''),marg+2,y+5.5);
-    if(o.data){doc.setFontSize(7);doc.setFont('helvetica','normal');var dp=o.data.split('-');doc.text(dp[2]+'/'+dp[1]+'/'+dp[0],W-marg-18,y+5.5);}
-    y+=9;
-    doc.setTextColor(...stRGB[o.status]||[150,150,150]);doc.setFontSize(7);doc.setFont('helvetica','bold');
-    doc.text((o.status==='identificado'?'IDENTIFICADO':o.status==='andamento'?'EM ANDAMENTO':'RESOLVIDO'),marg+2,y+4);
-    y+=7;
-    doc.setTextColor(40,40,40);doc.setFontSize(8);doc.setFont('helvetica','normal');
-    var ls=doc.splitTextToSize(pdfTxt(o.desc),W-marg*2-4);doc.text(ls,marg+2,y);y+=ls.length*5+4;
-    if(o.fotos&&o.fotos.length>0){
-      if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Vistoria',curto,W,marg);y=50;}
-      var fx=marg;
-      o.fotos.forEach(function(foto){
-        if(fx+55>W-marg){fx=marg;y+=56;}
-        if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Vistoria',curto,W,marg);y=50;fx=marg;}
-        try{doc.addImage(foto,'JPEG',fx,y,52,52);}catch(er){try{doc.addImage(foto,'PNG',fx,y,52,52);}catch(er2){}}
-        fx+=56;
+  // CONTRATOS / OS
+  if (secContratos) {
+    html += '<div class="card" style="margin-bottom:16px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--text)">📋 Contratos / Ordens de Serviço</div>';
+    html += '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="relAbrirModal(\'contrato\')">+ OS</button>';
+    html += '</div>';
+    if (!d.contratos || d.contratos.length === 0) {
+      html += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Nenhuma OS lançada</div>';
+    } else {
+      // Group by empresa
+      var empresas = {};
+      d.contratos.forEach(function(o){ if (!empresas[o.empresa]) empresas[o.empresa]=[]; empresas[o.empresa].push(o); });
+      Object.keys(empresas).forEach(function(emp) {
+        html += '<div style="margin-bottom:12px;">';
+        html += '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)">' + emp + '</div>';
+        empresas[emp].forEach(function(o, i) {
+          var idx = d.contratos.indexOf(o);
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;">';
+          html += '<span style="color:var(--muted2)">' + (o.data ? fmtData(o.data) : '') + (o.os ? ' — OS Nº ' + o.os : '') + '</span>';
+          html += '<span style="flex:1;margin:0 10px">' + o.desc + '</span>';
+          html += '<button onclick="relExcluirItem(\'contratos\',' + idx + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px">🗑️</button>';
+          html += '</div>';
+        });
+        html += '</div>';
       });
-      y+=56;
     }
-    doc.setDrawColor(42,45,56);doc.line(marg,y,W-marg,y);y+=6;
-  });
-  var total=doc.internal.getNumberOfPages();
-  for(var p=1;p<=total;p++){doc.setPage(p);pdfRodape(doc,p,total,'Modulo Administradora — '+curto+' — '+comp,W);}
-  doc.save('Vistoria_'+curto.replace(/\s+/g,'_')+'_'+mes+'.pdf');
+    html += '</div>';
+  }
+
+  // RESSARCIMENTO
+  if (secRessarc) {
+    html += '<div class="card" style="margin-bottom:16px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--text)">🧾 Ressarcimento de Notas Fiscais</div>';
+    html += '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="relAbrirModal(\'ressarc\')">+ Item</button>';
+    html += '</div>';
+    if (!d.ressarc || d.ressarc.length === 0) {
+      html += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Nenhum item lançado</div>';
+    } else {
+      var total = 0;
+      html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      html += '<tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:6px 4px;color:var(--muted);font-weight:600">Produto</th><th style="padding:6px 4px;color:var(--muted);font-weight:600">Qtd</th><th style="padding:6px 4px;color:var(--muted);font-weight:600">Valor Unit.</th><th style="padding:6px 4px;color:var(--muted);font-weight:600">Total</th><th></th></tr>';
+      d.ressarc.forEach(function(r, i) {
+        var t = parseFloat(r.total)||0; total += t;
+        html += '<tr style="border-bottom:1px solid rgba(255,255,255,.04);">';
+        html += '<td style="padding:6px 4px">' + r.produto + '</td>';
+        html += '<td style="padding:6px 4px;text-align:center">' + (r.qtd||'-') + '</td>';
+        html += '<td style="padding:6px 4px;text-align:right">' + (r.valor ? 'R$ '+parseFloat(r.valor).toFixed(2) : '-') + '</td>';
+        html += '<td style="padding:6px 4px;text-align:right;font-weight:700">R$ ' + t.toFixed(2) + '</td>';
+        html += '<td><button onclick="relExcluirItem(\'ressarc\',' + i + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px">🗑️</button></td>';
+        html += '</tr>';
+      });
+      html += '<tr><td colspan="3" style="text-align:right;padding:8px 4px;font-weight:700;color:var(--text)">TOTAL</td><td style="padding:8px 4px;text-align:right;font-weight:800;color:var(--accent)">R$ ' + total.toFixed(2) + '</td><td></td></tr>';
+      html += '</table>';
+      if (d.ressarcObs) html += '<div style="font-size:12px;color:var(--muted2);margin-top:8px">Obs: ' + d.ressarcObs + '</div>';
+    }
+    html += '</div>';
+  }
+
+  // HISTÓRICO ADMINISTRATIVO
+  if (secHistorico) {
+    html += '<div class="card" style="margin-bottom:16px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--text)">📅 Histórico Administrativo</div>';
+    html += '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="relAbrirModal(\'historico\')">+ Atividade</button>';
+    html += '</div>';
+    if (!d.historico || d.historico.length === 0) {
+      html += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Nenhuma atividade lançada</div>';
+    } else {
+      var hist = d.historico.slice().sort(function(a,b){ return a.data < b.data ? -1 : 1; });
+      hist.forEach(function(h) {
+        var idx = d.historico.indexOf(h);
+        html += '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;">';
+        html += '<span style="color:var(--muted);min-width:36px">' + (h.data ? h.data.slice(5).replace('-','/') : '') + '</span>';
+        html += '<span style="flex:1">' + h.desc + '</span>';
+        html += '<button onclick="relExcluirItem(\'historico\',' + idx + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px">🗑️</button>';
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+  }
+
+  // CARTA FIANÇA
+  if (secFianca) {
+    var f = d.fianca || {};
+    html += '<div class="card" style="margin-bottom:16px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--text)">🔒 Carta Fiança / Seguro</div>';
+    html += '<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="relAbrirModal(\'fianca\')">✏️ Editar</button>';
+    html += '</div>';
+    if (!f.texto) {
+      html += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Nenhuma informação lançada</div>';
+    } else {
+      html += '<div style="font-size:13px;white-space:pre-wrap;line-height:1.6">' + f.texto + '</div>';
+      if (f.protocolo) html += '<div style="font-size:12px;color:var(--muted2);margin-top:8px">Nº Protocolo: ' + f.protocolo + '</div>';
+      if (f.atendente) html += '<div style="font-size:12px;color:var(--muted2)">Atendente: ' + f.atendente + '</div>';
+    }
+    html += '</div>';
+  }
+
+  document.getElementById('rel-lista').innerHTML = html;
 }
 
-function acoPDF() {
-  if (!acoChave) return;
-  var parts=acoChave.split('||');
-  var condo=parts[0],mes=parts[1];
-  var lista=acoDados[acoChave]||[];
-  var curto=condoShort(condo);
-  var comp=nomeMes(mes);
-  var {jsPDF}=window.jspdf;
-  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var W=210,marg=15;
-  pdfCabecalho(doc,'Acompanhamento de Servicos',curto+' | '+comp,W,marg);
-  var y=50;
-  lista.forEach(function(s){
-    if(y>220){doc.addPage();pdfCabecalho(doc,'Acompanhamento de Servicos',curto,W,marg);y=50;}
-    doc.setFillColor(26,38,64);doc.rect(marg,y,W-marg*2,8,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont('helvetica','bold');
-    doc.text(pdfTxt(s.desc).substring(0,60),marg+2,y+5.5);
-    if(s.data){var dp=s.data.split('-');doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text(dp[2]+'/'+dp[1]+'/'+dp[0],W-marg-18,y+5.5);}
-    y+=9;
-    var stCor=s.status==='concluido'?[39,174,96]:[200,140,0];
-    doc.setTextColor(...stCor);doc.setFontSize(7);doc.setFont('helvetica','bold');
-    doc.text(s.status==='concluido'?'CONCLUIDO':'EM ANDAMENTO',marg+2,y+4);
-    if(s.empresa){doc.setTextColor(96,130,200);doc.setFont('helvetica','normal');doc.text('Empresa: '+pdfTxt(s.empresa),marg+50,y+4);}
-    y+=8;
-    if(s.obs){var ls=doc.splitTextToSize(pdfTxt(s.obs),W-marg*2-4);doc.setTextColor(100,100,100);doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.text(ls,marg+2,y);y+=ls.length*5+2;}
-    ['antes','depois'].forEach(function(momento){
-      var fotos=s[momento]||[];
-      if(!fotos.length)return;
-      if(y+60>270){doc.addPage();pdfCabecalho(doc,'Acompanhamento de Servicos',curto,W,marg);y=50;}
-      var cor=momento==='antes'?[96,165,250]:[74,222,128];
-      doc.setTextColor(...cor);doc.setFontSize(8);doc.setFont('helvetica','bold');
-      doc.text(momento.toUpperCase(),marg,y);y+=6;
-      var fx=marg;
-      fotos.forEach(function(foto){
-        if(fx+55>W-marg){fx=marg;y+=56;}
-        if(y+55>270){doc.addPage();pdfCabecalho(doc,'Acompanhamento de Servicos',curto,W,marg);y=50;fx=marg;}
-        try{doc.addImage(foto,'JPEG',fx,y,52,52);}catch(er){try{doc.addImage(foto,'PNG',fx,y,52,52);}catch(er2){}}
-        fx+=56;
-      });
-      y+=56;
+function relAbrirModal(tipo) {
+  document.getElementById('rel-modal-tipo').value = tipo;
+  document.getElementById('rel-modal-idx').value = '';
+  // Reset fields
+  ['rel-serv-desc','rel-serv-empresa','rel-serv-obs',
+   'rel-os-empresa','rel-os-os','rel-os-desc',
+   'rel-nf-produto','rel-nf-qtd','rel-nf-valor','rel-nf-total','rel-nf-obs',
+   'rel-hist-desc','rel-fianca-texto','rel-fianca-protocolo','rel-fianca-atendente'
+  ].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('rel-serv-status').value = 'andamento';
+  document.getElementById('rel-serv-data').value = '';
+  document.getElementById('rel-os-data').value = '';
+  document.getElementById('rel-hist-data').value = '';
+  relServFotosAntes = []; relServFotosDepois = [];
+  document.getElementById('rel-antes-prev').innerHTML = '';
+  document.getElementById('rel-depois-prev').innerHTML = '';
+
+  // Pre-fill fianca
+  if (tipo === 'fianca' && relDados[relChave] && relDados[relChave].fianca) {
+    var f = relDados[relChave].fianca;
+    document.getElementById('rel-fianca-texto').value = f.texto || '';
+    document.getElementById('rel-fianca-protocolo').value = f.protocolo || '';
+    document.getElementById('rel-fianca-atendente').value = f.atendente || '';
+  }
+
+  // Show correct section in modal
+  ['servico','contrato','ressarc','historico','fianca'].forEach(function(t){
+    document.getElementById('rel-modal-sec-'+t).style.display = t===tipo ? '' : 'none';
+  });
+  document.getElementById('rel-modal-title').textContent =
+    tipo==='servico'?'Serviço Realizado':tipo==='contrato'?'Ordem de Serviço':
+    tipo==='ressarc'?'Item de Ressarcimento':tipo==='historico'?'Atividade Administrativa':'Carta Fiança / Seguro';
+  abrir('m-relatorio');
+}
+
+function relEditarServico(i) {
+  var s = relDados[relChave].servicos[i];
+  document.getElementById('rel-modal-tipo').value = 'servico';
+  document.getElementById('rel-modal-idx').value = i;
+  document.getElementById('rel-serv-desc').value = s.desc || '';
+  document.getElementById('rel-serv-empresa').value = s.empresa || '';
+  document.getElementById('rel-serv-data').value = s.data || '';
+  document.getElementById('rel-serv-status').value = s.status || 'andamento';
+  document.getElementById('rel-serv-obs').value = s.obs || '';
+  relServFotosAntes = s.antes ? s.antes.slice() : [];
+  relServFotosDepois = s.depois ? s.depois.slice() : [];
+  relRenderFotosPrev('antes'); relRenderFotosPrev('depois');
+  ['servico','contrato','ressarc','historico','fianca'].forEach(function(t){
+    document.getElementById('rel-modal-sec-'+t).style.display = t==='servico' ? '' : 'none';
+  });
+  document.getElementById('rel-modal-title').textContent = 'Editar Serviço';
+  abrir('m-relatorio');
+}
+
+var relServFotosAntes = [], relServFotosDepois = [];
+
+function relAddFotos(lado, event) {
+  var files = event.target.files;
+  var arr = lado === 'antes' ? relServFotosAntes : relServFotosDepois;
+  var pending = files.length;
+  Array.from(files).forEach(function(f) {
+    var r = new FileReader();
+    r.onload = function(e) {
+      arr.push(e.target.result);
+      pending--;
+      if (pending === 0) relRenderFotosPrev(lado);
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function relRenderFotosPrev(lado) {
+  var arr = lado === 'antes' ? relServFotosAntes : relServFotosDepois;
+  var el = document.getElementById('rel-' + lado + '-prev');
+  el.innerHTML = arr.map(function(f, i) {
+    return '<div style="position:relative;display:inline-block;">'
+      + '<img src="'+f+'" style="width:60px;height:60px;object-fit:cover;border-radius:6px;">'
+      + '<button onclick="relRemoveFoto(\''+lado+'\','+i+')" style="position:absolute;top:-4px;right:-4px;background:var(--danger);border:none;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;line-height:16px;text-align:center">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+function relRemoveFoto(lado, i) {
+  if (lado === 'antes') relServFotosAntes.splice(i, 1);
+  else relServFotosDepois.splice(i, 1);
+  relRenderFotosPrev(lado);
+}
+
+function relSalvar() {
+  var tipo = document.getElementById('rel-modal-tipo').value;
+  var idx  = document.getElementById('rel-modal-idx').value;
+  if (!relDados[relChave]) relDados[relChave] = { servicos:[], contratos:[], ressarc:[], historico:[], fianca:{} };
+  var d = relDados[relChave];
+
+  if (tipo === 'servico') {
+    var desc = document.getElementById('rel-serv-desc').value.trim();
+    if (!desc) { alert('Informe a descrição.'); return; }
+    var obj = {
+      desc:    desc,
+      empresa: document.getElementById('rel-serv-empresa').value.trim(),
+      data:    document.getElementById('rel-serv-data').value,
+      status:  document.getElementById('rel-serv-status').value,
+      obs:     document.getElementById('rel-serv-obs').value.trim(),
+      antes:   relServFotosAntes.slice(),
+      depois:  relServFotosDepois.slice()
+    };
+    if (idx !== '') d.servicos[parseInt(idx)] = obj;
+    else d.servicos.push(obj);
+  } else if (tipo === 'contrato') {
+    var desc = document.getElementById('rel-os-desc').value.trim();
+    if (!desc) { alert('Informe a descrição.'); return; }
+    d.contratos.push({
+      empresa: document.getElementById('rel-os-empresa').value.trim(),
+      os:      document.getElementById('rel-os-os').value.trim(),
+      data:    document.getElementById('rel-os-data').value,
+      desc:    desc
     });
-    doc.setDrawColor(42,45,56);doc.line(marg,y,W-marg,y);y+=6;
-  });
-  var total=doc.internal.getNumberOfPages();
-  for(var p=1;p<=total;p++){doc.setPage(p);pdfRodape(doc,p,total,'Modulo Administradora — '+curto+' — '+comp,W);}
-  doc.save('Servicos_'+curto.replace(/\s+/g,'_')+'_'+mes+'.pdf');
+  } else if (tipo === 'ressarc') {
+    var prod = document.getElementById('rel-nf-produto').value.trim();
+    if (!prod) { alert('Informe o produto.'); return; }
+    var qtd = document.getElementById('rel-nf-qtd').value;
+    var valor = document.getElementById('rel-nf-valor').value;
+    var total = document.getElementById('rel-nf-total').value || (parseFloat(qtd||1) * parseFloat(valor||0)).toFixed(2);
+    d.ressarc.push({ produto:prod, qtd:qtd, valor:valor, total:total });
+    var obs = document.getElementById('rel-nf-obs').value.trim();
+    if (obs) d.ressarcObs = obs;
+  } else if (tipo === 'historico') {
+    var desc = document.getElementById('rel-hist-desc').value.trim();
+    if (!desc) { alert('Informe a atividade.'); return; }
+    d.historico.push({ data: document.getElementById('rel-hist-data').value, desc: desc });
+  } else if (tipo === 'fianca') {
+    d.fianca = {
+      texto:     document.getElementById('rel-fianca-texto').value.trim(),
+      protocolo: document.getElementById('rel-fianca-protocolo').value.trim(),
+      atendente: document.getElementById('rel-fianca-atendente').value.trim()
+    };
+  }
+
+  salvar();
+  fechar('m-relatorio');
+  relRender();
+  toast('Lançamento salvo!');
 }
+
+function relExcluirItem(tipo, i) {
+  if (!confirm('Excluir este item?')) return;
+  relDados[relChave][tipo].splice(i, 1);
+  salvar(); relRender();
+}
+
+function relPDF() {
+  if (!relChave) return;
+  var parts = relChave.split('||');
+  var condo = parts[0], mes = parts[1];
+  var d = relDados[relChave] || {};
+  var curto = condoShort(condo);
+  var comp  = nomeMes(mes);
+  var {jsPDF} = window.jspdf;
+  var doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+  var W = 210, marg = 15;
+  var pg = 1;
+
+  // ── CAPA ──
+  doc.setFillColor(30, 58, 138); doc.rect(0, 0, W, 80, 'F');
+  // Badge mês (canto superior direito)
+  doc.setFillColor(234, 88, 12); doc.roundedRect(W-42, 8, 34, 20, 3, 3, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.text(comp.split('/')[0], W-25, 16, {align:'center'});
+  doc.text(mes.slice(0,4), W-25, 23, {align:'center'});
+  // Título
+  doc.setFontSize(18); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+  doc.text('Relatório Mensal', W/2, 45, {align:'center'});
+  doc.setFontSize(12); doc.setFont('helvetica','normal');
+  doc.text('(' + curto + ')', W/2, 55, {align:'center'});
+  // Logo
+  var logoEl = document.getElementById('modulo-logo');
+  if (logoEl && logoEl.src && logoEl.src.startsWith('data:')) {
+    try { doc.addImage(logoEl.src, 'PNG', W/2-25, 90, 50, 20); } catch(e) {}
+  }
+  // Mês em destaque
+  doc.setDrawColor(234,88,12); doc.setLineWidth(1); doc.rect(marg+20, 120, W-marg*2-40, 14);
+  doc.setTextColor(234,88,12); doc.setFontSize(16); doc.setFont('helvetica','bold');
+  doc.text(comp, W/2, 129, {align:'center'});
+  pdfRodape(doc, 1, 1, 'Módulo Administradora', W);
+  pg++;
+
+  var secServicos  = document.getElementById('rel-sec-servicos').checked;
+  var secContratos = document.getElementById('rel-sec-contratos').checked;
+  var secRessarc   = document.getElementById('rel-sec-ressarc').checked;
+  var secHistorico = document.getElementById('rel-sec-historico').checked;
+  var secFianca    = document.getElementById('rel-sec-fianca').checked;
+
+  function novaPagina(titulo) {
+    doc.addPage();
+    pdfCabecalho(doc, titulo, curto + ' | ' + comp, W, marg);
+    return 50;
+  }
+
+  function secHeader(doc, y, titulo) {
+    doc.setFillColor(30, 58, 138); doc.rect(marg, y, W-marg*2, 8, 'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text(pdfTxt(titulo), marg+3, y+5.5);
+    return y + 10;
+  }
+
+  // ── SERVIÇOS REALIZADOS ──
+  if (secServicos && d.servicos && d.servicos.length > 0) {
+    var y = novaPagina('Serviços Realizados');
+    d.servicos.forEach(function(s) {
+      if (y > 230) { y = novaPagina('Serviços Realizados'); }
+      // Header do serviço
+      y = secHeader(doc, y, s.desc + (s.empresa ? ' — ' + s.empresa : ''));
+      // Status badge
+      var stCor = s.status==='concluido' ? [39,174,96] : s.status==='cancelado' ? [220,50,50] : [200,140,0];
+      var stTxt = s.status==='concluido' ? 'CONCLUÍDO' : s.status==='cancelado' ? 'CANCELADO' : 'EM ANDAMENTO';
+      doc.setFillColor(stCor[0],stCor[1],stCor[2]);
+      doc.roundedRect(marg+2, y+1, 30, 5, 1, 1, 'F');
+      doc.setTextColor(255,255,255); doc.setFontSize(7); doc.setFont('helvetica','bold');
+      doc.text(stTxt, marg+17, y+4.5, {align:'center'});
+      if (s.data) { doc.setTextColor(100,100,100); doc.setFont('helvetica','normal'); doc.text(fmtData(s.data), marg+36, y+4.5); }
+      y += 9;
+      if (s.obs) {
+        var ls = doc.splitTextToSize(pdfTxt(s.obs), W-marg*2-4);
+        doc.setTextColor(100,100,100); doc.setFontSize(8); doc.text(ls, marg+2, y); y += ls.length*4+3;
+      }
+      // Fotos antes/depois
+      var temAntes = s.antes && s.antes.length > 0;
+      var temDepois = s.depois && s.depois.length > 0;
+      if (temAntes || temDepois) {
+        if (y + 60 > 270) { y = novaPagina('Serviços Realizados'); }
+        var fW = (W - marg*2 - 5) / 2;
+        if (temAntes) {
+          doc.setTextColor(60,120,220); doc.setFontSize(8); doc.setFont('helvetica','bold');
+          doc.text('ANTES', marg+2, y+4); y += 6;
+          var fx = marg;
+          s.antes.forEach(function(foto) {
+            if (fx + 40 > W-marg) { fx = marg; y += 42; }
+            if (y + 40 > 270) { y = novaPagina('Serviços Realizados'); fx = marg; }
+            try { doc.addImage(foto,'JPEG',fx,y,38,38); } catch(e){ try { doc.addImage(foto,'PNG',fx,y,38,38); } catch(e2){} }
+            fx += 40;
+          });
+          y += 42;
+        }
+        if (temDepois) {
+          doc.setTextColor(39,174,96); doc.setFontSize(8); doc.setFont('helvetica','bold');
+          doc.text('DEPOIS', marg+2, y+4); y += 6;
+          var fx = marg;
+          s.depois.forEach(function(foto) {
+            if (fx + 40 > W-marg) { fx = marg; y += 42; }
+            if (y + 40 > 270) { y = novaPagina('Serviços Realizados'); fx = marg; }
+            try { doc.addImage(foto,'JPEG',fx,y,38,38); } catch(e){ try { doc.addImage(foto,'PNG',fx,y,38,38); } catch(e2){} }
+            fx += 40;
+          });
+          y += 42;
+        }
+      }
+      doc.setDrawColor(42,45,56); doc.line(marg,y,W-marg,y); y += 6;
+    });
+  }
+
+  // ── CONTRATOS / OS ──
+  if (secContratos && d.contratos && d.contratos.length > 0) {
+    var y = novaPagina('Contratos / Ordens de Serviço');
+    doc.setTextColor(234,88,12); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text(pdfTxt('COMPETÊNCIA: ' + mes.slice(5,7) + '/' + mes.slice(0,4)), marg, y); y += 8;
+    var empresas = {};
+    d.contratos.forEach(function(o){ if(!empresas[o.empresa]) empresas[o.empresa]=[]; empresas[o.empresa].push(o); });
+    Object.keys(empresas).forEach(function(emp) {
+      if (y > 240) { y = novaPagina('Contratos / Ordens de Serviço'); }
+      doc.setTextColor(30,58,138); doc.setFontSize(9); doc.setFont('helvetica','bold');
+      doc.text(pdfTxt(emp.toUpperCase() + ':'), marg, y); y += 6;
+      empresas[emp].forEach(function(o) {
+        if (y > 255) { y = novaPagina('Contratos / Ordens de Serviço'); }
+        var linha = (o.data ? fmtData(o.data) + ' — ' : '') + (o.os ? '(OS Nº '+o.os+') ' : '') + o.desc;
+        var ls = doc.splitTextToSize(pdfTxt(linha), W-marg*2-4);
+        doc.setTextColor(60,60,60); doc.setFontSize(8); doc.setFont('helvetica','normal');
+        doc.text(ls, marg+3, y); y += ls.length*5;
+      });
+      y += 4;
+    });
+  }
+
+  // ── RESSARCIMENTO ──
+  if (secRessarc && d.ressarc && d.ressarc.length > 0) {
+    var y = novaPagina('Ressarcimento de Notas Fiscais');
+    y = secHeader(doc, y, 'RESSARCIMENTO NOTAS FISCAIS MATERIAL');
+    // Table header
+    doc.setFillColor(30,58,138);
+    doc.rect(marg, y, W-marg*2, 7, 'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text('PRODUTO', marg+2, y+4.5);
+    doc.text('QUANTIDADE', marg+80, y+4.5, {align:'center'});
+    doc.text('VALOR (UNIDADE)', marg+120, y+4.5, {align:'center'});
+    doc.text('VALOR TOTAL R$', W-marg-2, y+4.5, {align:'right'});
+    y += 8;
+    var total = 0;
+    d.ressarc.forEach(function(r) {
+      var t = parseFloat(r.total)||0; total += t;
+      doc.setDrawColor(200,200,200); doc.line(marg,y,W-marg,y);
+      doc.setTextColor(60,60,60); doc.setFont('helvetica','normal');
+      var ls = doc.splitTextToSize(pdfTxt(r.produto), 70);
+      doc.text(ls, marg+2, y+4);
+      doc.text(r.qtd||'-', marg+80, y+4, {align:'center'});
+      doc.text(r.valor ? 'R$ '+parseFloat(r.valor).toFixed(2) : '-', marg+120, y+4, {align:'center'});
+      doc.setFont('helvetica','bold');
+      doc.text('R$ '+t.toFixed(2), W-marg-2, y+4, {align:'right'});
+      y += ls.length*5+2;
+    });
+    // Total row
+    doc.setFillColor(240,240,240); doc.rect(marg, y, W-marg*2, 7, 'F');
+    doc.setTextColor(20,20,20); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text('R$ ' + total.toFixed(2), W-marg-2, y+4.5, {align:'right'});
+    y += 10;
+    doc.setTextColor(60,60,60); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text(pdfTxt('Valor a ser ressarcido: R$ ' + total.toFixed(2)), marg, y); y += 7;
+    if (d.ressarcObs) {
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      var ls = doc.splitTextToSize(pdfTxt('Observação: ' + d.ressarcObs), W-marg*2);
+      doc.text(ls, marg, y);
+    }
+  }
+
+  // ── HISTÓRICO ADMINISTRATIVO ──
+  if (secHistorico && d.historico && d.historico.length > 0) {
+    var y = novaPagina('Histórico Administrativo');
+    y = secHeader(doc, y, 'Histórico de Atividades Administrativas — Envios por e-mail em ' + comp);
+    var hist = d.historico.slice().sort(function(a,b){ return a.data < b.data ? -1 : 1; });
+    hist.forEach(function(h) {
+      if (y > 255) { y = novaPagina('Histórico Administrativo'); }
+      var dia = h.data ? h.data.slice(8,10) + '/' + h.data.slice(5,7) : '';
+      var ls = doc.splitTextToSize(pdfTxt((dia ? dia + ' — ' : '') + h.desc), W-marg*2-4);
+      doc.setTextColor(60,60,60); doc.setFontSize(8); doc.setFont('helvetica','normal');
+      doc.text(ls, marg+2, y); y += ls.length*5+1;
+    });
+  }
+
+  // ── CARTA FIANÇA ──
+  if (secFianca && d.fianca && d.fianca.texto) {
+    var y = novaPagina('Carta Fiança / Seguro');
+    y = secHeader(doc, y, 'ACOMPANHAMENTO DE PAGAMENTO CARTA FIANÇA');
+    var ls = doc.splitTextToSize(pdfTxt(d.fianca.texto), W-marg*2-4);
+    doc.setTextColor(60,60,60); doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(ls, marg+2, y); y += ls.length*5+6;
+    if (d.fianca.protocolo) {
+      doc.setFont('helvetica','bold');
+      var ls2 = doc.splitTextToSize(pdfTxt('Nº protocolo de atendimento: '+d.fianca.protocolo), W-marg*2-4);
+      doc.text(ls2, marg+2, y); y += ls2.length*5+3;
+    }
+    if (d.fianca.atendente) {
+      doc.setFont('helvetica','bold');
+      doc.text(pdfTxt('Atendente: '+d.fianca.atendente), marg+2, y);
+    }
+  }
+
+  // Paginação
+  var total2 = doc.internal.getNumberOfPages();
+  for (var p = 1; p <= total2; p++) {
+    doc.setPage(p);
+    pdfRodape(doc, p, total2, 'Módulo Administradora — ' + curto, W);
+  }
+
+  doc.save('Relatorio_' + curto.replace(/\s+/g,'_') + '_' + mes + '.pdf');
+}
+
+
 
 // ── INIT ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
@@ -1616,6 +1706,7 @@ document.addEventListener('DOMContentLoaded', function() {
           periodicos    = JSON.parse(d.periodicos    || '{}');
           visDados      = JSON.parse(d.visDados      || '{}');
           acoDados      = JSON.parse(d.acoDados      || '{}');
+          relDados      = JSON.parse(d.relDados      || '{}');
           alugueis      = JSON.parse(d.alugueis      || '[]');
           // Atualiza localStorage com dados do Firebase
           try {
@@ -1646,6 +1737,159 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }).catch(function(){});
 });
+function relMostrarCampos() {
+  var tipo = document.getElementById('rel-tipo-select').value;
+  ['servico','os','nf','historico','fianca'].forEach(function(t) {
+    var el = document.getElementById('campos-'+t);
+    if (el) el.style.display = t===tipo ? '' : 'none';
+  });
+}
+
+function relCalcNF() {
+  var v = parseFloat(document.getElementById('rel-nf-valor').value)||0;
+  document.getElementById('rel-nf-total').value = v.toFixed(2);
+}
 </script>
+
+<!-- ═══ MODAL RELATÓRIO MENSAL ═══ -->
+<div id="rel-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box" style="max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-header">
+      <span id="rel-modal-titulo">Novo Lançamento</span>
+      <button class="modal-close" onclick="document.getElementById('rel-modal').style.display='none'">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="rel-modal-tipo" />
+      <input type="hidden" id="rel-modal-idx" />
+
+      <!-- Tipo -->
+      <div class="form-group">
+        <label class="form-label">Tipo de lançamento</label>
+        <select id="rel-tipo-select" class="form-input" onchange="relMostrarCampos()">
+          <option value="servico">📸 Serviço Realizado</option>
+          <option value="os">📋 Ordem de Serviço / Contrato</option>
+          <option value="nf">🧾 Ressarcimento NF</option>
+          <option value="historico">📅 Histórico Administrativo</option>
+          <option value="fianca">🔒 Carta Fiança</option>
+        </select>
+      </div>
+
+      <!-- Campos: Serviço -->
+      <div id="campos-servico">
+        <div class="form-group">
+          <label class="form-label">Descrição do serviço</label>
+          <input type="text" id="rel-serv-desc" class="form-input" placeholder="Ex: Remoção de Armários (Bloco A e B)" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Empresa / Responsável</label>
+          <input type="text" id="rel-serv-empresa" class="form-input" placeholder="Ex: COOP Elevadores" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="rel-serv-status" class="form-input">
+            <option value="concluido">✅ Concluído</option>
+            <option value="andamento">🔄 Em Andamento</option>
+            <option value="pendente">⏳ Pendente</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observação</label>
+          <textarea id="rel-serv-obs" class="form-input" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fotos — Antes</label>
+          <input type="file" id="rel-foto-antes-input" accept="image/*" multiple onchange="relAddFotos('antes',event)" style="display:none"/>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('rel-foto-antes-input').click()">📷 Adicionar fotos</button>
+          <div id="rel-fotos-antes-prev" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fotos — Depois</label>
+          <input type="file" id="rel-foto-depois-input" accept="image/*" multiple onchange="relAddFotos('depois',event)" style="display:none"/>
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('rel-foto-depois-input').click()">📷 Adicionar fotos</button>
+          <div id="rel-fotos-depois-prev" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- Campos: OS -->
+      <div id="campos-os" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Empresa</label>
+          <input type="text" id="rel-os-empresa" class="form-input" placeholder="Ex: COOP (Elevadores)" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" id="rel-os-data" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nº da OS</label>
+          <input type="text" id="rel-os-os" class="form-input" placeholder="Ex: 68092308" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição</label>
+          <input type="text" id="rel-os-desc" class="form-input" placeholder="Ex: Manutenção Preventiva (Serviço A)" />
+        </div>
+      </div>
+
+      <!-- Campos: NF -->
+      <div id="campos-nf" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Produto / Descrição</label>
+          <input type="text" id="rel-nf-produto" class="form-input" />
+        </div>
+        <div class="form-group" style="display:flex;gap:10px;">
+          <div style="flex:1">
+            <label class="form-label">Quantidade</label>
+            <input type="text" id="rel-nf-qtd" class="form-input" />
+          </div>
+          <div style="flex:1">
+            <label class="form-label">Valor unit. R$</label>
+            <input type="number" id="rel-nf-valor" class="form-input" step="0.01" oninput="relCalcNF()" />
+          </div>
+          <div style="flex:1">
+            <label class="form-label">Total R$</label>
+            <input type="number" id="rel-nf-total" class="form-input" step="0.01" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observação</label>
+          <textarea id="rel-nf-obs" class="form-input" rows="2"></textarea>
+        </div>
+      </div>
+
+      <!-- Campos: Histórico -->
+      <div id="campos-historico" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" id="rel-hist-data" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição</label>
+          <input type="text" id="rel-hist-desc" class="form-input" placeholder="Ex: Envio de remessas" />
+        </div>
+      </div>
+
+      <!-- Campos: Fiança -->
+      <div id="campos-fianca" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Texto / Informações</label>
+          <textarea id="rel-fianca-texto" class="form-input" rows="3" placeholder="Ex: Seguro ativo e em dia, 9 parcelas pagas..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nº Protocolo</label>
+          <input type="text" id="rel-fianca-protocolo" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Atendente</label>
+          <input type="text" id="rel-fianca-atendente" class="form-input" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('rel-modal').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary" onclick="relSalvar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
