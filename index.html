@@ -848,19 +848,36 @@ function salvar() {
     localStorage.setItem('mod_rel', JSON.stringify(relDados));
     localStorage.setItem('mod_alug', JSON.stringify(alugueis));
   } catch(e) {}
-  // Sincroniza com Firebase diretamente
+  // Sincroniza com Firebase — separa fotos do doc principal
   if (typeof _db !== 'undefined') {
+    // Cria versão sem fotos para o doc principal
+    function stripFotos(obj) {
+      var s = JSON.stringify(obj);
+      // Remove base64 images (data:image/...)
+      s = s.replace(/"data:image\/[^"]{0,2000000}"/g, '"__foto__"');
+      return s;
+    }
+    // Salva doc principal SEM fotos (bem menor)
     _db.collection('modulo').doc('dados').set({
-      extintores:    JSON.stringify(extintores),
+      extintores:    stripFotos(extintores),
       empresasCondo: JSON.stringify(empresasCondo),
       periodicos:    JSON.stringify(periodicos),
-      visDados:      JSON.stringify(visDados),
-      acoDados:      JSON.stringify(acoDados),
-      relDados:      JSON.stringify(relDados),
+      visDados:      stripFotos(visDados),
+      acoDados:      stripFotos(acoDados),
+      relDados:      stripFotos(relDados),
       alugueis:      JSON.stringify(alugueis),
       atualizado:    new Date().toISOString()
-    }).then(function(){ console.log('✓ Firebase salvo com relDados keys:', Object.keys(relDados)); })
-      .catch(function(e){ console.warn('Firebase erro:', e); });
+    }).then(function(){ console.log('✓ Firebase doc principal salvo'); })
+      .catch(function(e){ console.warn('Firebase dados erro:', e); });
+    // Salva fotos em doc separado
+    _db.collection('modulo').doc('fotos').set({
+      extintores: JSON.stringify(extintores),
+      visDados:   JSON.stringify(visDados),
+      acoDados:   JSON.stringify(acoDados),
+      relDados:   JSON.stringify(relDados),
+      atualizado: new Date().toISOString()
+    }).then(function(){ console.log('✓ Firebase fotos salvo'); })
+      .catch(function(e){ console.warn('Firebase fotos erro:', e); });
   }
 }
 function carregar() {
@@ -1805,18 +1822,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Depois tenta Firebase
   if (typeof _db !== 'undefined') {
-    _db.collection('modulo').doc('dados').get()
-      .then(function(snap) {
+    // Carrega doc principal + doc de fotos em paralelo
+    Promise.all([
+      _db.collection('modulo').doc('dados').get(),
+      _db.collection('modulo').doc('fotos').get()
+    ]).then(function(results) {
+      var snap = results[0];
+      var snapFotos = results[1];
         if (snap.exists) {
           var d = snap.data();
-          extintores    = JSON.parse(d.extintores    || '{}');
+          // Carrega dados estruturais do doc principal
           empresasCondo = JSON.parse(d.empresasCondo || '{}');
           periodicos    = JSON.parse(d.periodicos    || '{}');
-          visDados      = JSON.parse(d.visDados      || '{}');
-          acoDados      = JSON.parse(d.acoDados      || '{}');
-          relDados      = JSON.parse(d.relDados      || '{}');
-          console.log('Firebase carregou relDados keys:', Object.keys(relDados));
           alugueis      = JSON.parse(d.alugueis      || '[]');
+          // Carrega dados com fotos do doc fotos (se existir), senão usa o principal
+          if (snapFotos.exists) {
+            var f = snapFotos.data();
+            extintores = JSON.parse(f.extintores || d.extintores || '{}');
+            visDados   = JSON.parse(f.visDados   || d.visDados   || '{}');
+            acoDados   = JSON.parse(f.acoDados   || d.acoDados   || '{}');
+            relDados   = JSON.parse(f.relDados   || d.relDados   || '{}');
+          } else {
+            extintores = JSON.parse(d.extintores || '{}');
+            visDados   = JSON.parse(d.visDados   || '{}');
+            acoDados   = JSON.parse(d.acoDados   || '{}');
+            relDados   = JSON.parse(d.relDados   || '{}');
+          }
+          console.log('Firebase carregou relDados keys:', Object.keys(relDados));
           // Atualiza localStorage com dados do Firebase
           try {
             localStorage.setItem('mod_ext',  JSON.stringify(extintores));
@@ -1831,8 +1863,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           console.log('Firebase: sem dados ainda');
         }
-      })
-      .catch(function(e) { console.warn('Firebase load erro:', e); });
+    }).catch(function(e) { console.warn('Firebase load erro:', e); });
   }
   // Logo
   fetch('https://rosembergcmfilho.github.io/modulo-adm/')
