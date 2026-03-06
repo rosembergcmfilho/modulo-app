@@ -1506,13 +1506,7 @@ function relPDF() {
 
   // ── CAPA ──
   doc.setFillColor(30, 58, 138); doc.rect(0, 0, W, 80, 'F');
-  // Badge mês (canto superior direito)
-  doc.setFillColor(234, 88, 12); doc.roundedRect(W-46, 6, 38, 22, 3, 3, 'F');
-  doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
-  var mesNome = new Date(mes+'-01').toLocaleDateString('pt-BR',{month:'long'});
-  mesNome = mesNome.charAt(0).toUpperCase()+mesNome.slice(1);
-  doc.text(mesNome, W-27, 15, {align:'center'});
-  doc.text(mes.slice(0,4), W-27, 23, {align:'center'});
+  // Badge removido — mês/ano já aparece na capa abaixo
   // Título
   doc.setFontSize(18); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
   doc.text('Relatório Mensal', W/2, 45, {align:'center'});
