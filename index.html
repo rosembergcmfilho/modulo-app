@@ -117,6 +117,29 @@ tr:hover td { background: var(--surface2); }
 
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* MOBILE */
+.menu-toggle { display:none; background:none; border:none; color:var(--text); font-size:22px; cursor:pointer; padding:4px 8px; }
+.sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:99; }
+.sidebar-overlay.open { display:block; }
+
+@media (max-width: 768px) {
+  .menu-toggle { display:block; }
+  .sidebar { transform: translateX(-100%); transition: transform .25s ease; z-index:100; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0 !important; }
+  .topbar { padding: 12px 16px; }
+  .topbar-title { font-size: 15px; }
+  .topbar-right { gap: 6px; flex-wrap: wrap; }
+  .content { padding: 16px; }
+  .form-row { grid-template-columns: 1fr; }
+  #dash-cards { grid-template-columns: repeat(2, 1fr) !important; }
+  .table-wrap { font-size: 11px; }
+  th, td { padding: 8px 6px; }
+  .modal { padding: 18px; }
+  .btn { padding: 7px 12px; font-size: 12px; }
+}
+
 </style>
   <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -198,6 +221,7 @@ tr:hover td { background: var(--surface2); }
     <div class="user-role">Supervisor</div>
   </div>
 </aside>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMenu()"></div>
 
 <!-- MAIN -->
 <main class="main">
@@ -205,6 +229,7 @@ tr:hover td { background: var(--surface2); }
 <!-- ═══════════════════ DASHBOARD ═══════════════════ -->
 <div id="pg-dashboard" class="section active">
   <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <div><div class="topbar-title">⊞ Dashboard</div><div class="topbar-sub">Visão geral de vencimentos</div></div>
     <div class="topbar-right">
       <select id="dash-filter" class="form-input" style="width:280px;font-size:12px;" onchange="renderDashboard()">
@@ -227,6 +252,7 @@ tr:hover td { background: var(--surface2); }
 <!-- ═══════════════════ SERV. PERIÓDICOS ═══════════════════ -->
 <div id="pg-periodicos" class="section">
   <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <div><div class="topbar-title" id="per-title">Serviços Periódicos</div><div class="topbar-sub">Selecione o condomínio</div></div>
     <div class="topbar-right"><button class="btn btn-primary" onclick="abrirModalPer()">+ Adicionar</button></div>
   </div>
@@ -257,6 +283,7 @@ tr:hover td { background: var(--surface2); }
 <!-- ═══════════════════ EXTINTORES ═══════════════════ -->
 <div id="pg-extintores" class="section">
   <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <div><div class="topbar-title" id="ext-title">Vistoria de Extintores</div><div class="topbar-sub" id="ext-sub">Selecione um condomínio</div></div>
     <div class="topbar-right">
       <button class="btn btn-ghost" id="btn-ext-pdf" onclick="extPDF()" style="display:none;">📄 PDF</button>
@@ -304,6 +331,7 @@ tr:hover td { background: var(--surface2); }
 <!-- ═══════════════════ VISTORIA ═══════════════════ -->
 <div id="pg-vistoria" class="section">
   <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <div><div class="topbar-title" id="vis-title">Vistoria</div><div class="topbar-sub" id="rel-topbar-sub">Selecione o condomínio e mês</div></div>
     <div class="topbar-right">
       <button class="btn btn-ghost" id="btn-vis-pdf" onclick="visPDF()" style="display:none;">📄 PDF</button>
@@ -340,6 +368,7 @@ tr:hover td { background: var(--surface2); }
 <!-- ═══════════════════ RELATÓRIO MENSAL ═══════════════════ -->
 <div id="pg-relatorio" class="section">
   <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <div><div class="topbar-title" id="rel-title">Relatório Mensal</div><div class="topbar-sub" id="rel-topbar-sub">Selecione o condomínio e mês</div></div>
     <div class="topbar-right">
       <select id="rel-pdf-layout" class="form-input" style="display:none;width:220px;font-size:12px;" >
@@ -387,6 +416,7 @@ tr:hover td { background: var(--surface2); }
 <!-- ═══════════════════ ALUGUÉIS ═══════════════════ -->
 <div id="pg-alugueis" class="section">
   <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <div><div class="topbar-title">🏢 Aluguéis</div><div class="topbar-sub">Controle de contratos e reajustes</div></div>
     <div class="topbar-right"><button class="btn btn-primary" onclick="abrirModalAlug()">+ Novo Contrato</button></div>
   </div>
@@ -732,11 +762,20 @@ var acoChave = null, servFotosTemp = {antes:[], depois:[]};
 var alugPDFTemp = null;
 
 // ── NAVEGAÇÃO ────────────────────────────────────────────────────
+function toggleMenu() {
+  var sidebar = document.querySelector('.sidebar');
+  var overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
 function nav(el, pg) {
   document.querySelectorAll('.nav-item').forEach(function(x){ x.classList.remove('active'); });
   el.classList.add('active');
   document.querySelectorAll('.section').forEach(function(x){ x.classList.remove('active'); });
   document.getElementById('pg-' + pg).classList.add('active');
+  // Fecha sidebar no mobile
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
   if (pg === 'dashboard') renderDashboard();
   if (pg === 'alugueis') renderAlugueis();
 }
