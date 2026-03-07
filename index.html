@@ -2849,7 +2849,7 @@ function extPDF() {
   doc.setFillColor(26,38,64);
   doc.rect(marg, y, W-marg*2, 7, 'F');
   doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-  doc.text('TOTAL: '+lista.length+' extintores', marg+3, y+4.8);
+  doc.text('TOTAL: '+lista.length+' Extintores', marg+3, y+4.8);
   var nOk=lista.filter(function(e){return calcStatus(e.proxima)==='ok';}).length;
   var nAl=lista.filter(function(e){return calcStatus(e.proxima)==='alerta';}).length;
   var nVe=lista.filter(function(e){return calcStatus(e.proxima)==='vencido';}).length;
