@@ -1856,7 +1856,6 @@ function relPDF() {
   doc.setDrawColor(234,88,12); doc.setLineWidth(1); doc.rect(marg+20, 120, W-marg*2-40, 14);
   doc.setTextColor(234,88,12); doc.setFontSize(16); doc.setFont('helvetica','bold');
   doc.text(comp, W/2, 129, {align:'center'});
-  pdfRodape(doc, 1, 1, 'Módulo Administradora', W);
   pg++;
 
   var secServicos  = document.getElementById('rel-sec-servicos').checked;
