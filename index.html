@@ -497,6 +497,21 @@ tr:hover td { background: var(--surface2); }
       </div>
     </div>
     <div id="ext-conteudo" style="display:none;">
+      <!-- Datas globais de recarga -->
+      <div class="card" style="margin-bottom:14px;padding:14px 18px;">
+        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">📅 Datas de Recarga (aplicadas a todos os extintores)</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">
+          <div class="form-group" style="margin:0;flex:1;min-width:140px;">
+            <label class="form-label">Última recarga</label>
+            <input class="form-input" type="date" id="ext-ultima-global" onchange="extSalvarDatasGlobais()" />
+          </div>
+          <div class="form-group" style="margin:0;flex:1;min-width:140px;">
+            <label class="form-label">Próxima recarga</label>
+            <input class="form-input" type="date" id="ext-proxima-global" onchange="extSalvarDatasGlobais()" />
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding-bottom:2px;">Altere aqui para atualizar todos os extintores de uma vez.</div>
+        </div>
+      </div>
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
         <button class="pill active" id="ef-todos" onclick="extFiltrar('todos')">Todos</button>
         <button class="pill" id="ef-ok" onclick="extFiltrar('ok')">✅ OK</button>
@@ -648,10 +663,6 @@ tr:hover td { background: var(--surface2); }
           <option>10 litros</option>
         </select>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Última recarga</label><input class="form-input" type="date" id="ei-ultima" /></div>
-      <div class="form-group"><label class="form-label">Próxima recarga *</label><input class="form-input" type="date" id="ei-proxima" /></div>
     </div>
     <div class="form-group"><label class="form-label">Observação</label><textarea class="form-input" id="ei-obs" rows="2" style="resize:vertical"></textarea></div>
     <div class="form-group">
@@ -1144,12 +1155,28 @@ function extCarregar() {
   document.getElementById('ext-empresa').value = empresasCondo[condo] || '';
   document.getElementById('ext-conteudo').style.display = '';
   document.getElementById('btn-ext-pdf').style.display = '';
+  // Carrega datas globais do condo
+  var cfg = empresasCondo[condo+'_datas'] || {};
+  document.getElementById('ext-ultima-global').value = cfg.ultima || '';
+  document.getElementById('ext-proxima-global').value = cfg.proxima || '';
   extFiltrar('todos');
 }
 function extSalvarEmpresa() {
   if (!extCondoAtual) return;
   empresasCondo[extCondoAtual] = document.getElementById('ext-empresa').value;
   salvar();
+}
+function extSalvarDatasGlobais() {
+  if (!extCondoAtual) return;
+  var ultima  = document.getElementById('ext-ultima-global').value;
+  var proxima = document.getElementById('ext-proxima-global').value;
+  empresasCondo[extCondoAtual+'_datas'] = {ultima: ultima, proxima: proxima};
+  (extintores[extCondoAtual] || []).forEach(function(e) {
+    if (ultima)  e.ultima  = ultima;
+    if (proxima) e.proxima = proxima;
+  });
+  extRender(); salvar();
+  toast('Datas atualizadas em todos os extintores!');
 }
 function extFiltrar(f) {
   extFiltroAtivo = f;
@@ -1209,7 +1236,7 @@ function abrirModalExt() {
   if (!extCondoAtual) { alert('Selecione um condomínio primeiro.'); return; }
   document.getElementById('m-ext-titulo').textContent = 'Novo Extintor';
   document.getElementById('ext-idx').value = '';
-  ['ei-num','ei-local','ei-obs','ei-ultima','ei-proxima'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['ei-num','ei-local','ei-obs'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('ei-tipo').value=''; document.getElementById('ei-cap').value='';
   extFotosTemp=[]; document.getElementById('ei-fotos-prev').innerHTML='';
   document.getElementById('ei-fotos-inp').value='';
@@ -1234,7 +1261,6 @@ function extEditar(idx) {
   document.getElementById('ext-idx').value = idx;
   document.getElementById('ei-num').value=e.numero||''; document.getElementById('ei-local').value=e.local||'';
   document.getElementById('ei-tipo').value=e.tipo||''; document.getElementById('ei-cap').value=e.capacidade||'';
-  document.getElementById('ei-ultima').value=e.ultima||''; document.getElementById('ei-proxima').value=e.proxima||'';
   document.getElementById('ei-obs').value=e.obs||'';
   extFotosTemp=[...(e.fotos||[])]; extRenderPrev();
   abrir('m-ext');
@@ -1248,9 +1274,9 @@ function extSalvar() {
   var loc=document.getElementById('ei-local').value.trim();
   var tipo=document.getElementById('ei-tipo').value;
   var cap=document.getElementById('ei-cap').value;
-  var prox=document.getElementById('ei-proxima').value;
-  if (!num||!loc||!tipo||!cap||!prox) { alert('Preencha número, local, tipo, capacidade e próxima recarga.'); return; }
-  var obj={numero:num,local:loc,tipo:tipo,capacidade:cap,ultima:document.getElementById('ei-ultima').value,proxima:prox,obs:document.getElementById('ei-obs').value.trim(),fotos:[...extFotosTemp]};
+  if (!num||!loc||!tipo||!cap) { alert('Preencha número, local, tipo e capacidade.'); return; }
+  var cfg = empresasCondo[extCondoAtual+'_datas'] || {};
+  var obj={numero:num,local:loc,tipo:tipo,capacidade:cap,ultima:cfg.ultima||'',proxima:cfg.proxima||'',obs:document.getElementById('ei-obs').value.trim(),fotos:[...extFotosTemp]};
   var idx=document.getElementById('ext-idx').value;
   if (idx!=='') extintores[extCondoAtual][parseInt(idx)]=obj;
   else extintores[extCondoAtual].push(obj);
@@ -2734,15 +2760,15 @@ function extPDF() {
   var stRGB={ok:[39,174,96],alerta:[200,140,0],vencido:[220,50,50]};
 
   pdfCabecalho(doc,'Relatorio de Extintores',curto+(emp?' | '+emp:''),W,marg);
-  var y=50;
+  var y=44;
 
   // ── TABELA RESUMO ──────────────────────────────────────────────
   // Título da seção
   doc.setFillColor(234,88,12);
-  doc.rect(marg, y, W-marg*2, 7, 'F');
-  doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
-  doc.text('RESUMO DOS EXTINTORES', marg+3, y+4.8);
-  y+=8;
+  doc.rect(marg, y, W-marg*2, 6, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text('RESUMO DOS EXTINTORES', marg+3, y+4.2);
+  y+=7;
 
   // Cabeçalho da tabela
   var cols=[
@@ -2755,10 +2781,10 @@ function extPDF() {
     {l:'Status',   x:marg+156,w:29}
   ];
   doc.setFillColor(26,38,64);
-  doc.rect(marg, y, W-marg*2, 7, 'F');
-  doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-  cols.forEach(function(c){ doc.text(c.l, c.x+1, y+4.8); });
-  y+=8;
+  doc.rect(marg, y, W-marg*2, 6, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(7); doc.setFont('helvetica','bold');
+  cols.forEach(function(c){ doc.text(c.l, c.x+1, y+4.2); });
+  y+=7;
 
   // Linhas da tabela
   lista.forEach(function(e, i){
@@ -2767,37 +2793,34 @@ function extPDF() {
     var stLabel=st==='ok'?'OK':st==='alerta'?'ALERTA':'VENCIDO';
     var rowBg = i%2===0 ? [245,245,245] : [255,255,255];
     doc.setFillColor(...rowBg);
-    doc.rect(marg, y, W-marg*2, 7, 'F');
-    doc.setDrawColor(220,220,220); doc.line(marg, y+7, W-marg, y+7);
-    doc.setTextColor(40,40,40); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
-    doc.text(pdfTxt(String(e.numero||'')),  cols[0].x+1, y+4.8);
-    // Local com truncamento
+    doc.rect(marg, y, W-marg*2, 6, 'F');
+    doc.setDrawColor(220,220,220); doc.line(marg, y+6, W-marg, y+6);
+    doc.setTextColor(40,40,40); doc.setFontSize(7); doc.setFont('helvetica','normal');
+    doc.text(pdfTxt(String(e.numero||'')),  cols[0].x+1, y+4.2);
     var localTxt = doc.splitTextToSize(pdfTxt(e.local||''), cols[1].w-2);
-    doc.text(localTxt[0]||'', cols[1].x+1, y+4.8);
-    doc.text(pdfTxt(e.tipo||''),       cols[2].x+1, y+4.8);
-    doc.text(pdfTxt(e.capacidade||''), cols[3].x+1, y+4.8);
-    doc.text(fmtData(e.ultima),        cols[4].x+1, y+4.8);
-    doc.text(fmtData(e.proxima),       cols[5].x+1, y+4.8);
-    // Badge de status colorido
+    doc.text(localTxt[0]||'', cols[1].x+1, y+4.2);
+    doc.text(pdfTxt(e.tipo||''),       cols[2].x+1, y+4.2);
+    doc.text(pdfTxt(e.capacidade||''), cols[3].x+1, y+4.2);
+    doc.text(fmtData(e.ultima),        cols[4].x+1, y+4.2);
+    doc.text(fmtData(e.proxima),       cols[5].x+1, y+4.2);
     doc.setTextColor(...stRGB[st]); doc.setFont('helvetica','bold');
-    doc.text(stLabel, cols[6].x+1, y+4.8);
-    y+=7;
+    doc.text(stLabel, cols[6].x+1, y+4.2);
+    y+=6;
   });
 
   // Linha de total
   doc.setFillColor(26,38,64);
-  doc.rect(marg, y, W-marg*2, 8, 'F');
-  doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
-  doc.text('TOTAL DE EXTINTORES: '+lista.length, marg+3, y+5.3);
-  // Contagem por status
+  doc.rect(marg, y, W-marg*2, 7, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
+  doc.text('TOTAL: '+lista.length+' extintores', marg+3, y+4.8);
   var nOk=lista.filter(function(e){return calcStatus(e.proxima)==='ok';}).length;
   var nAl=lista.filter(function(e){return calcStatus(e.proxima)==='alerta';}).length;
   var nVe=lista.filter(function(e){return calcStatus(e.proxima)==='vencido';}).length;
   doc.setFontSize(7); doc.setFont('helvetica','normal');
-  doc.setTextColor(74,222,128);  doc.text('Em dia: '+nOk,   marg+80, y+5.3);
-  doc.setTextColor(251,191,36);  doc.text('Alerta: '+nAl,   marg+110, y+5.3);
-  doc.setTextColor(248,113,113); doc.text('Vencido: '+nVe,  marg+140, y+5.3);
-  y+=14;
+  doc.setTextColor(74,222,128);  doc.text('Em dia: '+nOk,   marg+70, y+4.8);
+  doc.setTextColor(251,191,36);  doc.text('Alerta: '+nAl,   marg+100, y+4.8);
+  doc.setTextColor(248,113,113); doc.text('Vencido: '+nVe,  marg+130, y+4.8);
+  y+=11;
 
   // ── FOTOS POR EXTINTOR ─────────────────────────────────────────
   var comFotos = lista.filter(function(e){ return e.fotos && e.fotos.length>0; });
@@ -2805,29 +2828,28 @@ function extPDF() {
     // Título seção fotos
     if(y > 240){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; }
     doc.setFillColor(234,88,12);
-    doc.rect(marg, y, W-marg*2, 7, 'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text('REGISTRO FOTOGRATICO', marg+3, y+4.8);
-    y+=10;
+    doc.rect(marg, y, W-marg*2, 6, 'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text('REGISTRO FOTOGRATICO', marg+3, y+4.2);
+    y+=8;
 
     comFotos.forEach(function(e){
-      if(y>250){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; }
-      // Cabeçalho do extintor
+      if(y>255){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; }
       var st=calcStatus(e.proxima);
-      doc.setFillColor(26,38,64); doc.rect(marg,y,W-marg*2,7,'F');
-      doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
-      doc.text(pdfTxt('Extintor '+e.numero+' — '+e.local+' ('+e.tipo+' '+e.capacidade+')'),marg+2,y+4.8);
-      y+=8;
+      doc.setFillColor(26,38,64); doc.rect(marg,y,W-marg*2,6,'F');
+      doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
+      doc.text(pdfTxt('Extintor '+e.numero+' — '+e.local+' ('+e.tipo+' '+e.capacidade+')'),marg+2,y+4.2);
+      y+=7;
       // Fotos em grade 3 por linha
       var fW=56, fH=52, fx=marg, count=0;
       e.fotos.forEach(function(foto){
-        if(count>0 && count%3===0){ fx=marg; y+=fH+4; }
+        if(count>0 && count%3===0){ fx=marg; y+=fH+3; }
         if(y+fH>272){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; fx=marg; }
         try{doc.addImage(foto,'JPEG',fx,y,fW,fH);}catch(er){try{doc.addImage(foto,'PNG',fx,y,fW,fH);}catch(er2){}}
         fx+=fW+4; count++;
       });
-      y+=fH+8;
-      doc.setDrawColor(220,220,220); doc.line(marg,y-4,W-marg,y-4);
+      y+=fH+6;
+      doc.setDrawColor(220,220,220); doc.line(marg,y-3,W-marg,y-3);
     });
   }
 
