@@ -2834,22 +2834,28 @@ function extPDF() {
     y+=8;
 
     comFotos.forEach(function(e){
-      if(y>255){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; }
-      var st=calcStatus(e.proxima);
+      // Fotos 2 por linha, tamanho maior
+      var fW=85, fH=75, gap=5, fotsPerRow=2;
+      var linhas=Math.ceil(e.fotos.length/fotsPerRow);
+      // Espaço necessário: cabeçalho(6) + linhas de fotos
+      var espacoNecessario = 7 + linhas*(fH+gap);
+      // Se não couber na página atual, vai para nova página
+      if(y + espacoNecessario > 272){
+        doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50;
+      }
       doc.setFillColor(26,38,64); doc.rect(marg,y,W-marg*2,6,'F');
       doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
       doc.text(pdfTxt('Extintor '+e.numero+' — '+e.local+' ('+e.tipo+' '+e.capacidade+')'),marg+2,y+4.2);
       y+=7;
-      // Fotos em grade 3 por linha
-      var fW=56, fH=52, fx=marg, count=0;
+      var fx=marg, count=0;
       e.fotos.forEach(function(foto){
-        if(count>0 && count%3===0){ fx=marg; y+=fH+3; }
+        if(count>0 && count%fotsPerRow===0){ fx=marg; y+=fH+gap; }
         if(y+fH>272){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; fx=marg; }
         try{doc.addImage(foto,'JPEG',fx,y,fW,fH);}catch(er){try{doc.addImage(foto,'PNG',fx,y,fW,fH);}catch(er2){}}
-        fx+=fW+4; count++;
+        fx+=fW+gap; count++;
       });
-      y+=fH+6;
-      doc.setDrawColor(220,220,220); doc.line(marg,y-3,W-marg,y-3);
+      y+=fH+8;
+      doc.setDrawColor(220,220,220); doc.line(marg,y-4,W-marg,y-4);
     });
   }
 
