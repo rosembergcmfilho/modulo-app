@@ -146,6 +146,7 @@ tr:hover td { background: var(--surface2); }
   .content { padding: 16px; }
   .form-row { grid-template-columns: 1fr; }
   #dash-cards { grid-template-columns: repeat(2, 1fr) !important; }
+  #agenda-grid { grid-template-columns: 1fr !important; }
   .table-wrap { font-size: 11px; }
   th, td { padding: 8px 6px; }
   .modal { padding: 18px; }
@@ -200,6 +201,8 @@ tr:hover td { background: var(--surface2); }
   <div class="nav-group">
     <div class="nav-label">Gestão</div>
     <div class="nav-item active" onclick="nav(this,'dashboard')"><span>⊞</span> Dashboard</div>
+    <div class="nav-item" onclick="nav(this,'agenda')"><span>📅</span> Agenda <span class="nav-badge" id="badge-agenda" style="display:none">!</span></div>
+    <div class="nav-item" onclick="nav(this,'manutencoes')"><span>🔧</span> Manutenções</div>
     <div class="nav-item" onclick="nav(this,'periodicos')"><span>🗓</span> Serv. Periódicos</div>
   </div>
   <div class="nav-group">
@@ -246,6 +249,193 @@ tr:hover td { background: var(--surface2); }
     <div class="card">
       <div style="font-size:13px;font-weight:700;margin-bottom:16px;">⚠️ Vencimentos nos próximos 30 dias</div>
       <div id="dash-lista"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ AGENDA ═══════════════════ -->
+<div id="pg-agenda" class="section">
+  <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div><div class="topbar-title">📅 Agenda de Vencimentos</div><div class="topbar-sub">Todos os vencimentos consolidados</div></div>
+    <div class="topbar-right">
+      <button class="email-badge" onclick="enviarEmailVencimentos()" id="btn-email-agenda">📧 Enviar resumo por e-mail</button>
+      <button onclick="abrirCfgEmail()" style="background:none;border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px;" title="Configurar e-mail">⚙️</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;" id="agenda-grid">
+      <!-- Calendário -->
+      <div class="agenda-cal">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="agendaNavMes(-1)">‹</button>
+          <div style="font-size:15px;font-weight:700;" id="cal-titulo">—</div>
+          <button class="cal-nav" onclick="agendaNavMes(1)">›</button>
+        </div>
+        <div class="cal-grid" id="cal-dow">
+          <div class="cal-dow">Dom</div><div class="cal-dow">Seg</div><div class="cal-dow">Ter</div>
+          <div class="cal-dow">Qua</div><div class="cal-dow">Qui</div><div class="cal-dow">Sex</div><div class="cal-dow">Sáb</div>
+        </div>
+        <div class="cal-grid" id="cal-dias"></div>
+        <div style="padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:14px;flex-wrap:wrap;">
+          <span style="font-size:11px;color:var(--muted2)"><span class="cal-dot" style="background:var(--danger);display:inline-block;vertical-align:middle"></span> Vencido</span>
+          <span style="font-size:11px;color:var(--muted2)"><span class="cal-dot" style="background:var(--warn);display:inline-block;vertical-align:middle"></span> Alerta (≤30 dias)</span>
+          <span style="font-size:11px;color:var(--muted2)"><span class="cal-dot" style="background:var(--blue);display:inline-block;vertical-align:middle"></span> Futuro</span>
+        </div>
+      </div>
+      <!-- Lista cronológica -->
+      <div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;">⚠️ Próximos 30 dias</div>
+        <div id="agenda-lista30"></div>
+        <div style="font-size:13px;font-weight:700;margin:18px 0 12px;">📋 Todos os vencimentos</div>
+        <div id="agenda-lista-full"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MANUTENÇÕES ═══════════════════ -->
+<div id="pg-manutencoes" class="section">
+  <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div><div class="topbar-title">🔧 Manutenções Programadas</div><div class="topbar-sub">Eventos recorrentes por condomínio</div></div>
+    <div class="topbar-right"><button class="btn btn-primary" onclick="abrirModalMan()">+ Adicionar</button></div>
+  </div>
+  <div class="content">
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <label class="form-label" style="margin:0;white-space:nowrap;">Condomínio:</label>
+        <select id="man-condo" class="form-input" style="flex:1;min-width:200px;max-width:420px;" onchange="manCarregar()">
+          <option value="">— Selecione —</option>
+          <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option><option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option><option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option><option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option><option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option><option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option><option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option><option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option><option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option><option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option><option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option><option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option><option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option><option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option><option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option><option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option><option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option><option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option><option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option><option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option><option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option><option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option><option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option><option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option><option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option><option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option><option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option><option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option><option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option><option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option><option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option><option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option><option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option><option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+          <option>NEOS PREVIDÊNCIA RECIFE</option>
+          <option>NEOS PREVIDÊNCIA BRASÍLIA</option>
+        </select>
+        <div style="display:flex;gap:8px;">
+          <button id="mf-todos"  class="pill active" onclick="manFiltrar('todos')">Todos</button>
+          <button id="mf-alerta" class="pill" onclick="manFiltrar('alerta')">⚠️ Alerta</button>
+          <button id="mf-vencido" class="pill" onclick="manFiltrar('vencido')">🔴 Vencido</button>
+        </div>
+      </div>
+    </div>
+    <div id="man-conteudo" style="display:none;">
+      <div id="man-lista"></div>
+    </div>
+    <div id="man-vazio" style="text-align:center;padding:60px;color:var(--muted);font-size:14px;">
+      <div style="font-size:40px;margin-bottom:12px;opacity:.3">🔧</div>
+      Selecione um condomínio para ver as manutenções.
+    </div>
+  </div>
+</div>
+
+<!-- Modal Manutenção -->
+<div class="modal-overlay" id="m-man">
+  <div class="modal" style="max-width:520px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div><div class="modal-title" id="m-man-titulo">Nova Manutenção</div></div>
+      <button class="modal-close" onclick="fechar('m-man')">✕</button>
+    </div>
+    <input type="hidden" id="man-idx">
+    <div class="form-group">
+      <label class="form-label">Condomínio *</label>
+      <select id="mi-condo" class="form-input">
+        <option value="">— Selecione —</option>
+        <option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS FLAMBOYANTS</option><option>CONDOMÍNIO DO EDIFÍCIO ALAMEDA DOS IPÊS</option><option>CONDOMÍNIO DO EDIFÍCIO ALCINA VALENÇA</option><option>CONDOMÍNIO DO EDIFÍCIO CASTTELO DE RAVENA</option><option>CONDOMÍNIO DO EDIFÍCIO CONDADO COLONIAL</option><option>CONDOMÍNIO DO EDIFÍCIO DANIELA</option><option>CONDOMÍNIO DO EDIFÍCIO FIGUEIRA DA FOZ</option><option>CONDOMÍNIO DO EDIFÍCIO GERMANO AGUIAR</option><option>CONDOMÍNIO DO EDIFÍCIO GUARANY</option><option>CONDOMÍNIO DO EDIFÍCIO GUILHERME MOREIRA</option><option>CONDOMÍNIO DO EDIFÍCIO JASMIM</option><option>CONDOMÍNIO DO EDIFÍCIO JOSE CORREIA</option><option>CONDOMÍNIO DO EDIFÍCIO LONG BEACH IV</option><option>CONDOMÍNIO DO EDIFÍCIO LUCIANA (RECIFE)</option><option>CONDOMÍNIO DO EDIFÍCIO MAISON CARMELLE</option><option>CONDOMÍNIO DO EDIFÍCIO MAR ANTILHAS</option><option>CONDOMÍNIO DO EDIFÍCIO MAR BALTICO</option><option>CONDOMÍNIO DO EDIFÍCIO MARIA AMÉLIA</option><option>CONDOMÍNIO DO EDIFÍCIO MARIA TEREZA</option><option>CONDOMÍNIO DO EDIFÍCIO OS LUSIADAS</option><option>CONDOMÍNIO DO EDIFÍCIO PLAZA IMPERIAL</option><option>CONDOMÍNIO DO EDIFÍCIO PRAIA DO PORTO</option><option>CONDOMÍNIO DO EDIFÍCIO QUINTA DO SOL</option><option>CONDOMÍNIO DO EDIFÍCIO RESIDENCIAL MONTPELLIER</option><option>CONDOMÍNIO DO EDIFÍCIO SAMUEL MEIRA HENRIQUES</option><option>CONDOMÍNIO DO EDIFÍCIO SANTA ALZIRA</option><option>CONDOMÍNIO DO EDIFÍCIO SANTA CLARA</option><option>CONDOMÍNIO DO EDIFÍCIO SOLAR DOS JASMINS</option><option>CONDOMÍNIO DO MARUPIARA MURO ALTO FLAT</option><option>CONDOMÍNIO DO RESIDENCIAL AROEIRAS</option><option>CONDOMÍNIO DO RESIDENCIAL SITIO VIVER 02</option><option>CONDOMÍNIO PRIVÊ PORTO CARIBE</option><option>CONDOMÍNIO RESIDENCIAL DOIS IRMÃOS</option><option>CONDOMÍNIO RESIDENCIAL VILA JARDINS</option>
+        <option>NEOS PREVIDÊNCIA RECIFE</option>
+        <option>NEOS PREVIDÊNCIA BRASÍLIA</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo *</label>
+        <select id="mi-tipo" class="form-input" onchange="manTipoChange()">
+          <option value="">— Selecione —</option>
+          <option>Seguro Obrigatório</option>
+          <option>Limpeza de Reservatórios</option>
+          <option>Dedetização</option>
+          <option>SPDA (Para-raios)</option>
+          <option>Revisão de Elevadores</option>
+          <option>Revisão de Bombas</option>
+          <option>Manutenção de Portões</option>
+          <option>Manutenção de Câmeras</option>
+          <option>Pintura</option>
+          <option>Limpeza de Fachada</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group" id="mi-outro-wrap" style="display:none">
+        <label class="form-label">Descrever</label>
+        <input class="form-input" id="mi-outro" placeholder="Qual manutenção?" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Empresa Responsável</label>
+        <input class="form-input" id="mi-empresa" placeholder="Nome da empresa" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Periodicidade</label>
+        <select class="form-input" id="mi-period">
+          <option>Mensal</option><option>Bimestral</option><option>Trimestral</option>
+          <option>Semestral</option><option selected>Anual</option><option>Único</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Última realização</label>
+        <input class="form-input" type="date" id="mi-ultima" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Próximo vencimento *</label>
+        <input class="form-input" type="date" id="mi-proxima" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observações / Nº Contrato / Apólice</label>
+      <input class="form-input" id="mi-obs" placeholder="Nº apólice, contrato, observações..." />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fechar('m-man')">Cancelar</button>
+      <button class="btn btn-primary" onclick="manSalvar()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Config E-mail -->
+<div class="modal-overlay" id="m-email-cfg">
+  <div class="modal" style="max-width:480px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div><div class="modal-title">⚙️ Configurar E-mail</div><div class="modal-sub">Configure uma vez, use sempre</div></div>
+      <button class="modal-close" onclick="fechar('m-email-cfg')">✕</button>
+    </div>
+    <div style="background:rgba(96,165,250,.08);border:1px solid var(--blue);border-radius:10px;padding:14px;margin-bottom:18px;font-size:12px;color:var(--muted2);line-height:1.7;">
+      <strong style="color:var(--blue)">Como configurar:</strong><br>
+      1. Acesse <a href="https://www.emailjs.com" target="_blank" style="color:var(--blue)">emailjs.com</a> → crie conta gratuita<br>
+      2. Crie um <strong>Email Service</strong> (Gmail recomendado) → copie o <em>Service ID</em><br>
+      3. Crie um <strong>Email Template</strong> com variável <code>{{mensagem}}</code> → copie o <em>Template ID</em><br>
+      4. Copie sua <strong>Public Key</strong> em Account → API Keys<br>
+      5. Cole os três campos abaixo e salve
+    </div>
+    <div class="form-group">
+      <label class="form-label">E-mail destino (seu e-mail)</label>
+      <input class="form-input" type="email" id="cfg-email-dest" placeholder="seu@email.com" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">EmailJS — Service ID</label>
+      <input class="form-input" id="cfg-ejs-service" placeholder="service_xxxxxxx" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">EmailJS — Template ID</label>
+      <input class="form-input" id="cfg-ejs-template" placeholder="template_xxxxxxx" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">EmailJS — Public Key</label>
+      <input class="form-input" id="cfg-ejs-pubkey" placeholder="xxxxxxxxxxxxxxxxxxxx" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fechar('m-email-cfg')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCfgEmail()">💾 Salvar configuração</button>
     </div>
   </div>
 </div>
@@ -753,14 +943,43 @@ tr:hover td { background: var(--surface2); }
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+/* AGENDA / CALENDAR */
+.agenda-cal { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.cal-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); }
+.cal-nav { background:none; border:1px solid var(--border); color:var(--text); border-radius:7px; padding:5px 12px; cursor:pointer; font-size:14px; }
+.cal-nav:hover { border-color:var(--accent); color:var(--accent); }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); }
+.cal-dow { text-align:center; padding:8px 4px; font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; border-bottom:1px solid var(--border); }
+.cal-day { min-height:52px; padding:4px 6px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); position:relative; cursor:default; }
+.cal-day:nth-child(7n) { border-right:none; }
+.cal-day.other-month { opacity:.35; }
+.cal-day.today { background:rgba(74,222,128,.07); }
+.cal-day-num { font-size:11px; font-weight:600; color:var(--muted2); }
+.cal-day.today .cal-day-num { color:var(--accent); font-weight:800; }
+.cal-dot { width:6px; height:6px; border-radius:50%; display:inline-block; margin:1px; }
+.cal-dots { display:flex; flex-wrap:wrap; gap:1px; margin-top:2px; }
+.cal-event-chip { font-size:9px; border-radius:3px; padding:1px 4px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; }
+
+/* MANUTENCOES */
+.mcard { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:10px; overflow:hidden; }
+.mcard-header { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; }
+
+/* AGENDA EMAIL BADGE */
+.email-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(74,222,128,.12); border:1px solid var(--accent); border-radius:8px; padding:5px 12px; font-size:12px; color:var(--accent); font-weight:600; cursor:pointer; }
+.email-badge:hover { background:rgba(74,222,128,.2); }
+</style>
 <script>
 // ── ESTADO ──────────────────────────────────────────────────────
-var extintores = {}, empresasCondo = {}, periodicos = {}, visDados = {}, acoDados = {}, alugueis = [];
+var extintores = {}, empresasCondo = {}, periodicos = {}, visDados = {}, acoDados = {}, alugueis = [], manutencoes = {};
 var extCondoAtual = '', extFiltroAtivo = 'todos', extFotosTemp = [];
 var perCondoAtual = '', perFiltroAtivo = 'todos';
+var manCondoAtual = '', manFiltroAtivo = 'todos';
 var visChave = null, visFiltroAtivo = 'todos', ocrFotosTemp = [];
 var acoChave = null, servFotosTemp = {antes:[], depois:[]};
 var alugPDFTemp = null;
+var agendaMesAtual = new Date();
 
 // ── NAVEGAÇÃO ────────────────────────────────────────────────────
 function toggleMenu() {
@@ -779,6 +998,8 @@ function nav(el, pg) {
   document.getElementById('sidebar-overlay').classList.remove('open');
   if (pg === 'dashboard') renderDashboard();
   if (pg === 'alugueis') renderAlugueis();
+  if (pg === 'agenda') renderAgenda();
+  if (pg === 'manutencoes') { manCondoAtual=''; document.getElementById('man-condo').value=''; document.getElementById('man-conteudo').style.display='none'; document.getElementById('man-vazio').style.display=''; }
 }
 
 // ── UTILS ────────────────────────────────────────────────────────
@@ -861,6 +1082,7 @@ function salvar() {
     localStorage.setItem('mod_aco', JSON.stringify(acoDados));
     localStorage.setItem('mod_rel', JSON.stringify(relDados));
     localStorage.setItem('mod_alug', JSON.stringify(alugueis));
+    localStorage.setItem('mod_man', JSON.stringify(manutencoes));
   } catch(e) {}
   // Sincroniza com Firebase — separa fotos do doc principal
   if (typeof _db !== 'undefined') {
@@ -880,6 +1102,7 @@ function salvar() {
       acoDados:      stripFotos(acoDados),
       relDados:      stripFotos(relDados),
       alugueis:      JSON.stringify(alugueis),
+      manutencoes:   JSON.stringify(manutencoes),
       atualizado:    new Date().toISOString()
     }).then(function(){ console.log('✓ Firebase doc principal salvo'); })
       .catch(function(e){ console.warn('Firebase dados erro:', e); });
@@ -903,6 +1126,7 @@ function carregar() {
     acoDados      = JSON.parse(localStorage.getItem('mod_aco')  || '{}');
     alugueis      = JSON.parse(localStorage.getItem('mod_alug') || '[]');
     relDados      = JSON.parse(localStorage.getItem('mod_rel') || '{}');
+    manutencoes   = JSON.parse(localStorage.getItem('mod_man') || '{}');
   } catch(e) {}
 }
 
@@ -1829,6 +2053,370 @@ function relPDF() {
 
 
 
+
+// ══════════════════════════════════════════════════════════════════
+// MANUTENÇÕES PROGRAMADAS
+// ══════════════════════════════════════════════════════════════════
+var MAN_ICONS = {
+  'Seguro Obrigatório':'🛡️','Limpeza de Reservatórios':'💧','Dedetização':'🐛',
+  'SPDA (Para-raios)':'⚡','Revisão de Elevadores':'🛗','Revisão de Bombas':'⚙️',
+  'Manutenção de Portões':'🚪','Manutenção de Câmeras':'📷','Pintura':'🎨',
+  'Limpeza de Fachada':'🏗️','Outro':'🔧'
+};
+function manCarregar() {
+  var condo = document.getElementById('man-condo').value;
+  if (!condo) return;
+  manCondoAtual = condo;
+  if (!manutencoes[condo]) manutencoes[condo] = [];
+  document.getElementById('man-conteudo').style.display = '';
+  document.getElementById('man-vazio').style.display = 'none';
+  manFiltrar('todos');
+}
+function manFiltrar(f) {
+  manFiltroAtivo = f;
+  ['todos','alerta','vencido'].forEach(function(x) {
+    var b = document.getElementById('mf-'+x); if (b) b.classList.toggle('active', x===f);
+  });
+  manRender();
+}
+function manRender() {
+  var lista = manutencoes[manCondoAtual] || [];
+  var container = document.getElementById('man-lista');
+  var filtrada = lista.filter(function(m) {
+    if (manFiltroAtivo === 'todos') return true;
+    return calcStatus(m.proxima) === manFiltroAtivo;
+  });
+  if (filtrada.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px;">Nenhuma manutenção encontrada.</div>';
+    return;
+  }
+  var html = '';
+  filtrada.forEach(function(m, fi) {
+    var idx = lista.indexOf(m);
+    var st = calcStatus(m.proxima);
+    var stColors = {ok:'var(--accent)', alerta:'var(--warn)', vencido:'var(--danger)'};
+    var stLabel = {ok:'✅ OK', alerta:'⚠️ Alerta', vencido:'🔴 Vencido'};
+    var icon = MAN_ICONS[m.tipo] || '🔧';
+    var label = m.tipo === 'Outro' ? (m.outro || 'Outro') : (m.tipo || 'Manutenção');
+    html += '<div class="mcard">';
+    html += '<div class="mcard-header">';
+    html += '<div style="font-size:24px">'+icon+'</div>';
+    html += '<div style="flex:1"><div style="font-weight:600;font-size:13px">'+label+'</div>';
+    if (m.empresa) html += '<div style="font-size:11px;color:var(--blue);margin-top:2px">🏢 '+m.empresa+'</div>';
+    if (m.period) html += '<div style="font-size:11px;color:var(--muted2);margin-top:2px">🔄 '+m.period+'</div>';
+    if (m.obs) html += '<div style="font-size:11px;color:var(--muted2);margin-top:2px">📝 '+m.obs+'</div>';
+    html += '</div>';
+    html += '<div style="text-align:right">';
+    html += '<div style="font-size:12px;font-weight:700;color:'+stColors[st]+'">'+stLabel[st]+'</div>';
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">Próx: '+fmtData(m.proxima)+'</div>';
+    if (m.ultima) html += '<div style="font-size:11px;color:var(--muted);margin-top:1px">Últ: '+fmtData(m.ultima)+'</div>';
+    html += '<div style="margin-top:6px">';
+    html += '<button onclick="manEditar('+idx+')" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:14px">✏️</button>';
+    html += '<button onclick="manExcluir('+idx+')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px">🗑️</button>';
+    html += '</div></div></div></div>';
+  });
+  container.innerHTML = html;
+}
+function abrirModalMan() {
+  document.getElementById('m-man-titulo').textContent = 'Nova Manutenção';
+  document.getElementById('man-idx').value = '';
+  document.getElementById('mi-condo').value = manCondoAtual || '';
+  document.getElementById('mi-tipo').value = '';
+  document.getElementById('mi-empresa').value = '';
+  document.getElementById('mi-obs').value = '';
+  document.getElementById('mi-ultima').value = '';
+  document.getElementById('mi-proxima').value = '';
+  document.getElementById('mi-period').value = 'Anual';
+  document.getElementById('mi-outro').value = '';
+  document.getElementById('mi-outro-wrap').style.display = 'none';
+  abrir('m-man');
+}
+function manTipoChange() {
+  document.getElementById('mi-outro-wrap').style.display = document.getElementById('mi-tipo').value === 'Outro' ? '' : 'none';
+}
+function manEditar(idx) {
+  var m = manutencoes[manCondoAtual][idx];
+  document.getElementById('m-man-titulo').textContent = 'Editar Manutenção';
+  document.getElementById('man-idx').value = idx;
+  document.getElementById('mi-condo').value = manCondoAtual;
+  document.getElementById('mi-tipo').value = m.tipo || '';
+  document.getElementById('mi-empresa').value = m.empresa || '';
+  document.getElementById('mi-obs').value = m.obs || '';
+  document.getElementById('mi-ultima').value = m.ultima || '';
+  document.getElementById('mi-proxima').value = m.proxima || '';
+  document.getElementById('mi-period').value = m.period || 'Anual';
+  document.getElementById('mi-outro').value = m.outro || '';
+  document.getElementById('mi-outro-wrap').style.display = m.tipo === 'Outro' ? '' : 'none';
+  abrir('m-man');
+}
+function manExcluir(idx) {
+  if (!confirm('Excluir esta manutenção?')) return;
+  manutencoes[manCondoAtual].splice(idx, 1);
+  manRender(); salvar(); toast('Manutenção excluída.');
+}
+function manSalvar() {
+  var condo = document.getElementById('mi-condo').value;
+  var tipo = document.getElementById('mi-tipo').value;
+  var proxima = document.getElementById('mi-proxima').value;
+  if (!condo || !tipo || !proxima) { alert('Preencha condomínio, tipo e próximo vencimento.'); return; }
+  var obj = {
+    tipo: tipo,
+    outro: document.getElementById('mi-outro').value.trim(),
+    empresa: document.getElementById('mi-empresa').value.trim(),
+    period: document.getElementById('mi-period').value,
+    ultima: document.getElementById('mi-ultima').value,
+    proxima: proxima,
+    obs: document.getElementById('mi-obs').value.trim()
+  };
+  if (!manutencoes[condo]) manutencoes[condo] = [];
+  var idx = document.getElementById('man-idx').value;
+  if (idx !== '') manutencoes[condo][parseInt(idx)] = obj;
+  else manutencoes[condo].push(obj);
+  // Se cadastrou em condo diferente do atual, atualiza
+  if (condo !== manCondoAtual) { manCondoAtual = condo; document.getElementById('man-condo').value = condo; }
+  fechar('m-man');
+  manRender(); salvar(); toast('Manutenção salva!');
+  renderDashboard();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AGENDA DE VENCIMENTOS
+// ══════════════════════════════════════════════════════════════════
+function coletarTodosVencimentos() {
+  var todos = [];
+  var condos = Object.keys(Object.assign({}, extintores, periodicos, manutencoes));
+  condos.forEach(function(condo) {
+    var curto = condoShort(condo);
+    (extintores[condo]||[]).forEach(function(e) {
+      if (e.proxima) todos.push({condo:condo, curto:curto, icon:'🧯', nome:'Extintor '+(e.numero||'')+(e.local?' ('+e.local+')':''), venc:e.proxima, tipo:'extintor'});
+    });
+    (periodicos[condo]||[]).forEach(function(p) {
+      if (p.proxima) todos.push({condo:condo, curto:curto, icon:(TIPO_ICONS[p.tipo]||'📋'), nome:(p.tipo==='Outro'?(p.outro||'Outro'):p.tipo), venc:p.proxima, tipo:'periodico'});
+    });
+    (manutencoes[condo]||[]).forEach(function(m) {
+      if (m.proxima) todos.push({condo:condo, curto:curto, icon:(MAN_ICONS[m.tipo]||'🔧'), nome:(m.tipo==='Outro'?(m.outro||'Outro'):m.tipo), venc:m.proxima, tipo:'manutencao'});
+    });
+  });
+  alugueis.forEach(function(a) {
+    if (a.reajuste) todos.push({condo:a.imovel, curto:a.imovel, icon:'📈', nome:'Reajuste — '+a.inquilino, venc:a.reajuste, tipo:'reajuste'});
+    if (a.vencContrato) todos.push({condo:a.imovel, curto:a.imovel, icon:'📋', nome:'Venc. contrato — '+a.inquilino, venc:a.vencContrato, tipo:'contrato'});
+  });
+  todos.sort(function(a,b){ return a.venc < b.venc ? -1 : 1; });
+  return todos;
+}
+
+function agendaNavMes(delta) {
+  agendaMesAtual = new Date(agendaMesAtual.getFullYear(), agendaMesAtual.getMonth() + delta, 1);
+  renderCalendario();
+}
+
+function renderAgenda() {
+  renderCalendario();
+  renderAgendaListas();
+}
+
+function renderCalendario() {
+  var ano = agendaMesAtual.getFullYear();
+  var mes = agendaMesAtual.getMonth();
+  var titulo = new Date(ano, mes, 1).toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+  titulo = titulo.charAt(0).toUpperCase() + titulo.slice(1);
+  document.getElementById('cal-titulo').textContent = titulo;
+
+  var todos = coletarTodosVencimentos();
+  // Agrupa por data
+  var porData = {};
+  todos.forEach(function(v) {
+    if (!porData[v.venc]) porData[v.venc] = [];
+    porData[v.venc].push(v);
+  });
+
+  var primeiroDia = new Date(ano, mes, 1).getDay();
+  var diasNoMes = new Date(ano, mes+1, 0).getDate();
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var html = '';
+  // Dias do mês anterior
+  var diasAntes = primeiroDia;
+  var mesAnterior = new Date(ano, mes, 0);
+  for (var i = diasAntes - 1; i >= 0; i--) {
+    html += '<div class="cal-day other-month"><div class="cal-day-num">'+(mesAnterior.getDate()-i)+'</div></div>';
+  }
+  // Dias do mês atual
+  for (var d = 1; d <= diasNoMes; d++) {
+    var dataStr = ano + '-' + String(mes+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var dDate = new Date(ano, mes, d);
+    var isHoje = dDate.getTime() === hoje.getTime();
+    var eventos = porData[dataStr] || [];
+    var dots = '';
+    if (eventos.length > 0) {
+      dots = '<div class="cal-dots">';
+      eventos.slice(0,4).forEach(function(ev) {
+        var st = calcStatus(ev.venc);
+        var cor = st==='vencido'?'var(--danger)':st==='alerta'?'var(--warn)':'var(--blue)';
+        dots += '<span class="cal-dot" style="background:'+cor+';" title="'+ev.curto+' — '+ev.nome+'"></span>';
+      });
+      if (eventos.length > 4) dots += '<span style="font-size:8px;color:var(--muted)">+'+( eventos.length-4)+'</span>';
+      dots += '</div>';
+    }
+    html += '<div class="cal-day'+(isHoje?' today':'')+'"><div class="cal-day-num">'+d+'</div>'+dots+'</div>';
+  }
+  // Completar última semana
+  var total = diasAntes + diasNoMes;
+  var resto = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (var r = 1; r <= resto; r++) {
+    html += '<div class="cal-day other-month"><div class="cal-day-num">'+r+'</div></div>';
+  }
+  document.getElementById('cal-dias').innerHTML = html;
+}
+
+function renderAgendaListas() {
+  var todos = coletarTodosVencimentos();
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var limite30 = new Date(); limite30.setDate(limite30.getDate()+30); limite30.setHours(0,0,0,0);
+
+  // Lista próximos 30 dias
+  var prox30 = todos.filter(function(v) {
+    var d = new Date(v.venc + 'T00:00:00');
+    return d <= limite30;
+  });
+  var el30 = document.getElementById('agenda-lista30');
+  if (prox30.length === 0) {
+    el30.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13px;text-align:center;">✅ Nenhum vencimento nos próximos 30 dias.</div>';
+  } else {
+    el30.innerHTML = prox30.map(function(v) {
+      var st = calcStatus(v.venc);
+      var cor = st==='vencido'?'var(--danger)':st==='alerta'?'var(--warn)':'var(--blue)';
+      var label = st==='vencido'?'VENCIDO':st==='alerta'?'ALERTA':'OK';
+      return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--border);margin-bottom:6px;">'
+        +'<span style="font-size:16px">'+v.icon+'</span>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+v.nome+'</div>'
+          +'<div style="font-size:10px;color:var(--muted)">'+v.curto+'</div>'
+        +'</div>'
+        +'<div style="text-align:right;white-space:nowrap">'
+          +'<div style="font-size:10px;font-weight:700;color:'+cor+'">'+label+'</div>'
+          +'<div style="font-size:10px;color:var(--muted)">'+fmtData(v.venc)+'</div>'
+        +'</div>'
+        +'</div>';
+    }).join('');
+  }
+
+  // Lista completa agrupada por mês
+  var elFull = document.getElementById('agenda-lista-full');
+  if (todos.length === 0) {
+    elFull.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13px;text-align:center;">Nenhum vencimento cadastrado.</div>';
+    return;
+  }
+  var porMes = {};
+  todos.forEach(function(v) {
+    var chave = v.venc.slice(0,7);
+    if (!porMes[chave]) porMes[chave] = [];
+    porMes[chave].push(v);
+  });
+  var html = '';
+  Object.keys(porMes).sort().forEach(function(mes) {
+    var nomeM = nomeMes(mes);
+    html += '<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;padding:10px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px;">'+nomeM+'</div>';
+    porMes[mes].forEach(function(v) {
+      var st = calcStatus(v.venc);
+      var cor = st==='vencido'?'var(--danger)':st==='alerta'?'var(--warn)':'var(--text)';
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.04);">'
+        +'<span style="font-size:13px">'+v.icon+'</span>'
+        +'<div style="flex:1;min-width:0"><div style="font-size:12px;color:var(--text)">'+v.nome+'</div><div style="font-size:10px;color:var(--muted)">'+v.curto+'</div></div>'
+        +'<span style="font-size:11px;font-weight:700;color:'+cor+'">'+fmtData(v.venc)+'</span>'
+        +'</div>';
+    });
+    html += '<div style="margin-bottom:14px;"></div>';
+  });
+  elFull.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// E-MAIL DE VENCIMENTOS
+// ══════════════════════════════════════════════════════════════════
+function salvarCfgEmail() {
+  var cfg = {
+    dest:     document.getElementById('cfg-email-dest').value.trim(),
+    service:  document.getElementById('cfg-ejs-service').value.trim(),
+    template: document.getElementById('cfg-ejs-template').value.trim(),
+    pubkey:   document.getElementById('cfg-ejs-pubkey').value.trim()
+  };
+  if (!cfg.dest || !cfg.service || !cfg.template || !cfg.pubkey) { alert('Preencha todos os campos.'); return; }
+  localStorage.setItem('mod_email_cfg', JSON.stringify(cfg));
+  fechar('m-email-cfg');
+  toast('Configuração de e-mail salva!');
+}
+
+function abrirCfgEmail() {
+  var cfg = JSON.parse(localStorage.getItem('mod_email_cfg') || '{}');
+  document.getElementById('cfg-email-dest').value = cfg.dest || '';
+  document.getElementById('cfg-ejs-service').value = cfg.service || '';
+  document.getElementById('cfg-ejs-template').value = cfg.template || '';
+  document.getElementById('cfg-ejs-pubkey').value = cfg.pubkey || '';
+  abrir('m-email-cfg');
+}
+
+function enviarEmailVencimentos() {
+  var cfg = JSON.parse(localStorage.getItem('mod_email_cfg') || '{}');
+  if (!cfg.service || !cfg.template || !cfg.pubkey || !cfg.dest) {
+    if (confirm('E-mail ainda não configurado. Deseja configurar agora?')) abrirCfgEmail();
+    return;
+  }
+  var todos = coletarTodosVencimentos();
+  var limite30 = new Date(); limite30.setDate(limite30.getDate()+30); limite30.setHours(0,0,0,0);
+  var prox30 = todos.filter(function(v) { return new Date(v.venc+'T00:00:00') <= limite30; });
+  if (prox30.length === 0) { toast('Nenhum vencimento nos próximos 30 dias.'); return; }
+
+  var linhas = '=== VENCIMENTOS PRÓXIMOS 30 DIAS ===\n\n';
+  prox30.forEach(function(v) {
+    var st = calcStatus(v.venc);
+    var stLabel = st==='vencido'?'[VENCIDO]':st==='alerta'?'[ALERTA]':'[OK]';
+    linhas += stLabel + ' ' + fmtData(v.venc) + ' — ' + v.nome + ' | ' + v.curto + '\n';
+  });
+  linhas += '\nTotal: ' + prox30.length + ' item(s)\nGerado em: ' + new Date().toLocaleDateString('pt-BR');
+
+  var btn = document.getElementById('btn-email-agenda');
+  if (btn) { btn.textContent = '⏳ Enviando...'; btn.style.pointerEvents='none'; }
+
+  emailjs.init(cfg.pubkey);
+  emailjs.send(cfg.service, cfg.template, { mensagem: linhas, to_email: cfg.dest })
+    .then(function() {
+      toast('✅ E-mail enviado com sucesso!');
+      if (btn) { btn.textContent = '📧 Enviar resumo por e-mail'; btn.style.pointerEvents=''; }
+    })
+    .catch(function(err) {
+      console.error('EmailJS erro:', err);
+      alert('Erro ao enviar e-mail. Verifique a configuração do EmailJS.\n\nErro: ' + (err.text || JSON.stringify(err)));
+      if (btn) { btn.textContent = '📧 Enviar resumo por e-mail'; btn.style.pointerEvents=''; }
+    });
+}
+
+// Verifica vencimentos ao carregar e envia email se configurado
+function verificarVencimentosAuto() {
+  var cfg = JSON.parse(localStorage.getItem('mod_email_cfg') || '{}');
+  if (!cfg.service || !cfg.template || !cfg.pubkey || !cfg.dest) return;
+  // Só envia 1x por dia
+  var hoje = new Date().toISOString().slice(0,10);
+  var ultimoEnvio = localStorage.getItem('mod_email_ultimo');
+  if (ultimoEnvio === hoje) return;
+  var todos = coletarTodosVencimentos();
+  var limite30 = new Date(); limite30.setDate(limite30.getDate()+30); limite30.setHours(0,0,0,0);
+  var prox30 = todos.filter(function(v) { return new Date(v.venc+'T00:00:00') <= limite30; });
+  if (prox30.length === 0) return;
+  var linhas = '=== VENCIMENTOS PRÓXIMOS 30 DIAS ===\n\n';
+  prox30.forEach(function(v) {
+    var st = calcStatus(v.venc);
+    var stLabel = st==='vencido'?'[VENCIDO]':st==='alerta'?'[ALERTA]':'[OK]';
+    linhas += stLabel + ' ' + fmtData(v.venc) + ' — ' + v.nome + ' | ' + v.curto + '\n';
+  });
+  linhas += '\nTotal: ' + prox30.length + ' item(s)\nGerado em: ' + new Date().toLocaleDateString('pt-BR');
+  emailjs.init(cfg.pubkey);
+  emailjs.send(cfg.service, cfg.template, { mensagem: linhas, to_email: cfg.dest })
+    .then(function() {
+      localStorage.setItem('mod_email_ultimo', hoje);
+      console.log('✓ E-mail automático de vencimentos enviado');
+    }).catch(function(e){ console.warn('E-mail auto erro:', e); });
+}
+
 // ── INIT ─────────────────────────────────────────────────────────
 // ── AUTH ────────────────────────────────────────────────────────
 var _auth = firebase.auth();
@@ -1902,6 +2490,7 @@ document.addEventListener('DOMContentLoaded', function() {
           empresasCondo = JSON.parse(d.empresasCondo || '{}');
           periodicos    = JSON.parse(d.periodicos    || '{}');
           alugueis      = JSON.parse(d.alugueis      || '[]');
+          manutencoes   = JSON.parse(d.manutencoes   || '{}');
           // Carrega dados com fotos do doc fotos (se existir), senão usa o principal
           if (snapFotos.exists) {
             var f = snapFotos.data();
@@ -1924,8 +2513,10 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('mod_vis',  JSON.stringify(visDados));
             localStorage.setItem('mod_aco',  JSON.stringify(acoDados));
             localStorage.setItem('mod_alug', JSON.stringify(alugueis));
+            localStorage.setItem('mod_man',  JSON.stringify(manutencoes));
           } catch(e) {}
           renderDashboard();
+          verificarVencimentosAuto();
           console.log('✓ Dados carregados do Firebase');
         } else {
           console.log('Firebase: sem dados ainda');
@@ -1948,7 +2539,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function renderDashboard() {
   console.log('renderDashboard - extintores:', Object.keys(extintores).length, 'condos, periodicos:', Object.keys(periodicos).length);
   var filtro = document.getElementById('dash-filter') ? document.getElementById('dash-filter').value : '';
-  var condos = filtro ? [filtro] : Object.keys(Object.assign({}, extintores, periodicos));
+  var condos = filtro ? [filtro] : Object.keys(Object.assign({}, extintores, periodicos, manutencoes));
   var totalExt=0, alertaExt=0, totalPer=0, alertaPer=0;
   var limite30 = new Date(); limite30.setDate(limite30.getDate()+30); limite30.setHours(0,0,0,0);
   var porCondo = {};
@@ -1956,8 +2547,9 @@ function renderDashboard() {
   condos.forEach(function(condo) {
     var exts = extintores[condo] || [];
     var pers = periodicos[condo] || [];
+    var mans = manutencoes[condo] || [];
     totalExt += exts.length;
-    totalPer += pers.length;
+    totalPer += pers.length + mans.length;
     exts.forEach(function(e) {
       var st = calcStatus(e.proxima);
       if (st==='alerta'||st==='vencido') {
@@ -1975,9 +2567,23 @@ function renderDashboard() {
         porCondo[condo].push({icon:(TIPO_ICONS[p.tipo]||'📋'), nome:label, venc:p.proxima, st:st});
       }
     });
+    mans.forEach(function(m) {
+      var st = calcStatus(m.proxima);
+      if (st==='alerta'||st==='vencido') {
+        alertaPer++;
+        if (!porCondo[condo]) porCondo[condo] = [];
+        var label = m.tipo==='Outro' ? (m.outro||'Outro') : (m.tipo||'Manutenção');
+        porCondo[condo].push({icon:(MAN_ICONS[m.tipo]||'🔧'), nome:label, venc:m.proxima, st:st});
+      }
+    });
   });
 
   console.log('Dashboard - totalExt:', totalExt, 'alertaExt:', alertaExt, 'condosAlerta:', Object.keys(porCondo).length);
+
+  // Atualiza badge agenda
+  var totalAlertas = Object.keys(porCondo).reduce(function(acc,c){ return acc + porCondo[c].length; }, 0);
+  var badgeAgenda = document.getElementById('badge-agenda');
+  if (badgeAgenda) { badgeAgenda.style.display = totalAlertas > 0 ? '' : 'none'; badgeAgenda.textContent = totalAlertas; }
 
   var cardsEl = document.getElementById('dash-cards');
   if (cardsEl) {
@@ -2123,37 +2729,108 @@ function extPDF() {
   var emp=empresasCondo[extCondoAtual]||'';
   var {jsPDF}=window.jspdf;
   var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var W=210,marg=15;
+  var W=210, marg=15;
   var curto=condoShort(extCondoAtual);
+  var stRGB={ok:[39,174,96],alerta:[200,140,0],vencido:[220,50,50]};
+
   pdfCabecalho(doc,'Relatorio de Extintores',curto+(emp?' | '+emp:''),W,marg);
   var y=50;
-  lista.forEach(function(e,i){
-    if(y>240){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;}
+
+  // ── TABELA RESUMO ──────────────────────────────────────────────
+  // Título da seção
+  doc.setFillColor(234,88,12);
+  doc.rect(marg, y, W-marg*2, 7, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
+  doc.text('RESUMO DOS EXTINTORES', marg+3, y+4.8);
+  y+=8;
+
+  // Cabeçalho da tabela
+  var cols=[
+    {l:'Nº',       x:marg,    w:12},
+    {l:'Local',    x:marg+12, w:38},
+    {l:'Tipo',     x:marg+50, w:28},
+    {l:'Cap.',     x:marg+78, w:18},
+    {l:'Ult. Recarga', x:marg+96,  w:30},
+    {l:'Prox. Recarga',x:marg+126, w:30},
+    {l:'Status',   x:marg+156,w:29}
+  ];
+  doc.setFillColor(26,38,64);
+  doc.rect(marg, y, W-marg*2, 7, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(7.5); doc.setFont('helvetica','bold');
+  cols.forEach(function(c){ doc.text(c.l, c.x+1, y+4.8); });
+  y+=8;
+
+  // Linhas da tabela
+  lista.forEach(function(e, i){
+    if(y>265){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; }
     var st=calcStatus(e.proxima);
-    var stRGB={ok:[39,174,96],alerta:[200,140,0],vencido:[220,50,50]};
-    doc.setFillColor(26,38,64); doc.rect(marg,y,W-marg*2,8,'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text(pdfTxt('Extintor '+e.numero+' — '+e.local+' ('+e.tipo+' '+e.capacidade+')'),marg+2,y+5.5);
-    y+=9;
-    doc.setTextColor(...stRGB[st]); doc.setFontSize(7); doc.setFont('helvetica','bold');
-    doc.text((st==='ok'?'OK':st==='alerta'?'ALERTA':'VENCIDO'),marg+2,y+4);
-    doc.setTextColor(80,80,80); doc.setFont('helvetica','normal');
-    doc.text('Ultima: '+fmtData(e.ultima)+'   Proxima: '+fmtData(e.proxima),marg+30,y+4);
-    y+=8;
-    if(e.obs){var ls=doc.splitTextToSize(pdfTxt(e.obs),W-marg*2-4);doc.setTextColor(100,100,100);doc.setFontSize(7.5);doc.text(ls,marg+2,y);y+=ls.length*5+2;}
-    if(e.fotos&&e.fotos.length>0){
-      if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;}
-      var fx=marg;
-      e.fotos.forEach(function(foto){
-        if(fx+55>W-marg){fx=marg;y+=56;}
-        if(y+55>270){doc.addPage();pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg);y=50;fx=marg;}
-        try{doc.addImage(foto,'JPEG',fx,y,52,52);}catch(er){try{doc.addImage(foto,'PNG',fx,y,52,52);}catch(er2){}}
-        fx+=56;
-      });
-      y+=56;
-    }
-    doc.setDrawColor(42,45,56); doc.line(marg,y,W-marg,y); y+=6;
+    var stLabel=st==='ok'?'OK':st==='alerta'?'ALERTA':'VENCIDO';
+    var rowBg = i%2===0 ? [245,245,245] : [255,255,255];
+    doc.setFillColor(...rowBg);
+    doc.rect(marg, y, W-marg*2, 7, 'F');
+    doc.setDrawColor(220,220,220); doc.line(marg, y+7, W-marg, y+7);
+    doc.setTextColor(40,40,40); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+    doc.text(pdfTxt(String(e.numero||'')),  cols[0].x+1, y+4.8);
+    // Local com truncamento
+    var localTxt = doc.splitTextToSize(pdfTxt(e.local||''), cols[1].w-2);
+    doc.text(localTxt[0]||'', cols[1].x+1, y+4.8);
+    doc.text(pdfTxt(e.tipo||''),       cols[2].x+1, y+4.8);
+    doc.text(pdfTxt(e.capacidade||''), cols[3].x+1, y+4.8);
+    doc.text(fmtData(e.ultima),        cols[4].x+1, y+4.8);
+    doc.text(fmtData(e.proxima),       cols[5].x+1, y+4.8);
+    // Badge de status colorido
+    doc.setTextColor(...stRGB[st]); doc.setFont('helvetica','bold');
+    doc.text(stLabel, cols[6].x+1, y+4.8);
+    y+=7;
   });
+
+  // Linha de total
+  doc.setFillColor(26,38,64);
+  doc.rect(marg, y, W-marg*2, 8, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text('TOTAL DE EXTINTORES: '+lista.length, marg+3, y+5.3);
+  // Contagem por status
+  var nOk=lista.filter(function(e){return calcStatus(e.proxima)==='ok';}).length;
+  var nAl=lista.filter(function(e){return calcStatus(e.proxima)==='alerta';}).length;
+  var nVe=lista.filter(function(e){return calcStatus(e.proxima)==='vencido';}).length;
+  doc.setFontSize(7); doc.setFont('helvetica','normal');
+  doc.setTextColor(74,222,128);  doc.text('Em dia: '+nOk,   marg+80, y+5.3);
+  doc.setTextColor(251,191,36);  doc.text('Alerta: '+nAl,   marg+110, y+5.3);
+  doc.setTextColor(248,113,113); doc.text('Vencido: '+nVe,  marg+140, y+5.3);
+  y+=14;
+
+  // ── FOTOS POR EXTINTOR ─────────────────────────────────────────
+  var comFotos = lista.filter(function(e){ return e.fotos && e.fotos.length>0; });
+  if (comFotos.length > 0) {
+    // Título seção fotos
+    if(y > 240){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; }
+    doc.setFillColor(234,88,12);
+    doc.rect(marg, y, W-marg*2, 7, 'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text('REGISTRO FOTOGRATICO', marg+3, y+4.8);
+    y+=10;
+
+    comFotos.forEach(function(e){
+      if(y>250){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; }
+      // Cabeçalho do extintor
+      var st=calcStatus(e.proxima);
+      doc.setFillColor(26,38,64); doc.rect(marg,y,W-marg*2,7,'F');
+      doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+      doc.text(pdfTxt('Extintor '+e.numero+' — '+e.local+' ('+e.tipo+' '+e.capacidade+')'),marg+2,y+4.8);
+      y+=8;
+      // Fotos em grade 3 por linha
+      var fW=56, fH=52, fx=marg, count=0;
+      e.fotos.forEach(function(foto){
+        if(count>0 && count%3===0){ fx=marg; y+=fH+4; }
+        if(y+fH>272){ doc.addPage(); pdfCabecalho(doc,'Relatorio de Extintores',curto,W,marg); y=50; fx=marg; }
+        try{doc.addImage(foto,'JPEG',fx,y,fW,fH);}catch(er){try{doc.addImage(foto,'PNG',fx,y,fW,fH);}catch(er2){}}
+        fx+=fW+4; count++;
+      });
+      y+=fH+8;
+      doc.setDrawColor(220,220,220); doc.line(marg,y-4,W-marg,y-4);
+    });
+  }
+
   var total=doc.internal.getNumberOfPages();
   for(var p=1;p<=total;p++){doc.setPage(p);pdfRodape(doc,p,total,'Modulo Administradora — '+curto,W);}
   doc.save('Extintores_'+curto.replace(/\s+/g,'_')+'.pdf');
